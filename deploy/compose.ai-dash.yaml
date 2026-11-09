@@ -14,12 +14,32 @@ services:
       WORKER_TAGS: aidash
       AI_DASH_HOME: /opt/ai-dash
       AI_DASH_DATA_DIR: /data/ai-dash
+      AI_DASH_X_GATEWAY_URL: http://ai_dash_x_gateway:8080
       AI_DASH_GATEWAY_URL: ${AI_DASH_GATEWAY_URL:-http://daily_dash_model_gateway:8080}
       AI_DASH_TELEGRAM_TOKEN_FILE: /run/ai-dash-secrets/telegram_token
       AI_DASH_TELEGRAM_CHAT_ID_FILE: /run/ai-dash-secrets/telegram_chat_id
     volumes:
       - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
       - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}:/run/ai-dash-secrets:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '5'
+
+  ai_dash_x_gateway:
+    image: ai-dash-windmill-worker:local
+    restart: unless-stopped
+    entrypoint: ["/opt/ai-dash/.venv/bin/uvicorn"]
+    command: ["ai_dash.x_gateway:app", "--host", "0.0.0.0", "--port", "8080"]
+    environment:
+      AI_DASH_HOME: /opt/ai-dash
+      AI_DASH_X_PROVIDER_DATA: /data/ai-dash/x-provider
+      AI_DASH_X_MODEL: x-ai/grok-4.3
+      OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
+    volumes:
+      - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
+      - ${AI_DASH_X_OPENROUTER_KEY_FILE:-/var/code/daily-dash-windmill-local/secrets/openrouter_api_key}:/run/secrets/openrouter_api_key:ro
     logging:
       driver: json-file
       options:

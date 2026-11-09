@@ -82,3 +82,22 @@ docker stop "$(docker ps -q --filter name=windmill_worker_aidash)"
 
 Do not run `docker compose down` on the shared Windmill project.
 Back up `/var/code/ai-dash-data` and encrypted secrets independently of daily-dash.
+
+## Separate bounded X gateway
+
+X requests now go to the ai-dash-owned `ai_dash_x_gateway:8080` service, not the
+shared daily-dash X endpoint. Cheap ranking still uses the shared model gateway.
+The deploy script builds ai-dash once and starts its worker plus this small HTTP
+service, without restarting daily-dash infrastructure. The X gateway mounts the
+existing OpenRouter credential as a read-only infrastructure secret; the worker
+does not receive it. Override `AI_DASH_X_OPENROUTER_KEY_FILE` to use a dedicated key.
+No new host port is exposed.
+
+The X service has its own provider-side daily reservation, no retry/fallback,
+one server-tool step, a 1,200-token output cap, explicit account/date constraints,
+and response/query/citation auditing. Raw provider responses and rejected results
+are retained privately under `/var/code/ai-dash-data/x-provider`.
+
+`GET /health` is non-billing. It does not call a model or search provider.
+Keep `x_major.enabled: false` until an explicitly authorized paid verification
+passes. Do not clear either daily budget to force a retry.

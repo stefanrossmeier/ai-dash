@@ -62,8 +62,8 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
             selected.append(source)
     if not selected:
         raise ValueError(f"report has no sources: {report_id}")
-    if report.x_only and len(selected) > 7:
-        raise ValueError("daily X watchlist is limited to seven accounts")
+    if report.x_only and len(selected) > 3:
+        raise ValueError("daily X watchlist is limited to three accounts")
     data = settings.model_dump()
     data.update(
         sources=[s.model_dump() for s in selected],
@@ -76,7 +76,7 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         max_per_source=report.max_per_source,
         x_enabled=report.x_only,
         x_retry_split=False,
-        x_batch_size=7,
+        x_batch_size=3,
         send_empty=report.send_empty,
     )
     return Settings.model_validate(data)

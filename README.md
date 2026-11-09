@@ -25,6 +25,10 @@ in `config/reports.yaml`; workspace registration respects that flag even with
 The configured 20:30 slot is retained for after the provider integration is repaired
 and verified. One application request does not imply one provider-side search.
 
+The correction is implemented in the ai-dash-owned X gateway (see
+[the fix and validation status](docs/X_REPORT_FIX.md)). It is deployed for non-billing
+health checks, while the X schedule remains paused pending a new authorized paid test.
+
 ## Cost control
 
 The original 95-row Hermes source registry is retained for provenance. Its 45 X

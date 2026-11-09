@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "AI engineering news digests on shared Windmill infrastructure"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28,<1", "feedparser>=6.0,<7", "pydantic>=2.11,<3", "pyyaml>=6,<7", "beautifulsoup4>=4.13,<5"]
+dependencies = ["httpx>=0.28,<1", "feedparser>=6.0,<7", "pydantic>=2.11,<3", "pyyaml>=6,<7", "beautifulsoup4>=4.13,<5", "fastapi>=0.116,<1", "uvicorn>=0.35,<1"]
 
 [project.scripts]
 ai-dash = "ai_dash.cli:main"

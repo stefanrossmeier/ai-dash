@@ -13,5 +13,5 @@ docker compose --project-directory "$RUNTIME" \
   -f "$RUNTIME/docker-compose.yml" \
   -f "$RUNTIME/docker-compose.override.yml" \
   -f "$ROOT/deploy/compose.ai-dash.yaml" \
-  up -d --build --no-deps windmill_worker_aidash
+  up -d --build --no-deps windmill_worker_aidash ai_dash_x_gateway
 python3 "$ROOT/scripts/register-windmill.py"

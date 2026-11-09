@@ -401,7 +401,7 @@ def test_release_build_noise_filtered_and_feed_cap_keeps_newest():
     assert count == 1 and items[0].title == "v2.0"
 
 
-def test_x_timeout_retries_once_in_smaller_groups():
+def test_x_timeout_never_retries_paid_search():
     calls = []
 
     class Fake:
@@ -413,14 +413,14 @@ def test_x_timeout_retries_once_in_smaller_groups():
 
     sources = [
         source().model_copy(update={"id": f"x-{n}", "kind": "x", "url": f"https://x.com/test{n}"})
-        for n in range(4)
+        for n in range(3)
     ]
     items, coverage = retrieve_x(sources, Settings(sources=sources), Fake(), NOW)
-    assert [len(c) for c in calls] == [4, 2, 2]
-    assert len(coverage) == 4 and all(c.status == "empty" for c in coverage)
+    assert [len(c) for c in calls] == [3]
+    assert len(coverage) == 3 and all(c.status == "unavailable" for c in coverage)
 
 
-def test_x_outage_retries_are_bounded():
+def test_x_outage_has_one_attempt():
     calls = []
 
     class Fake:
@@ -430,11 +430,11 @@ def test_x_outage_retries_are_bounded():
 
     sources = [
         source().model_copy(update={"id": f"x-{n}", "kind": "x", "url": f"https://x.com/test{n}"})
-        for n in range(4)
+        for n in range(3)
     ]
     items, coverage = retrieve_x(sources, Settings(sources=sources), Fake(), NOW)
-    assert len(calls) == 3
-    assert len(coverage) == 4 and all(c.status == "unavailable" for c in coverage)
+    assert len(calls) == 1
+    assert len(coverage) == 3 and all(c.status == "unavailable" for c in coverage)
 
 
 def test_ranking_constrains_ids_and_ignores_harmless_repetition(tmp_path):
