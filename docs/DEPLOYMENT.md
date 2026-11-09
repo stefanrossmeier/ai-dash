@@ -99,5 +99,6 @@ and response/query/citation auditing. Raw provider responses and rejected result
 are retained privately under `/var/code/ai-dash-data/x-provider`.
 
 `GET /health` is non-billing. It does not call a model or search provider.
-Keep `x_major.enabled: false` until an explicitly authorized paid verification
-passes. Do not clear either daily budget to force a retry.
+The authorized paid verification passed on 2026-11-09, including offline replay of
+long-form posts. `x_major.enabled` is true. Set it false to pause X without affecting
+other reports. Do not clear either daily budget to force a retry.

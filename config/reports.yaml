@@ -63,4 +63,4 @@ reports:
     new independent evaluations from Artificial Analysis. These supplement the configured
     company blogs. Exclude company announcement reposts and stories already delivered
     through blogs or model hubs. Attribute opinions and benchmark claims to the author.
-  enabled: false
+  enabled: true

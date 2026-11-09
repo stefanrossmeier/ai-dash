@@ -196,13 +196,14 @@ def test_newsroom_feature_outside_news_path_keeps_publisher_date():
     assert items[0].published_at == datetime(2026, 11, 9, tzinfo=UTC)
 
 
-def test_failed_x_acceptance_keeps_schedule_disabled_on_registration():
+def test_explicit_report_pause_is_honored_on_registration():
     import runpy
 
     reports = load_reports(ROOT / "config/reports.yaml")
     x = next(r for r in reports.reports if r.id == "x_major")
     company = next(r for r in reports.reports if r.id == "company")
-    assert not x.enabled and company.enabled
+    assert x.enabled and company.enabled
+    x = x.model_copy(update={"enabled": False})
     policy = runpy.run_path(str(ROOT / "scripts/register-windmill.py"))["should_enable"]
     assert not policy(x.model_dump(), True, [])
     assert not policy(x.model_dump(), False, ["x_major"])

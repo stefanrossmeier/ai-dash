@@ -50,7 +50,7 @@ class SearchRequest(Model):
 class Post(Model):
     author_handle: str
     post_url: str
-    post_text: str = Field(min_length=1, max_length=700)
+    post_text: str = Field(min_length=1, max_length=4000)
 
 
 class Posts(Model):

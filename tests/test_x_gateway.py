@@ -250,3 +250,18 @@ def test_query_with_an_unscoped_or_clause_is_not_accepted():
     body["output"][0]["action"]["query"] = QUERY.replace(") since:", " OR trending) since:")
     with pytest.raises(ValueError, match="broadened"):
         xg.validate_response(body, request())
+
+
+def test_long_x_posts_keep_full_text_within_the_application_limit():
+    long_text = "A substantive long-form X post. " * 80
+    body = response([dict(author_handle="karpathy", post_url=URL, post_text=long_text)])
+    content, audit = xg.validate_response(body, request())
+    assert 700 < len(content["posts"][0]["post_text"]) <= 4000
+    assert content["posts"][0]["post_text"] == long_text
+    assert audit["scope_verified"]
+
+
+def test_posts_beyond_the_application_limit_are_rejected():
+    body = response([dict(author_handle="karpathy", post_url=URL, post_text="x" * 4001)])
+    with pytest.raises(ValueError):
+        xg.validate_response(body, request())

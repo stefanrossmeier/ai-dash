@@ -117,3 +117,28 @@ The X schedule is paused and `x_major.enabled` is false, preventing accidental
 reactivation during future workspace registration. Company, Blogs and Research/OSS
 remain enabled. The integration must be repaired and another paid validation would
 require new authorization; this test does not establish successful scoped retrieval.
+
+## Corrected X paid verification accepted — 2026-11-09
+
+The user explicitly authorized one additional paid test of the corrected gateway.
+One uncached provider request made exactly one combined query for `karpathy`,
+`ArtificialAnlys`, and `fchollet`. It returned ten citation URLs and two fresh
+posts by Artificial Analysis. Reported cost: **$0.060482** (8,182 input / 1,177
+output tokens). Generation: `redacted-generation-id`.
+
+The two legitimate long-form posts exceeded the old local 700-character cap.
+That field now accepts the application's existing 4,000-character content limit.
+The original response was replayed without contacting the provider and passed
+query, author, URL, citation and rolling 24-hour timestamp checks. The two source
+post IDs are `2119878995386982508` and `2119879000713724390`.
+
+The validated response was cached without resetting either request reservation.
+A labeled verification example was persisted as
+`20261109T204742Z-paid-x-verification` and delivered successfully in one Telegram
+message. It uses the saved results and performs no additional ranking/model call.
+Private evidence is in `verification/paid-x-fixed-20261109/accepted.json`, alongside
+the original failure and replay records.
+
+All five report schedules are enabled, including X at 20:30 Europe/Berlin. The
+one-daily-retrieval and one-daily-X-edition guards remain active. The final quality
+gate passes 52 tests, including long-form post handling and explicit report pauses.

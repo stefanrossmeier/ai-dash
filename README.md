@@ -9,7 +9,7 @@ application code, worker, secrets, data and delivery history are separate from d
 | Company & Product Updates | 18 official lab/company/product blogs | 07:30, 17:30 |
 | Blogs & Analysis | 6 independent authors, newsletters and aggregators | 12:30 |
 | Research & Open Source | 22 paper, model, release and community sources | 15:30 |
-| X — AI Leaders & Evaluations | 3 complementary accounts | Paused |
+| X — AI Leaders & Evaluations | 3 complementary accounts | 20:30 |
 
 Configuration is in [config/reports.yaml](config/reports.yaml). These source groups
 are disjoint; one report never triggers the other reports' collectors.
@@ -17,17 +17,13 @@ The old mixed digest and its four schedules are retired.
 
 ## X verification status
 
-The user-authorized paid test on 2026-11-09 failed acceptance: one uncached request
-cost $1.03470405, its provider trace reported 18 search queries including accounts
-outside the requested three, and it returned zero structured posts. X is disabled
-in `config/reports.yaml`; workspace registration respects that flag even with
-`--enable`. The other reports continue running. No further paid test was made.
-The configured 20:30 slot is retained for after the provider integration is repaired
-and verified. One application request does not imply one provider-side search.
+The corrected request was verified on 2026-11-09 with one user-authorized paid call:
+**one scoped search, two cited fresh posts, reported cost $0.060482**. Long-form X
+posts initially exceeded a local text cap; the parser was corrected and the saved
+response was replayed successfully without another provider request.
 
-The correction is implemented in the ai-dash-owned X gateway (see
-[the fix and validation status](docs/X_REPORT_FIX.md)). It is deployed for non-billing
-health checks, while the X schedule remains paused pending a new authorized paid test.
+The X report is enabled at 20:30 Berlin. The earlier failed $1.03470405 test and
+its corrective work are recorded in [the X fix audit](docs/X_REPORT_FIX.md).
 
 ## Cost control
 

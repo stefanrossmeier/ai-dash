@@ -1,7 +1,7 @@
 # X report correction and acceptance status
 
 The initial implementation was pushed first as commit `bfaa63c` so it could be
-inspected before this separate correction. The X schedule remains disabled.
+inspected before this separate correction. The corrected X schedule is enabled after the paid verification described below.
 
 ## Observed failure
 
@@ -40,10 +40,32 @@ valid/quiet results, author/citation/query/date failures, the 18-query failure s
 one paid attempt across repeated service calls, zero-cost cache reuse, and health
 checks that do not contact a provider. Existing delivery/history tests also pass.
 
-The deployed `/health` check validates service startup and routing only. It does
-not verify actual provider behavior. No second paid verification has been made.
-The X schedule must stay paused until the user authorizes that final test and it
-succeeds. The company, blog and research/open-source reports continue operating.
+## Paid verification accepted — 2026-11-09
+
+The user authorized one additional paid request. It produced exactly one combined
+query for `karpathy`, `ArtificialAnlys`, and `fchollet`, ten citation URLs, and two
+fresh posts from Artificial Analysis. Reported provider cost: **$0.060482**.
+Generation: `redacted-generation-id`.
+
+The provider returned legitimate long-form posts (2,646 and 715 characters), which
+initially exceeded the local 700-character field cap. The limit now matches the
+application's 4,000-character content contract. The exact saved provider response
+was replayed through the corrected author/query/citation validation and 24-hour
+Snowflake timestamp checks. It yielded two accepted posts, with zero new paid
+requests. The 1,200-output-token and one-search limits were unchanged.
+
+The two verified source URLs are:
+
+- https://x.com/artificialanlys/status/2119878995386982508
+- https://x.com/artificialanlys/status/2119879000713724390
+
+Private audit files live under
+`/var/code/ai-dash-data/verification/paid-x-fixed-20261109/` and
+`/var/code/ai-dash-data/x-provider/`. The original failure record is retained.
+The validated response is cached for reuse without resetting request reservations.
+A labeled Telegram verification example uses these saved posts and no extra model
+call. Normal X scheduling resumes at 20:30 Berlin; daily retrieval/delivery guards
+remain in force. Search is not an exhaustive account timeline.
 
 ## Primary documentation consulted
 
