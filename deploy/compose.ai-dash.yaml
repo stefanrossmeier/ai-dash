@@ -1,0 +1,27 @@
+# Add this overlay to the EXISTING Windmill Compose project. Start only this service.
+services:
+  windmill_worker_aidash:
+    build:
+      context: ${AI_DASH_SOURCE:-/var/code/ai-dash}
+      dockerfile: deploy/windmill-worker.Dockerfile
+      args:
+        WM_IMAGE: ${WM_IMAGE:-ghcr.io/windmill-labs/windmill:1.775.1}
+    image: ai-dash-windmill-worker:local
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Use the existing Windmill runtime .env}
+      MODE: worker
+      WORKER_TAGS: aidash
+      AI_DASH_HOME: /opt/ai-dash
+      AI_DASH_DATA_DIR: /data/ai-dash
+      AI_DASH_GATEWAY_URL: ${AI_DASH_GATEWAY_URL:-http://daily_dash_model_gateway:8080}
+      AI_DASH_TELEGRAM_TOKEN_FILE: /run/ai-dash-secrets/telegram_token
+      AI_DASH_TELEGRAM_CHAT_ID_FILE: /run/ai-dash-secrets/telegram_chat_id
+    volumes:
+      - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
+      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}:/run/ai-dash-secrets:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '5'

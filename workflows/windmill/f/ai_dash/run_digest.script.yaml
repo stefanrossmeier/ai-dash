@@ -1,0 +1,16 @@
+summary: Run one source-based AI report
+description: Select only this report's sources, persist and deliver with global history and daily X budget.
+lock: ''
+kind: script
+schema:
+  type: object
+  properties:
+    report:
+      type: string
+      enum: [company, blogs, research_oss, x_major]
+      originalType: string
+    example:
+      type: string
+      originalType: string
+      default: "false"
+  required: [report]

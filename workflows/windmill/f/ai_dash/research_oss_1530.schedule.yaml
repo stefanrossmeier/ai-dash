@@ -1,0 +1,8 @@
+summary: Research & Open Source 15:30
+schedule: 0 30 15 * * *
+timezone: Europe/Berlin
+enabled: false
+script_path: f/ai_dash/research_oss
+is_flow: true
+args: {}
+no_flow_overlap: true

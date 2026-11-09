@@ -1,0 +1,8 @@
+summary: Blogs & Analysis 12:30
+schedule: 0 30 12 * * *
+timezone: Europe/Berlin
+enabled: false
+script_path: f/ai_dash/blogs
+is_flow: true
+args: {}
+no_flow_overlap: true

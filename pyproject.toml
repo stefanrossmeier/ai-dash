@@ -1,0 +1,30 @@
+[project]
+name = "ai-dash"
+version = "0.1.0"
+description = "AI engineering news digests on shared Windmill infrastructure"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["httpx>=0.28,<1", "feedparser>=6.0,<7", "pydantic>=2.11,<3", "pyyaml>=6,<7", "beautifulsoup4>=4.13,<5"]
+
+[project.scripts]
+ai-dash = "ai_dash.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_dash"]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

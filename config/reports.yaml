@@ -1,0 +1,66 @@
+reports:
+- id: company
+  title: Company & Product Updates
+  categories:
+  - Lab
+  - Blog
+  - Infra
+  - Tools
+  slots:
+  - 07:30
+  - '17:30'
+  max_stories: 12
+  max_paper_stories: 0
+  focus: Official company blogs, model/API announcements, coding tools, product releases
+    and inference infrastructure. Require a concrete new development; exclude generic
+    marketing.
+- id: blogs
+  title: Blogs & Analysis
+  categories:
+  - Analysis
+  - Aggregator
+  exclude_ids:
+  - aggregator-hacker-news
+  slots:
+  - '12:30'
+  max_stories: 10
+  max_paper_stories: 0
+  focus: Independent AI engineering commentary, technical deep dives and useful analysis
+    from the configured authors and newsletters. Substantive new analysis is eligible;
+    exclude unrelated programming posts and recycled announcements.
+- id: research_oss
+  title: Research & Open Source
+  categories:
+  - Research
+  - GitHub
+  - Discovery
+  - Model hub
+  - Community
+  source_ids:
+  - aggregator-hacker-news
+  slots:
+  - '15:30'
+  max_stories: 12
+  max_paper_stories: 6
+  focus: Research papers, open models, GitHub releases, datasets, local inference
+    and community engineering discoveries. Distinguish a repository creation or paper
+    submission from a validated model release. Keep practical engineering relevance
+    high.
+- id: x_major
+  title: X — AI Leaders & Evaluations
+  source_ids:
+  - x-researcher-andrej-karpathy
+  - x-researcher-fran-ois-chollet
+  - x-analyst-artificial-analysis
+  slots:
+  - '20:30'
+  x_only: true
+  max_per_source: 2
+  max_stories: 6
+  max_paper_stories: 0
+  send_empty: true
+  focus: Original technical insights from Andrej Karpathy and François Chollet, and
+    new independent evaluations from Artificial Analysis. These supplement the configured
+    company blogs. Exclude company announcement reposts and stories already delivered
+    through blogs or model hubs. Attribute opinions and benchmark claims to the author.
+  enabled: false

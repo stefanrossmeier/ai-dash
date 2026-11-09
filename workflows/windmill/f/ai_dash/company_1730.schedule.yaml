@@ -1,0 +1,8 @@
+summary: Company & Product Updates 17:30
+schedule: 0 30 17 * * *
+timezone: Europe/Berlin
+enabled: false
+script_path: f/ai_dash/company
+is_flow: true
+args: {}
+no_flow_overlap: true
