@@ -144,7 +144,7 @@ def test_bootstrap_profile_permissions_and_first_run_password_change(tmp_path, m
         route = request.full_url.removeprefix("http://127.0.0.1:18090/api")
         if route == "/auth/login":
             if not initialized and body["password"] != "changeme":
-                raise module.urllib.error.HTTPError(request.full_url, 401, "unauthorized", {}, None)
+                raise module.urllib.error.HTTPError(request.full_url, 400, "Invalid login", {}, None)
             return Response("session-token")
         if route == "/users/setpassword":
             assert body["password"] != "changeme"

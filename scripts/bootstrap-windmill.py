@@ -49,7 +49,7 @@ def main():
             "POST", "/auth/login", {"email": "admin@windmill.dev", "password": password}
         )
     except urllib.error.HTTPError as exc:
-        if exc.code != 401:
+        if exc.code not in {400, 401}:
             raise
         token = request(
             "POST", "/auth/login", {"email": "admin@windmill.dev", "password": "changeme"}
