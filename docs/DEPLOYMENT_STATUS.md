@@ -142,3 +142,53 @@ the original failure and replay records.
 All five report schedules are enabled, including X at 20:30 Europe/Berlin. The
 one-daily-retrieval and one-daily-X-edition guards remain active. The final quality
 gate passes 52 tests, including long-form post handling and explicit report pauses.
+
+# Independent runtime rollout — 2026-11-11
+
+The earlier shared-runtime deployment descriptions above are historical. AI Dash
+now runs as the standalone Compose project `ai-dash`, using only this repository.
+The operational procedure is in [DEPLOYMENT.md](DEPLOYMENT.md), and the complete
+coupling audit is in [INDEPENDENCE.md](INDEPENDENCE.md).
+
+- Six independent services: PostgreSQL, Windmill server, orchestration worker,
+  AI Dash application worker, ranking gateway and bounded X gateway.
+- Own network `ai-dash_default`, database volume `ai-dash_db_data`, worker volumes,
+  runtime `.env` and operator profile; own Windmill workspace `ai-dash`.
+- Own ranking code/configuration and copied provider credential file. The initial
+  upstream key value/account is reused, with independent storage and rotation.
+- Windmill binds to loopback port 18090; ranking to 18082; X to 18081.
+- All five source-report schedules are enabled with the existing Berlin slots.
+- All nine former shared-instance AI Dash schedules are disabled and both retired
+  AI Dash containers were removed from that project.
+
+Acceptance evidence:
+
+- Complete quality gate: **60 passing tests**, Ruff lint/format, source/report
+  validation, generated workflow checks, source distribution and wheel builds.
+- Independent Windmill flow `01a1c905-fea1-91de-332f-3b4625febbd9` succeeded through
+  its own orchestrator and `aidash` worker (see private job evidence).
+  It verified gateway health, imported the owned gateway implementation, rejected
+  legacy service DNS names and read the existing delivery state.
+- Telegram preflight confirmed `@YOUR_BOT_USERNAME` has posting permissions in
+  the AI-Dash channel. No verification message was sent.
+- Delivery history preserved: 11 editions, 16 sent outbox messages, no unresolved sends.
+- Real company-source collection returned 292 items across 18 coverage records,
+  with zero model traces. No paid model/search request was made during cutover.
+- Provider credential validated through the non-billing key endpoint. Ranking
+  health also checks that the owned configuration and credential are readable.
+- All 10 existing X budget/cache files matched their pre-cutover SHA-256 hashes.
+- All 41 daily-dash schedule states and all 19 running containers from other
+  projects matched the baseline; none of those containers was recreated.
+- Every AI Dash service uses only its own Docker network and has no mount or
+  environment reference to daily-dash.
+- The full standalone deploy script completed successfully against pushed code
+  revision `7f0bb3f`; bootstrap is repeatable and schedules default to disabled.
+
+Private backup and machine-readable evidence:
+`/var/code/ai-dash-runtime/migration-20261111/`. This includes the prior source,
+application-data archive, old schedule/container baselines, completed smoke-flow
+result and `final-verification.json`. Secrets were never added to the repository.
+
+All commits from this rollout use `stefanrossmeier <github@rossmeier.info>` as both
+author and committer. The two initially misattributed commits were rewritten with
+a guarded force push, and global/repository Git identity settings were corrected.
