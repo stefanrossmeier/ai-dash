@@ -121,6 +121,15 @@ async def _post_openrouter(
 
 @app.get("/health")
 def health() -> dict[str, str]:
+    try:
+        config = _load_config()
+        if not config.get("aliases"):
+            raise ValueError("No ranking aliases configured")
+        _load_api_key()
+    except (OSError, ValueError, RuntimeError, yaml.YAMLError):
+        raise HTTPException(
+            status_code=503, detail="Ranking configuration or credential unavailable"
+        ) from None
     return {"status": "ok"}
 
 

@@ -1,0 +1,9 @@
+# Owned by ai-dash; no runtime or configuration reads from another project.
+schema_version: 1
+aliases:
+  rank-cheap:
+    provider: openrouter
+    model: openai/gpt-6-luna
+    max_attempts: 3
+    timeout_seconds: 180
+    require_structured_output: true

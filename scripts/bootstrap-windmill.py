@@ -59,7 +59,7 @@ def main():
         request(
             "POST",
             "/workspaces/create",
-            {"id": "ai-dash", "name": "AI Dash", "username": "ai_dash"},
+            {"id": "ai-dash", "name": "AI Dash"},
         )
     profile_file = runtime / "windmill-profile.json"
     if not profile_file.exists():
@@ -86,5 +86,5 @@ if __name__ == "__main__":
         main()
     except urllib.error.HTTPError as exc:
         raise SystemExit(
-            f"Windmill bootstrap failed (HTTP {exc.code}; credentials omitted)"
+            f"Windmill bootstrap failed at {exc.url} (HTTP {exc.code}; credentials omitted)"
         ) from None

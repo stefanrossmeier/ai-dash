@@ -144,7 +144,9 @@ def test_bootstrap_profile_permissions_and_first_run_password_change(tmp_path, m
         route = request.full_url.removeprefix("http://127.0.0.1:18090/api")
         if route == "/auth/login":
             if not initialized and body["password"] != "changeme":
-                raise module.urllib.error.HTTPError(request.full_url, 400, "Invalid login", {}, None)
+                raise module.urllib.error.HTTPError(
+                    request.full_url, 400, "Invalid login", {}, None
+                )
             return Response("session-token")
         if route == "/users/setpassword":
             assert body["password"] != "changeme"
@@ -153,6 +155,7 @@ def test_bootstrap_profile_permissions_and_first_run_password_change(tmp_path, m
             return Response(False)
         if route == "/workspaces/create":
             assert body["id"] == "ai-dash"
+            assert "username" not in body
         if route == "/users/tokens/create":
             assert body["workspace_id"] == "ai-dash"
             return Response("own-api-token")
@@ -167,3 +170,17 @@ def test_bootstrap_profile_permissions_and_first_run_password_change(tmp_path, m
     count = calls.count("http://127.0.0.1:18090/api/users/tokens/create")
     module.main()
     assert calls.count("http://127.0.0.1:18090/api/users/tokens/create") == count
+
+
+def test_ranking_health_detects_missing_owned_config_or_key_without_provider_call(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("AI_DASH_MODEL_GATEWAY_CONFIG", str(tmp_path / "missing.yaml"))
+    client = TestClient(mg.app)
+    assert client.get("/health").status_code == 503
+    monkeypatch.setenv("AI_DASH_MODEL_GATEWAY_CONFIG", str(ROOT / "config/model-gateway.yaml"))
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY_FILE", raising=False)
+    assert client.get("/health").status_code == 503
+    monkeypatch.setenv("OPENROUTER_API_KEY", "owned-key")
+    assert client.get("/health").status_code == 200
