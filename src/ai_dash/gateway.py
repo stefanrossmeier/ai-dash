@@ -9,7 +9,7 @@ from ai_dash.x_budget import XDailyBudget
 
 
 class Gateway:
-    """Client for daily-dash's existing structured chat and native X search APIs."""
+    """Client for ai-dash's independently deployed ranking and bounded X gateways."""
 
     def __init__(self, url: str, data_dir: Path | None = None, timezone: str = "Europe/Berlin"):
         self.url = url.rstrip("/")

@@ -1,104 +1,106 @@
-# Deploy beside the existing Windmill installation
+# Independent deployment on deployment-host
 
-Source: `/var/code/ai-dash`. Private artifacts/SQLite: `/var/code/ai-dash-data`.
-Secrets: `/var/code/ai-dash-runtime/secrets`. Use a NEW Telegram bot and channel.
-The existing shared Windmill runtime is `/var/code/daily-dash-windmill-local`.
+AI Dash owns its entire Compose project (`ai-dash`), Windmill server and workers,
+PostgreSQL database, Docker network/volumes, model gateway and X gateway. All
+runtime code and model settings come from this repository. No external Docker
+network, database, CLI profile, source checkout or daily-dash service is required.
+
+- Source checkout: `/var/code/ai-dash`
+- Persistent application data, history, outbox and X budgets: `/var/code/ai-dash-data`
+- Private runtime configuration: `/var/code/ai-dash-runtime/.env`
+- Private operator profile: `/var/code/ai-dash-runtime/windmill-profile.json`
+- Credentials: `/var/code/ai-dash-runtime/secrets`
+- Windmill workspace: `ai-dash`; definitions: `f/ai_dash`; application tag: `aidash`
 
 ## Install
 
-Copy the tested checkout to `/var/code/ai-dash` (or clone once the code is pushed).
-On the VPS:
+Clone this repository, install Docker Compose and host Python 3 with PyYAML, and
+place `openrouter_api_key`, `telegram_token` and `telegram_chat_id` in the private
+secrets directory (mode 600, directory mode 700). Use the AI Dash bot/channel.
 
 ```bash
 cd /var/code/ai-dash
 ./scripts/deploy-vps.sh
 ```
 
-The script adds only `windmill_worker_aidash` to the current Compose project, using
-`--no-deps` to avoid restarting the database, existing workers or model gateway.
-It shares the existing DB/network and tags its jobs `aidash`. The image installs
-only ai-dash and its locked Python dependencies. No ports are published.
+The deploy script generates a new database password once, builds the locked
+application image, starts only the `ai-dash` project, waits for health checks,
+bootstraps its Windmill workspace and registers definitions with schedules disabled.
+It replaces Windmill's default administrator password on first startup. The private
+password is in `secrets/windmill_admin_password`; login email is `admin@windmill.dev`.
+All administration and registration use only this runtime's profile.
+`AI_DASH_RUNTIME`, `AI_DASH_DATA_SOURCE` and `AI_DASH_SECRETS_SOURCE` can override
+host paths. Set port overrides in the generated runtime `.env`.
 
-The current shared model gateway is available on its internal Docker DNS name
-`daily_dash_model_gateway:8080`. Override `AI_DASH_GATEWAY_URL` in the worker
-configuration to move to a separate compatible gateway later. This is the only
-shared application service; ai-dash does not read daily-dash news, bot credentials,
-configuration or delivery state. The registration preflight only compares the bot
-tokens privately to guard against accidentally reusing the daily-dash bot.
+Loopback endpoints on deployment-host:
 
-`register-windmill.py` reads the existing operator Windmill CLI profile privately
-and upserts ONLY the folder, script, flow and schedules under `f/ai_dash`.
-It does not perform a workspace-wide synchronization, deletion or secret copy.
-Schedules register disabled by default, including on redeployment.
-The host needs Python 3 and PyYAML (present on this VPS).
+| Service | Endpoint |
+| --- | --- |
+| Windmill UI/API | `http://127.0.0.1:18090` |
+| Ranking gateway | `http://127.0.0.1:18082` |
+| Bounded X gateway | `http://127.0.0.1:18081` |
 
-## Configure and check the independent bot
+Access Windmill from your workstation with `ssh -L 18090:127.0.0.1:18090 deployment-host`
+and open `http://127.0.0.1:18090`. No proxy from another project is involved.
+Inside Docker, jobs use `ai_dash_model_gateway:8080` and `ai_dash_x_gateway:8080`.
+The ranking configuration is `config/model-gateway.yaml`, built into AI Dash's image.
+The gateway implementation was copied under Apache-2.0 and is maintained here.
+The bounded X implementation and all existing reservation/cache limits are preserved.
 
-Follow [TELEGRAM.md](TELEGRAM.md). Then:
+Only gateways mount the AI Dash-owned OpenRouter credential file. The application
+worker mounts only its two Telegram credential files, not provider/admin credentials.
+The default worker handles flow orchestration; the application worker handles `aidash` jobs.
 
-```bash
-WORKER=$(docker ps -q --filter name=windmill_worker_aidash)
-docker exec "$WORKER" /opt/ai-dash/.venv/bin/ai-dash check-telegram
-# Collection smoke test: no Telegram send, no X provider cost.
-docker exec "$WORKER" /opt/ai-dash/.venv/bin/ai-dash collect --report company \
-  --output /data/ai-dash/collection-smoke.json
-# Model-backed preview, still no delivery/history update.
-docker exec "$WORKER" /opt/ai-dash/.venv/bin/ai-dash preview --report company \
-  --output /data/ai-dash/preview-smoke.json
-```
-
-Only enable once Telegram and collection/model checks pass:
+## Verify and enable
 
 ```bash
+docker exec ai-dash-windmill_worker_aidash-1 /opt/ai-dash/.venv/bin/ai-dash check-telegram
+docker exec ai-dash-windmill_worker_aidash-1 /opt/ai-dash/.venv/bin/ai-dash collect \
+  --report company --output /data/ai-dash/collection-smoke.json
+curl --fail http://127.0.0.1:18082/health
+curl --fail http://127.0.0.1:18081/health
 python3 scripts/register-windmill.py --enable
 ```
 
-This checks the NEW bot's channel and posting permission before activation.
-Report slots are defined in `config/reports.yaml`: company 07:30/17:30, blogs 12:30,
-research/open source 15:30, X 20:30, all Europe/Berlin;
-Windmill handles daylight saving time. The application lock protects overlap
-across manual runs and different schedule entries too.
+Health checks, collection and Telegram preflight do not send messages or make paid
+model/search calls. `preview` uses paid ranking; X collect/preview can consume the
+persistent daily X attempt. Reuse existing caches and never reset reservations.
 
-Run one of `f/ai_dash/company`, `blogs`, `research_oss`, or `x_major` from the Windmill UI.
-Set `example: true` to send the new report’s example before enabling its schedule.
-The four retired mixed schedules are explicitly disabled during registration.
-It executes collect → rank → persist → deliver; no separate test message is necessary.
-The immutable run artifact contains source health, candidates, decisions and model traces.
-Scheduled retries resume pending outbox entries first. A crash/timeout during a send
-requires manual resolution because Telegram cannot guarantee exactly-once delivery.
+Reports retain their Europe/Berlin slots: company 07:30/17:30, blogs 12:30,
+research/open source 15:30, X 20:30. Registration honors explicit report pauses.
+An application lock protects overlap; delivery history/outbox prevents duplicates.
 
-## Update and rollback
+## Update, stop and rollback
 
-Copy or pull a tested source revision. Run `deploy-vps.sh` to rebuild only the new
-worker, then repeat checks and `register-windmill.py --enable` to reactivate.
-Revert to a known-good source revision and rebuild to roll back application code.
-Do not reset/delete the data directory or redeploy the shared infrastructure.
-
-To stop ai-dash, disable its four schedules in Windmill and stop only its worker:
+Pull a tested revision and run `deploy-vps.sh`. Verify and explicitly re-enable
+schedules. Revert code and redeploy to roll back; preserve data and runtime secrets.
+Operate only the owned project:
 
 ```bash
-docker stop "$(docker ps -q --filter name=windmill_worker_aidash)"
+docker compose -p ai-dash --env-file /var/code/ai-dash-runtime/.env \
+  -f deploy/compose.ai-dash.yaml ps
+docker compose -p ai-dash --env-file /var/code/ai-dash-runtime/.env \
+  -f deploy/compose.ai-dash.yaml stop
 ```
 
-Do not run `docker compose down` on the shared Windmill project.
-Back up `/var/code/ai-dash-data` and encrypted secrets independently of daily-dash.
+Back up the application data, runtime secrets/profile and the `ai-dash_db_data`
+PostgreSQL volume. Never use `down -v` during an application update.
 
-## Separate bounded X gateway
+## Migration from the former shared runtime
 
-X requests now go to the ai-dash-owned `ai_dash_x_gateway:8080` service, not the
-shared daily-dash X endpoint. Cheap ranking still uses the shared model gateway.
-The deploy script builds ai-dash once and starts its worker plus this small HTTP
-service, without restarting daily-dash infrastructure. The X gateway mounts the
-existing OpenRouter credential as a read-only infrastructure secret; the worker
-does not receive it. Override `AI_DASH_X_OPENROUTER_KEY_FILE` to use a dedicated key.
-No new host port is exposed.
+This is a one-time operational cutover, not a deployment dependency:
 
-The X service has its own provider-side daily reservation, no retry/fallback,
-one server-tool step, a 1,200-token output cap, explicit account/date constraints,
-and response/query/citation auditing. Raw provider responses and rejected results
-are retained privately under `/var/code/ai-dash-data/x-provider`.
+1. Disable only the old `f/ai_dash/*` schedules and confirm no AI Dash job is running.
+   Disabling removes their future queued executions. Keep other projects running.
+2. Back up AI Dash's data and copy the reused provider credential once into its
+   own secrets directory. That file can subsequently be rotated independently.
+3. Deploy this stack with schedules disabled. Keep the existing application data,
+   Telegram bot/channel, outbox, X reservations and provider cache.
+4. Verify health, registration, flow execution and Telegram permissions. Enable the
+   five schedules in the new `ai-dash` workspace only after old schedules are disabled.
+5. Remove the two retired AI Dash containers from the former Compose project.
+   Keep the old disabled definitions/job history as migration evidence.
 
-`GET /health` is non-billing. It does not call a model or search provider.
-The authorized paid verification passed on 2026-11-09, including offline replay of
-long-form posts. `x_major.enabled` is true. Set it false to pause X without affecting
-other reports. Do not clear either daily budget to force a retry.
+The copied OpenRouter key initially uses the same provider account/key value; there
+is no shared filesystem or service dependency. A separately issued key can replace
+this file without changing daily-dash. See [the independence audit](INDEPENDENCE.md).

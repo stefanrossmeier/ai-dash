@@ -1,8 +1,8 @@
 # ai-dash
 
 Source-based AI engineering reports in English, delivered to an independent Telegram
-bot and channel. Shares the existing VPS, Windmill installation and model gateway;
-application code, worker, secrets, data and delivery history are separate from daily-dash.
+bot and channel. Owns its Windmill instance, database, workers, model gateways,
+configuration, secrets and delivery history. Deploys independently on the deployment-host VPS.
 
 | Report | Sources | Berlin slots |
 | --- | --- | --- |
@@ -41,7 +41,7 @@ are excluded because their blogs/model hubs are already collected.
 - Other reports have no X sources and cannot invoke paid X retrieval.
 
 This limits application retrieval requests, not the native search engine's internal
-tool calls or exact dollar cost. Ranking/summarization still uses the cheap shared
+tool calls or exact dollar cost. Ranking/summarization still uses the AI Dash-owned cheap
 gateway alias. Each artifact records reported usage and cost; cached retrieval
 records zero new usage. No automatic fallback widens the watchlist.
 
@@ -77,11 +77,11 @@ public checkout. X previews count against the same daily retrieval budget.
 
 ## Deploy and operate
 
-[Deployment](docs/DEPLOYMENT.md) · [Telegram setup](docs/TELEGRAM.md) ·
+[Deployment](docs/DEPLOYMENT.md) · [Independence audit](docs/INDEPENDENCE.md) · [Telegram setup](docs/TELEGRAM.md) ·
 [Source provenance](docs/SOURCES.md) · [Deployment evidence](docs/DEPLOYMENT_STATUS.md).
 
 ```bash
-# On deployment-host, rebuild only ai-dash's worker; schedules register disabled.
+# On deployment-host, deploy ai-dash's standalone stack; schedules register disabled.
 ./scripts/deploy-vps.sh
 # Enable each report only after its example has succeeded.
 python3 scripts/register-windmill.py --enable-report company

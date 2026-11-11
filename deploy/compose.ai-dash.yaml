@@ -1,47 +1,142 @@
-# Add this overlay to the EXISTING Windmill Compose project. Start only this service.
+# Standalone stack: no external networks, volumes, configuration or services.
+name: ai-dash
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 20m
+    max-file: '5'
+
+x-worker-env: &worker-env
+  DATABASE_URL: ${DATABASE_URL:?Run scripts/init-runtime.py first}
+  MODE: worker
+  BASE_INTERNAL_URL: http://windmill_server:8000
+
+x-app: &app
+  image: ai-dash-app:local
+  restart: unless-stopped
+  logging: *logging
+
 services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    shm_size: 256m
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/init-runtime.py first}
+      POSTGRES_DB: windmill
+    volumes:
+      - db_data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U postgres -d windmill']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    logging: *logging
+
+  windmill_server:
+    image: ${WM_IMAGE:-ghcr.io/windmill-labs/windmill:1.775.1}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      MODE: server
+      BASE_URL: http://127.0.0.1:${AI_DASH_WINDMILL_PORT:-18090}
+    ports:
+      - '127.0.0.1:${AI_DASH_WINDMILL_PORT:-18090}:8000'
+    volumes:
+      - worker_logs:/tmp/windmill/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:8000/api/version]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    logging: *logging
+
+  # Orchestrates flows and dependency jobs independently of the application worker.
+  windmill_worker:
+    image: ${WM_IMAGE:-ghcr.io/windmill-labs/windmill:1.775.1}
+    restart: unless-stopped
+    environment:
+      <<: *worker-env
+      WORKER_GROUP: default
+    volumes:
+      - worker_cache:/tmp/windmill/cache
+      - worker_logs:/tmp/windmill/logs
+    depends_on:
+      windmill_server:
+        condition: service_healthy
+    logging: *logging
+
   windmill_worker_aidash:
+    <<: *app
     build:
-      context: ${AI_DASH_SOURCE:-/var/code/ai-dash}
+      context: ${AI_DASH_SOURCE:-..}
       dockerfile: deploy/windmill-worker.Dockerfile
       args:
         WM_IMAGE: ${WM_IMAGE:-ghcr.io/windmill-labs/windmill:1.775.1}
-    image: ai-dash-windmill-worker:local
-    restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL:?Use the existing Windmill runtime .env}
-      MODE: worker
+      <<: *worker-env
       WORKER_TAGS: aidash
       AI_DASH_HOME: /opt/ai-dash
       AI_DASH_DATA_DIR: /data/ai-dash
       AI_DASH_X_GATEWAY_URL: http://ai_dash_x_gateway:8080
-      AI_DASH_GATEWAY_URL: ${AI_DASH_GATEWAY_URL:-http://daily_dash_model_gateway:8080}
+      AI_DASH_GATEWAY_URL: http://ai_dash_model_gateway:8080
       AI_DASH_TELEGRAM_TOKEN_FILE: /run/ai-dash-secrets/telegram_token
       AI_DASH_TELEGRAM_CHAT_ID_FILE: /run/ai-dash-secrets/telegram_chat_id
     volumes:
       - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
-      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}:/run/ai-dash-secrets:ro
-    logging:
-      driver: json-file
-      options:
-        max-size: 20m
-        max-file: '5'
+      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/telegram_token:/run/ai-dash-secrets/telegram_token:ro
+      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/telegram_chat_id:/run/ai-dash-secrets/telegram_chat_id:ro
+      - worker_logs:/tmp/windmill/logs
+    depends_on:
+      windmill_server:
+        condition: service_healthy
+      ai_dash_model_gateway:
+        condition: service_healthy
+      ai_dash_x_gateway:
+        condition: service_healthy
+
+  ai_dash_model_gateway:
+    <<: *app
+    entrypoint: [/opt/ai-dash/.venv/bin/uvicorn]
+    command: [ai_dash.model_gateway:app, --host, 0.0.0.0, --port, '8080']
+    environment:
+      AI_DASH_MODEL_GATEWAY_CONFIG: /opt/ai-dash/config/model-gateway.yaml
+      OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
+    volumes:
+      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/openrouter_api_key:/run/secrets/openrouter_api_key:ro
+    ports:
+      - '127.0.0.1:${AI_DASH_MODEL_PORT:-18082}:8080'
+    healthcheck:
+      test: [CMD, /opt/ai-dash/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
 
   ai_dash_x_gateway:
-    image: ai-dash-windmill-worker:local
-    restart: unless-stopped
-    entrypoint: ["/opt/ai-dash/.venv/bin/uvicorn"]
-    command: ["ai_dash.x_gateway:app", "--host", "0.0.0.0", "--port", "8080"]
+    <<: *app
+    entrypoint: [/opt/ai-dash/.venv/bin/uvicorn]
+    command: [ai_dash.x_gateway:app, --host, 0.0.0.0, --port, '8080']
     environment:
       AI_DASH_HOME: /opt/ai-dash
       AI_DASH_X_PROVIDER_DATA: /data/ai-dash/x-provider
-      AI_DASH_X_MODEL: x-ai/grok-4.3
+      AI_DASH_X_MODEL: ${AI_DASH_X_MODEL:-x-ai/grok-4.3}
       OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
     volumes:
       - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
-      - ${AI_DASH_X_OPENROUTER_KEY_FILE:-/var/code/daily-dash-windmill-local/secrets/openrouter_api_key}:/run/secrets/openrouter_api_key:ro
-    logging:
-      driver: json-file
-      options:
-        max-size: 20m
-        max-file: '5'
+      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/openrouter_api_key:/run/secrets/openrouter_api_key:ro
+    ports:
+      - '127.0.0.1:${AI_DASH_X_PORT:-18081}:8080'
+    healthcheck:
+      test: [CMD, /opt/ai-dash/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  db_data:
+  worker_cache:
+  worker_logs:

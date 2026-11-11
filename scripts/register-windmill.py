@@ -1,12 +1,13 @@
 """Upsert ONLY f/ai_dash definitions through the installed Windmill API.
 
-Uses an existing operator CLI profile without printing its token. No workspace-wide sync/deletion.
+Uses only the ai-dash runtime profile. No workspace-wide sync/deletion.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -23,8 +24,13 @@ def should_enable(report: dict, enable_all: bool, selected: list[str]) -> bool:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", default="daily-dash-local")
-    parser.add_argument("--config-dir", type=Path, default=Path.home() / ".config/windmill")
+    runtime = Path(os.getenv("AI_DASH_RUNTIME", "/var/code/ai-dash-runtime"))
+    parser.add_argument("--profile-file", type=Path, default=runtime / "windmill-profile.json")
+    parser.add_argument(
+        "--secrets-dir",
+        type=Path,
+        default=Path(os.getenv("AI_DASH_SECRETS_SOURCE", str(runtime / "secrets"))),
+    )
     parser.add_argument(
         "--enable", action="store_true", help="Enable after independent bot preflight"
     )
@@ -32,12 +38,7 @@ def main():
         "--enable-report", action="append", default=[], help="Enable only the named report"
     )
     args = parser.parse_args()
-    profiles = [
-        json.loads(line)
-        for line in (args.config_dir / "remotes.ndjson").read_text().splitlines()
-        if line.strip()
-    ]
-    profile = next(p for p in profiles if p["name"] == args.profile)
+    profile = json.loads(args.profile_file.read_text())
     base = profile["remote"].rstrip("/") + "/api/w/" + profile["workspaceId"]
 
     def request(method, route, body=None, missing_ok=False):
@@ -64,15 +65,12 @@ def main():
             raise RuntimeError(f"Windmill {method} {route} failed (HTTP {exc.code})") from None
 
     if args.enable or args.enable_report:
-        # Read-only preflight on host; no messages, token output, or dependency on daily-dash bot.
-        secrets = Path("/var/code/ai-dash-runtime/secrets")
+        # Read-only preflight using only ai-dash-owned credentials.
+        secrets = args.secrets_dir
         token = (secrets / "telegram_token").read_text().strip()
         target = (secrets / "telegram_chat_id").read_text().strip()
         if not token or not target:
             raise ValueError("Independent AI Dash Telegram secrets are required")
-        old = Path("/var/code/daily-dash-windmill-local/secrets/telegram_token")
-        if old.exists() and old.read_text().strip() == token:
-            raise ValueError("AI Dash must use its own bot token")
 
         def telegram(method, body):
             req = urllib.request.Request(

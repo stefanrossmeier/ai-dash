@@ -13,7 +13,8 @@ working source-restricted report. The normal daily budget was not reset.
 ## Corrections
 
 - An ai-dash-owned X provider boundary replaces the shared daily-dash X endpoint.
-  The shared cheap ranking gateway remains unchanged.
+  The ranking gateway was subsequently copied into the independent AI Dash stack;
+  see [the independence audit](INDEPENDENCE.md).
 - The request names the actual accounts in the prompt as well as the native X
   allowlist. It supplies a single combined `from:` query and permits no followups.
 - `max_tool_calls: 1`, `max_total_results: 6`, and `max_output_tokens: 1200` bound

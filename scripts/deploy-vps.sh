@@ -1,17 +1,25 @@
 #!/usr/bin/env bash
-# Run ON the existing Windmill VPS, after copying this independent checkout there.
+# Run on the VPS from ai-dash's own source checkout.
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-RUNTIME="${WINDMILL_RUNTIME:-/var/code/daily-dash-windmill-local}"
+export AI_DASH_RUNTIME="${AI_DASH_RUNTIME:-/var/code/ai-dash-runtime}"
 export AI_DASH_SOURCE="$ROOT"
 export AI_DASH_DATA_SOURCE="${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}"
-export AI_DASH_SECRETS_SOURCE="${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}"
+export AI_DASH_SECRETS_SOURCE="${AI_DASH_SECRETS_SOURCE:-$AI_DASH_RUNTIME/secrets}"
 install -d -m 700 "$AI_DASH_DATA_SOURCE" "$AI_DASH_SECRETS_SOURCE"
-# Existing project name/network/DB; scope mutation to the NEW worker only.
-docker compose --project-directory "$RUNTIME" \
-  --env-file "$RUNTIME/.env" \
-  -f "$RUNTIME/docker-compose.yml" \
-  -f "$RUNTIME/docker-compose.override.yml" \
-  -f "$ROOT/deploy/compose.ai-dash.yaml" \
-  up -d --build --no-deps windmill_worker_aidash ai_dash_x_gateway
+python3 "$ROOT/scripts/init-runtime.py"
+for secret in openrouter_api_key telegram_token telegram_chat_id; do
+  test -s "$AI_DASH_SECRETS_SOURCE/$secret" || {
+    echo "Missing ai-dash secret: $AI_DASH_SECRETS_SOURCE/$secret" >&2
+    exit 1
+  }
+done
+docker compose --project-name ai-dash --project-directory "$ROOT" \
+  --env-file "$AI_DASH_RUNTIME/.env" -f "$ROOT/deploy/compose.ai-dash.yaml" \
+  build windmill_worker_aidash
+docker compose --project-name ai-dash --project-directory "$ROOT" \
+  --env-file "$AI_DASH_RUNTIME/.env" -f "$ROOT/deploy/compose.ai-dash.yaml" \
+  up -d --wait --wait-timeout 300
+python3 "$ROOT/scripts/bootstrap-windmill.py"
+# Definitions default to disabled, so deployment cannot unexpectedly start delivery.
 python3 "$ROOT/scripts/register-windmill.py"

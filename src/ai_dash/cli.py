@@ -28,7 +28,7 @@ def secret(name: str) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="AI engineering news on shared Windmill infrastructure"
+        description="AI engineering news on independent Windmill infrastructure"
     )
     parser.add_argument(
         "command",
@@ -54,7 +54,7 @@ def main() -> int:
         "--data-dir", type=Path, default=Path(os.getenv("AI_DASH_DATA_DIR", "./var"))
     )
     parser.add_argument(
-        "--gateway-url", default=os.getenv("AI_DASH_GATEWAY_URL", "http://127.0.0.1:18080")
+        "--gateway-url", default=os.getenv("AI_DASH_GATEWAY_URL", "http://127.0.0.1:18082")
     )
     parser.add_argument(
         "--no-x", action="store_true", help="Skip X with explicit search_required coverage"

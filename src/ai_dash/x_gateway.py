@@ -1,4 +1,4 @@
-"""AI Dash's bounded X provider boundary. No changes to daily-dash's gateway."""
+"""AI Dash's independently deployed bounded X provider boundary."""
 
 from __future__ import annotations
 
