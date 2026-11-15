@@ -18,6 +18,7 @@ from ai_dash.processing import deduplicate, identity, rank
 from ai_dash.reports import load_reports, select_report
 from ai_dash.retrieval import html_items, parse_feed, retrieve_one
 from ai_dash.storage import Store
+from tests.ranking_helpers import FakeImpactRanker as FakeRanker
 
 ROOT = Path(__file__).resolve().parents[1]
 NOW = datetime(2026, 11, 15, 12, tzinfo=UTC)
@@ -72,37 +73,6 @@ def feed(*entries):
         + "".join(entries)
         + "</channel></rss>"
     )
-
-
-class FakeRanker:
-    def __init__(self, score=80, groups=None):
-        self.score, self.groups = score, groups
-        self.calls, self.traces = [], []
-
-    def request(self, route, body):
-        self.calls.append(body)
-        candidates = json.loads(body["messages"][1]["content"])["candidates"]
-        if body["purpose"] == "ai-news-consolidation":
-            groups = self.groups or [
-                dict(representative=c["id"], duplicates=[]) for c in candidates
-            ]
-            return {"content": {"groups": groups}}
-        return {
-            "content": {
-                "decisions": [
-                    dict(
-                        id=c["id"],
-                        technical=min(30, self.score),
-                        practical=min(30, max(0, self.score - 30)),
-                        novelty=min(20, max(0, self.score - 60)),
-                        impact=max(0, self.score - 80),
-                        summary=FACTS * 3,
-                        reason="Concrete engineering evidence.",
-                    )
-                    for c in candidates
-                ]
-            }
-        }
 
 
 @pytest.fixture
@@ -325,7 +295,9 @@ def test_consolidation_prefers_later_primary_without_provisional_history(prompt)
     assert [s.item.id for s in result] == [item(1).id]
     scoring = [c for c in gateway.calls if c["purpose"] == "ai-news-ranking"]
     assert all(
-        json.loads(c["messages"][1]["content"])["already_covered"] == history for c in scoring
+        json.loads(c["messages"][1]["content"])["already_covered"]
+        == [{"title": h["title"]} for h in history]
+        for c in scoring
     )
 
 
@@ -357,15 +329,10 @@ def test_selection_prefers_diverse_publishers_but_backfills(prompt):
 def test_ranking_rejection_scores_and_reasons_are_auditable(prompt):
     log = []
     assert rank([item()], Settings(sources=[]), FakeRanker(score=50), prompt, [], audit=log) == []
-    assert log == [
-        {
-            "stage": "ranking",
-            "id": item().id,
-            "score": 50,
-            "reason": "Concrete engineering evidence.",
-            "status": "below_threshold",
-        }
-    ]
+    assert log[0]["score"] == 50
+    assert log[0]["status"] == "rejected"
+    assert {"low_impact", "below_threshold"} <= set(log[0]["rejection_reasons"])
+    assert log[0]["policy"] == "ai-impact-v2"
 
 
 def test_outage_checkpoint_exists_before_failure(monkeypatch, tmp_path):

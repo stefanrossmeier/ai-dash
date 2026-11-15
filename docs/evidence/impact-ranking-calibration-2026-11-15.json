@@ -1,0 +1,127 @@
+{
+  "policy": "ai-impact-v2",
+  "evaluated": 378,
+  "real_candidates": 372,
+  "real_eligible": 11,
+  "thresholds": {
+    "company": 65,
+    "blogs": 65,
+    "research_oss": 60,
+    "x_major": 65
+  },
+  "controls": [
+    {
+      "expected_eligible": true,
+      "name": "major-open-model",
+      "id": "2569865381ff774ebdb7e7a3",
+      "actual_eligible": true
+    },
+    {
+      "expected_eligible": true,
+      "name": "critical-rce",
+      "id": "cba0198551f699a60e8b0354",
+      "actual_eligible": true
+    },
+    {
+      "expected_eligible": true,
+      "name": "memory-breakthrough",
+      "id": "9127583215e720912b105ef3",
+      "actual_eligible": true
+    },
+    {
+      "expected_eligible": false,
+      "name": "minor-cli",
+      "id": "f9a415fe3a06228df002ba85",
+      "actual_eligible": false
+    },
+    {
+      "expected_eligible": false,
+      "name": "vague-security",
+      "id": "0c3f490b896a663b883d3d7f",
+      "actual_eligible": false
+    },
+    {
+      "expected_eligible": false,
+      "name": "metadata-push",
+      "id": "456f223e09ac4732b8c59898",
+      "actual_eligible": false
+    }
+  ],
+  "minor_codex_updates": [
+    {
+      "title": "0.169.0",
+      "source": "Codex Releases",
+      "eligible": false,
+      "decision": {
+        "stage": "ranking",
+        "id": "a0c08c461d827e1c37f0ee00",
+        "rank_score": 35,
+        "impact": 27,
+        "breadth": 22,
+        "novelty": 75,
+        "quality": 65,
+        "tier": 2,
+        "change_type": "routine_update",
+        "event_key": "codex-0-169-0",
+        "reason": "Adds side-chat tabs and task-history search, useful to Codex users but a narrow workflow/UI update rather than a material capability shift.",
+        "score": 35.0092,
+        "status": "rejected",
+        "rejection_reasons": [
+          "routine_update",
+          "low_tier",
+          "low_impact",
+          "narrow_breadth",
+          "below_threshold"
+        ],
+        "policy": "ai-impact-v2",
+        "title": "0.169.0",
+        "source": "Codex Releases",
+        "report": "research_oss",
+        "threshold": 60
+      }
+    },
+    {
+      "title": "0.168.0",
+      "source": "Codex Releases",
+      "eligible": false,
+      "decision": {
+        "stage": "ranking",
+        "id": "6cfc942e5da70ee0eba82b72",
+        "rank_score": 35,
+        "impact": 28,
+        "breadth": 22,
+        "novelty": 75,
+        "quality": 65,
+        "tier": 2,
+        "change_type": "routine_update",
+        "event_key": "codex-0-168-0",
+        "reason": "Model-provider picker, resizable side chat and audio attachments are incremental interface and workflow improvements.",
+        "score": 35.266,
+        "status": "rejected",
+        "rejection_reasons": [
+          "routine_update",
+          "low_tier",
+          "low_impact",
+          "narrow_breadth",
+          "below_threshold"
+        ],
+        "policy": "ai-impact-v2",
+        "title": "0.168.0",
+        "source": "Codex Releases",
+        "report": "research_oss",
+        "threshold": 60
+      }
+    }
+  ],
+  "model_requests": 3,
+  "reported_cost_usd": 0.03021489,
+  "seconds": 211.6,
+  "mode": "Evaluation only; no Telegram delivery, history writes or X retrieval",
+  "model": "openai/gpt-6-luna",
+  "reasoning_effort": "low",
+  "batches": [
+    150,
+    150,
+    78
+  ]
+}

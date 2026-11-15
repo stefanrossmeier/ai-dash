@@ -4,6 +4,8 @@ aliases:
   rank-cheap:
     provider: openrouter
     model: openai/gpt-6-luna
-    max_attempts: 3
+    reasoning_effort: low
+    max_output_tokens: 32768
+    max_attempts: 2
     timeout_seconds: 180
     require_structured_output: true

@@ -13,7 +13,8 @@ reports:
   max_paper_stories: 0
   focus: Official company blogs, model/API announcements, coding tools, product releases
     and inference infrastructure. Require a concrete new development; exclude generic
-    marketing.
+    marketing. Require material impact beyond routine maintenance or minor tool features;
+    do not fill the report with patch notes or small benchmark deltas.
   freshness_hours: 48
 - id: blogs
   title: Blogs & Analysis
@@ -28,7 +29,9 @@ reports:
   max_paper_stories: 0
   focus: Independent AI engineering commentary, technical deep dives and useful analysis
     from the configured authors and newsletters. Substantive new analysis is eligible;
-    exclude unrelated programming posts and recycled announcements.
+    exclude unrelated programming posts and recycled announcements. Require material
+    impact beyond routine maintenance or minor tool features; do not fill the report
+    with patch notes or small benchmark deltas.
   freshness_hours: 168
 - id: research_oss
   title: Research & Open Source
@@ -47,9 +50,11 @@ reports:
   focus: Research papers, open models, GitHub releases, datasets, local inference
     and community engineering discoveries. Distinguish a repository creation or paper
     submission from a validated model release. Keep practical engineering relevance
-    high.
+    high. Require material impact beyond routine maintenance or minor tool features;
+    do not fill the report with patch notes or small benchmark deltas.
   freshness_hours: 72
   max_per_source: 100
+  min_score: 60
 - id: x_major
   title: X — AI Leaders & Evaluations
   source_ids:
@@ -67,5 +72,7 @@ reports:
     new independent evaluations from Artificial Analysis. These supplement the configured
     company blogs. Exclude company announcement reposts and stories already delivered
     through blogs or model hubs. Attribute opinions and benchmark claims to the author.
+    Require material impact beyond routine maintenance or minor tool features; do
+    not fill the report with patch notes or small benchmark deltas.
   enabled: true
   freshness_hours: 24

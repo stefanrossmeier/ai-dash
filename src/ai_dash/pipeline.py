@@ -76,14 +76,14 @@ def build(
     ]
     if len(evidence) < len(candidates):
         warnings.append(f"{len(candidates) - len(evidence)} candidates lack usable evidence")
-    if evidence and not stories:
-        warnings.append("all evidenced candidates rejected; inspect selection_log")
     stats = {
         "items_dated": len(raw),
         "items_24h": sum(now - timedelta(hours=24) <= i.published_at < now for i in raw),
         "items_in_window": sum(start <= i.published_at < now for i in raw),
         "candidates_unseen": len(candidates),
         "candidates_evidenced": len(evidence),
+        "candidates_ranked": sum(r["stage"] == "ranking" and "id" in r for r in selection_log),
+        "candidates_policy_rejected": sum(r.get("status") == "rejected" for r in selection_log),
         "hydration_requests": len(hydration_log),
         "health_warnings": len(warnings),
         "selected": len(stories),

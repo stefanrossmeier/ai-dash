@@ -9,6 +9,7 @@ from ai_dash.presentation import render
 from ai_dash.processing import canonical_url, deduplicate, identity, rank
 from ai_dash.retrieval import parse_feed, retrieve_x, timestamp
 from ai_dash.storage import Store, exclusive
+from tests.ranking_helpers import FakeImpactRanker
 
 NOW = datetime(2026, 11, 9, 18, tzinfo=UTC)
 
@@ -101,20 +102,7 @@ def test_ranking_rejects_invented_ids(tmp_path):
 
     class Fake:
         def request(self, *args):
-            return {
-                "content": {
-                    "decisions": [
-                        {
-                            "id": "invented",
-                            "technical": 30,
-                            "practical": 30,
-                            "novelty": 20,
-                            "impact": 20,
-                            "summary": "Fake",
-                        }
-                    ]
-                }
-            }
+            return {"content": {"evaluations": {"invented": {}}}}
 
     with pytest.raises(ValueError, match="unknown"):
         rank([item()], Settings(sources=[]), Fake(), prompt, [])
@@ -125,39 +113,14 @@ def test_ranking_processes_all_batches_without_provisional_history(tmp_path):
 
     prompt = tmp_path / "prompt.md"
     prompt.write_text("Use candidates only")
-    calls = []
-
-    class Fake:
-        def request(self, route, payload):
-            user = json.loads(payload["messages"][1]["content"])
-            if payload["purpose"] == "ai-news-consolidation":
-                return {
-                    "content": {
-                        "groups": [
-                            {"representative": c["id"], "duplicates": []}
-                            for c in user["candidates"]
-                        ]
-                    }
-                }
-            calls.append(user)
-            return {
-                "content": {
-                    "decisions": [
-                        dict(
-                            id=c["id"],
-                            technical=30,
-                            practical=30,
-                            novelty=20,
-                            impact=20,
-                            summary="New release.",
-                        )
-                        for c in user["candidates"]
-                    ]
-                }
-            }
-
+    gateway = FakeImpactRanker()
     items = [item(f"Model {n}", f"https://example.org/{n}") for n in range(5)]
-    result = rank(items, Settings(sources=[], ranking_batch_size=2), Fake(), prompt, [])
+    result = rank(items, Settings(sources=[], ranking_batch_size=2), gateway, prompt, [])
+    calls = [
+        json.loads(c["messages"][1]["content"])
+        for c in gateway.calls
+        if c["purpose"] == "ai-news-ranking"
+    ]
     assert len(result) == 5 and len(calls) == 3
     assert calls[1]["already_covered"] == []
 
@@ -448,35 +411,18 @@ def test_x_outage_has_one_attempt():
     assert len(coverage) == 3 and all(c.status == "unavailable" for c in coverage)
 
 
-def test_ranking_constrains_ids_and_ignores_harmless_repetition(tmp_path):
-    import json
-
+def test_ranking_requires_exact_keyed_slots(tmp_path):
     prompt = tmp_path / "prompt.md"
     prompt.write_text("Use supplied items")
-
-    class Fake:
-        def request(self, route, payload):
-            candidates = json.loads(payload["messages"][1]["content"])["candidates"]
-            assert payload["response_schema"]["$defs"]["Decision"]["properties"]["id"]["enum"] == [
-                "c0"
-            ]
-            assert candidates[0]["id"] == "c0"
-            decision = dict(
-                id="c0",
-                technical=30,
-                practical=30,
-                novelty=20,
-                impact=20,
-                summary="A useful release.",
-            )
-            return {"content": {"decisions": [decision, decision]}}
-
-    stories = rank([item()], Settings(sources=[]), Fake(), prompt, [])
+    gateway = FakeImpactRanker()
+    stories = rank([item()], Settings(sources=[]), gateway, prompt, [])
+    schema = gateway.calls[0]["response_schema"]["properties"]["evaluations"]
+    assert schema["required"] == ["c0"]
+    assert schema["additionalProperties"] is False
     assert len(stories) == 1 and stories[0].item.id == item().id
 
 
 def test_paper_cap_preserves_room_for_blogs_and_x(tmp_path):
-    import json
 
     prompt = tmp_path / "prompt.md"
     prompt.write_text("Use candidates")
@@ -488,34 +434,9 @@ def test_paper_cap_preserves_room_for_blogs_and_x(tmp_path):
     ]
     items += [item("Company model release", "https://example.org/release")]
 
-    class Fake:
-        def request(self, route, body):
-            candidates = json.loads(body["messages"][1]["content"])["candidates"]
-            if body["purpose"] == "ai-news-consolidation":
-                return {
-                    "content": {
-                        "groups": [
-                            {"representative": c["id"], "duplicates": []} for c in candidates
-                        ]
-                    }
-                }
-            return {
-                "content": {
-                    "decisions": [
-                        dict(
-                            id=c["id"],
-                            technical=30,
-                            practical=30 if c["source_id"] == "papers" else 20,
-                            novelty=20,
-                            impact=20,
-                            summary="A material development.",
-                        )
-                        for c in candidates
-                    ]
-                }
-            }
-
-    stories = rank(items, Settings(sources=[paper, blog], max_paper_stories=6), Fake(), prompt, [])
+    stories = rank(
+        items, Settings(sources=[paper, blog], max_paper_stories=6), FakeImpactRanker(), prompt, []
+    )
     assert len(stories) == 7
     assert sum(s.item.source_id == "papers" for s in stories) == 6
     assert any(s.item.title == "Company model release" for s in stories)

@@ -44,8 +44,13 @@ class Settings(Model):
     max_per_source: int = Field(default=25, ge=1, le=100)
     max_stories: int = Field(default=30, ge=1, le=60)
     max_paper_stories: int = Field(default=6, ge=0, le=60)
-    min_score: int = Field(default=55, ge=0, le=100)
-    ranking_batch_size: int = Field(default=40, ge=1, le=80)
+    min_score: int = Field(default=65, ge=0, le=100)
+    min_impact: int = Field(default=60, ge=0, le=100)
+    min_breadth: int = Field(default=45, ge=0, le=100)
+    min_novelty: int = Field(default=40, ge=0, le=100)
+    min_quality: int = Field(default=60, ge=0, le=100)
+    ranking_batch_size: int = Field(default=150, ge=1, le=250)
+    ranking_excerpt_chars: int = Field(default=1200, ge=200, le=3000)
     ranking_alias: str = "rank-cheap"
     x_alias: str = "x-retrieve"
     x_batch_size: int = Field(default=8, ge=1, le=20)
@@ -145,6 +150,25 @@ class Decision(Model):
 
 class Selection(Model):
     decisions: list[Decision]
+
+
+class ImpactDecision(Model):
+    rank_score: int = Field(ge=0, le=100)
+    impact: int = Field(ge=0, le=100)
+    breadth: int = Field(ge=0, le=100)
+    novelty: int = Field(ge=0, le=100)
+    quality: int = Field(ge=0, le=100)
+    tier: int = Field(ge=1, le=5)
+    change_type: Literal[
+        "routine_update",
+        "new_capability",
+        "research_breakthrough",
+        "substantive_analysis",
+        "material_security",
+        "other",
+    ]
+    event_key: str = Field(min_length=1, max_length=120)
+    reason: str = Field(min_length=1, max_length=180)
 
 
 class EventGroup(Model):

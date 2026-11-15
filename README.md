@@ -106,15 +106,20 @@ hydrates thin candidates (up to 40 article requests per report, ten-second reque
 timeout, two-MB response cap); inaccessible text is never invented. AINews can
 supply up to eight linked discoveries per issue, accepted only after verifying
 their publisher dates. The duplicate Latent Space feed alias is archived.
-Ranking records a score/reason for every evidenced candidate; a global comparison
-then consolidates events before paper/story limits and a soft publisher-diversity
-preference. One additional cheap ranking-model call consolidates editions with
-multiple qualifying stories. Missing model decisions fail visibly instead of
+GPT-6 Luna at low reasoning effort evaluates every evidenced candidate in batches
+of up to 150 using source-neutral headlines and 1,200-character facts excerpts.
+Publication requires a joint impact/breadth score of 65 (60 for research), impact 60, breadth 45,
+novelty 40, evidence quality 60 and tier 3; routine updates never qualify.
+A global comparison consolidates qualifying events before paper/story limits and
+publisher diversity; only final selections receive full-evidence summaries.
+Rejected items incur no summary-generation call. Missing model decisions fail visibly instead of
 silently producing an empty edition. `ai-dash status` exposes latest report health;
 artifacts/checkpoints contain evidence gaps and per-candidate selection logs.
 
 The [news audit](docs/NEWS_AUDIT_2026-11-15.md) records the production baseline;
 [repair verification](docs/NEWS_REPAIR_2026-11-15.md) describes the changes and limits.
+The [impact ranking policy](docs/IMPACT_RANKING.md) documents the high-signal thresholds
+and the lightweight DailyDash-inspired ranking design.
 
 Private data: `/var/code/ai-dash-data`. New bot credentials:
 `/var/code/ai-dash-runtime/secrets`. Back up data and encrypted secrets independently.

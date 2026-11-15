@@ -8,7 +8,8 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from ai_dash.gateway import Gateway
-from ai_dash.models import Consolidation, Item, Selection, Settings, Story
+from ai_dash.models import Consolidation, Item, Settings, Story
+from ai_dash.ranking import evaluate, summarize
 
 
 def canonical_url(url: str) -> str:
@@ -73,78 +74,7 @@ def rank(
     audit: list[dict] | None = None,
 ) -> list[Story]:
     audit = audit if audit is not None else []
-    stories = []
-    # Feed every candidate to a bounded ranking batch; do not silently truncate the pool.
-    for offset in range(0, len(items), settings.ranking_batch_size):
-        batch = items[offset : offset + settings.ranking_batch_size]
-        context = history[-120:]
-        # Short batch-local IDs reduce transcription errors. Enum constrains provider output.
-        by_id = {f"c{n}": item for n, item in enumerate(batch)}
-        schema = Selection.model_json_schema()
-        schema["$defs"]["Decision"]["properties"]["id"]["enum"] = list(by_id)
-        schema["properties"]["decisions"]["maxItems"] = len(batch)
-        schema["properties"]["decisions"]["minItems"] = len(batch)
-        schema["$defs"]["Decision"]["required"] = list(schema["$defs"]["Decision"]["properties"])
-        schema["$defs"]["Decision"]["properties"]["reason"].pop("default", None)
-        response = gateway.request(
-            "chat",
-            {
-                "alias": settings.ranking_alias,
-                "purpose": "ai-news-ranking",
-                "profile": "ai-dash",
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": prompt.read_text()
-                        + "\nReport focus: "
-                        + settings.editorial_focus,
-                    },
-                    {
-                        "role": "user",
-                        "content": json.dumps(
-                            {
-                                "already_covered": context,
-                                "candidates": [
-                                    dict(i.model_dump(mode="json"), id=key)
-                                    for key, i in by_id.items()
-                                ],
-                            }
-                        ),
-                    },
-                ],
-                "response_schema_name": "ai_dash_selection_v1",
-                "response_schema": schema,
-            },
-        )
-        selection = Selection.model_validate(response["content"])
-        seen = set()
-        for decision in selection.decisions:
-            if decision.id not in by_id:
-                raise ValueError("ranking returned an unknown candidate id")
-            if decision.id in seen:
-                continue
-            seen.add(decision.id)
-            audit.append(
-                {
-                    "stage": "ranking",
-                    "id": by_id[decision.id].id,
-                    "score": decision.score,
-                    "reason": decision.reason,
-                    "status": "qualified"
-                    if decision.score >= settings.min_score
-                    else "below_threshold",
-                }
-            )
-            if decision.score >= settings.min_score:
-                stories.append(
-                    Story(item=by_id[decision.id], score=decision.score, summary=decision.summary)
-                )
-        if seen != set(by_id):
-            missing = [by_id[key].id for key in by_id.keys() - seen]
-            audit.extend(
-                {"stage": "ranking", "id": key, "status": "model_omitted"} for key in missing
-            )
-            raise ValueError("ranking omitted candidate decisions; refusing silent story loss")
+    stories = evaluate(items, settings, gateway, prompt, history, audit)
     # Batch scores are provisional. Compare every qualifying representation together
     # before caps; an early weak source must not suppress a later primary source.
     if len(stories) > 1:
@@ -259,4 +189,4 @@ def rank(
         }
         for s in diverse + deferred
     )
-    return selected
+    return summarize(selected, settings, gateway)

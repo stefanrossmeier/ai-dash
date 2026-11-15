@@ -23,6 +23,7 @@ class Report(Model):
     send_empty: bool = False
     x_only: bool = False
     freshness_hours: int = Field(default=24, ge=1, le=168)
+    min_score: int | None = Field(default=None, ge=0, le=100)
 
 
 class Reports(Model):
@@ -81,4 +82,6 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         send_empty=report.send_empty,
         freshness_hours=report.freshness_hours,
     )
+    if report.min_score is not None:
+        data["min_score"] = report.min_score
     return Settings.model_validate(data)

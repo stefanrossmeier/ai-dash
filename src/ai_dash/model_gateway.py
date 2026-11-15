@@ -159,6 +159,10 @@ async def chat(request: ChatRequest) -> ChatResponse:
             detail="configured max_attempts must be at least one",
         )
 
+    effort = alias.get("reasoning_effort")
+    if effort is not None and effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
+        raise HTTPException(status_code=500, detail="invalid configured reasoning effort")
+
     api_key = _load_api_key()
     attempt_errors: list[str] = []
     request_started = time.monotonic()
@@ -169,6 +173,10 @@ async def chat(request: ChatRequest) -> ChatResponse:
             "messages": [message.model_dump() for message in request.messages],
             "usage": {"include": True},
         }
+        if effort is not None:
+            payload["reasoning"] = {"effort": effort, "exclude": True}
+        if alias.get("max_output_tokens") is not None:
+            payload["max_tokens"] = int(alias["max_output_tokens"])
 
         if request.response_schema is not None:
             payload["response_format"] = {
@@ -233,6 +241,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
                 attempts=attempt,
                 attempt_errors=attempt_errors,
                 usage_complete=not attempt_errors,
+                provider_metadata={"reasoning_effort": effort},
             )
 
         except (
