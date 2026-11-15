@@ -1,0 +1,542 @@
+{
+  "checked_at": "2026-11-15T12:57:14.096111+00:00",
+  "results": [
+    {
+      "requested_url": "https://latent.space/feeds/all.xml",
+      "resolved_url": "https://latent.space/feeds/all.xml",
+      "status": 200,
+      "entries": 20,
+      "dated": 20,
+      "newest": "2026-11-14T08:31:02+00:00",
+      "summary_empty": 0,
+      "content_richer": 20,
+      "first_entries": [
+        {
+          "title": "[AINews] The No AI Slop Manifesto",
+          "link": "https://latent.space/p/ainews-the-no-ai-slop-manifesto/",
+          "date": "Sat, 14 Nov 2026 08:31:02 GMT",
+          "summary_chars": 68,
+          "content_chars": 23466
+        },
+        {
+          "title": "[AINews] Jensen Huang resigns after 33 years leading NVIDIA",
+          "link": "https://latent.space/p/ainews-jensen-huang-resigns-after-33-years-leading-nvidia/",
+          "date": "Fri, 13 Nov 2026 09:04:13 GMT",
+          "summary_chars": 112,
+          "content_chars": 35993
+        },
+        {
+          "title": "AI Ambition: ArtCraft Cloned Photoshop and Now Wants to \"Rebuild Everything\"",
+          "link": "https://latent.space/p/artcraft/",
+          "date": "Fri, 13 Nov 2026 04:17:25 GMT",
+          "summary_chars": 140,
+          "content_chars": 7298
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://www.latent.space/feed",
+      "resolved_url": "https://latent.space/feed",
+      "status": 200,
+      "entries": 20,
+      "dated": 20,
+      "newest": "2026-11-14T08:31:02+00:00",
+      "summary_empty": 0,
+      "content_richer": 20,
+      "first_entries": [
+        {
+          "title": "[AINews] The No AI Slop Manifesto",
+          "link": "https://latent.space/p/ainews-the-no-ai-slop-manifesto/",
+          "date": "Sat, 14 Nov 2026 08:31:02 GMT",
+          "summary_chars": 68,
+          "content_chars": 23466
+        },
+        {
+          "title": "[AINews] Jensen Huang resigns after 33 years leading NVIDIA",
+          "link": "https://latent.space/p/ainews-jensen-huang-resigns-after-33-years-leading-nvidia/",
+          "date": "Fri, 13 Nov 2026 09:04:13 GMT",
+          "summary_chars": 112,
+          "content_chars": 35993
+        },
+        {
+          "title": "AI Ambition: ArtCraft Cloned Photoshop and Now Wants to \"Rebuild Everything\"",
+          "link": "https://latent.space/p/artcraft/",
+          "date": "Fri, 13 Nov 2026 04:17:25 GMT",
+          "summary_chars": 140,
+          "content_chars": 7298
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://latent.space/news/",
+      "resolved_url": "https://latent.space/news/",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": [
+        {
+          "rel": [
+            "alternate"
+          ],
+          "type": "application/rss+xml",
+          "title": "Latent Space",
+          "href": "/feeds/all.xml"
+        },
+        {
+          "rel": [
+            "alternate"
+          ],
+          "type": "application/rss+xml",
+          "title": "Latent Space Podcast",
+          "href": "https://podcast.latent.space/feed.xml"
+        }
+      ],
+      "news_links": [
+        "/p/ainews-d-day-decision-models-day/",
+        "/p/ainews-d-day-decision-models-day/"
+      ]
+    },
+    {
+      "requested_url": "https://huggingface.co/blog/feed.xml",
+      "resolved_url": "https://huggingface.co/blog/feed.xml",
+      "status": 200,
+      "entries": 907,
+      "dated": 907,
+      "newest": "2026-11-13T18:00:39+00:00",
+      "summary_empty": 907,
+      "content_richer": 0,
+      "first_entries": [
+        {
+          "title": "Build a Robot Pick-and-Place Simulation with SimReady Assets",
+          "link": "https://huggingface.co/blog/nvidia/simready-assets-robot-pick-and-place",
+          "date": "Fri, 13 Nov 2026 18:00:39 GMT",
+          "summary_chars": 0,
+          "content_chars": 0
+        },
+        {
+          "title": "XYBench: Helping with the problem behind the question",
+          "link": "https://huggingface.co/blog/allenai/xybench",
+          "date": "Fri, 13 Nov 2026 17:02:35 GMT",
+          "summary_chars": 0,
+          "content_chars": 0
+        },
+        {
+          "title": "llama.cpp v1.0.0 : A stronger foundation for the local AI ecosystem",
+          "link": "https://huggingface.co/blog/ggml-org/llama-cpp-v1",
+          "date": "Fri, 13 Nov 2026 14:05:22 GMT",
+          "summary_chars": 0,
+          "content_chars": 0
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://www.interconnects.ai/feed",
+      "resolved_url": "https://www.interconnects.ai/feed",
+      "status": 200,
+      "entries": 20,
+      "dated": 20,
+      "newest": "2026-11-14T12:23:15+00:00",
+      "summary_empty": 0,
+      "content_richer": 20,
+      "first_entries": [
+        {
+          "title": "Open-source AI without Jensen",
+          "link": "https://www.interconnects.ai/p/open-source-ai-without-jensen",
+          "date": "Sat, 14 Nov 2026 12:23:15 GMT",
+          "summary_chars": 43,
+          "content_chars": 8468
+        },
+        {
+          "title": "How big is the open model economy today?",
+          "link": "https://www.interconnects.ai/p/how-well-can-we-measure-open-model",
+          "date": "Wed, 04 Nov 2026 16:35:44 GMT",
+          "summary_chars": 64,
+          "content_chars": 2843
+        },
+        {
+          "title": "Was I wrong about open models & cyber risks?",
+          "link": "https://www.interconnects.ai/p/was-i-wrong-about-open-models-and",
+          "date": "Fri, 30 Oct 2026 17:36:56 GMT",
+          "summary_chars": 242,
+          "content_chars": 10346
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://magazine.sebastianraschka.com/feed",
+      "resolved_url": "https://magazine.sebastianraschka.com/feed",
+      "status": 200,
+      "entries": 20,
+      "dated": 20,
+      "newest": "2026-11-15T12:10:37+00:00",
+      "summary_empty": 0,
+      "content_richer": 20,
+      "first_entries": [
+        {
+          "title": "Understanding Positional Embeddings in Modern LLMs",
+          "link": "https://magazine.sebastianraschka.com/p/understanding-positional-embeddings",
+          "date": "Sun, 15 Nov 2026 12:10:37 GMT",
+          "summary_chars": 53,
+          "content_chars": 54947
+        },
+        {
+          "title": "Building Reasoning Models from the Ground Up: A Full Video Course",
+          "link": "https://magazine.sebastianraschka.com/p/building-reasoning-models",
+          "date": "Sat, 24 Oct 2026 11:14:32 GMT",
+          "summary_chars": 136,
+          "content_chars": 14796
+        },
+        {
+          "title": "Language Models for Text Classification: From Bag-of-Words to Jev",
+          "link": "https://magazine.sebastianraschka.com/p/classifier-history-and-jev",
+          "date": "Tue, 29 Sep 2026 10:50:25 GMT",
+          "summary_chars": 113,
+          "content_chars": 51579
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://newsletter.semianalysis.com/feed",
+      "resolved_url": "https://newsletter.semianalysis.com/feed",
+      "status": 200,
+      "entries": 20,
+      "dated": 20,
+      "newest": "2026-11-12T18:06:26+00:00",
+      "summary_empty": 0,
+      "content_richer": 20,
+      "first_entries": [
+        {
+          "title": "Nvidia and the World Without Jensen",
+          "link": "https://newsletter.semianalysis.com/p/nvidia-and-the-world-without-jensen",
+          "date": "Thu, 12 Nov 2026 18:06:26 GMT",
+          "summary_chars": 127,
+          "content_chars": 26702
+        },
+        {
+          "title": "We Visited China\u2019s Stargate in Inner Mongolia",
+          "link": "https://newsletter.semianalysis.com/p/we-visited-chinas-stargate-in-inner",
+          "date": "Sat, 07 Nov 2026 19:01:39 GMT",
+          "summary_chars": 132,
+          "content_chars": 15990
+        },
+        {
+          "title": "The Iron(wood) Throne: Google's TPU Stakes Its Claim on Inference",
+          "link": "https://newsletter.semianalysis.com/p/tpu-strikes-the-king",
+          "date": "Thu, 05 Nov 2026 19:03:45 GMT",
+          "summary_chars": 187,
+          "content_chars": 19404
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://jack-clark.net/feed/",
+      "resolved_url": "https://jack-clark.net/feed/",
+      "status": 200,
+      "entries": 10,
+      "dated": 10,
+      "newest": "2026-11-09T13:31:34+00:00",
+      "summary_empty": 0,
+      "content_richer": 10,
+      "first_entries": [
+        {
+          "title": "Import AI 480: Self-sustaining space economies; AI for science progress, and Meta builds perfect hands for a superintelligence",
+          "link": "https://jack-clark.net/2026/11/09/import-ai-480-self-sustaining-space-economies-ai-for-science-progress-and-meta-builds-perfect-hands-for-a-superintelligence/",
+          "date": "Mon, 09 Nov 2026 13:31:34 +0000",
+          "summary_chars": 344,
+          "content_chars": 16088
+        },
+        {
+          "title": "Import AI 479: Spacewar; low-latency tasks versus LLMs; Genie 4",
+          "link": "https://jack-clark.net/2026/11/02/import-ai-479-spacewar-low-latency-tasks-versus-llms-genie-4/",
+          "date": "Mon, 02 Nov 2026 14:30:54 +0000",
+          "summary_chars": 346,
+          "content_chars": 15166
+        },
+        {
+          "title": "Import AI 478: Math for alignment; ProgramBench; and Mirendil shows what RSI means",
+          "link": "https://jack-clark.net/2026/10/26/import-ai-478-math-for-alignment-programbench-and-mirendil-shows-what-rsi-means/",
+          "date": "Mon, 26 Oct 2026 12:31:52 +0000",
+          "summary_chars": 371,
+          "content_chars": 13194
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://the-decoder.com/feed/",
+      "resolved_url": "https://the-decoder.com/feed/",
+      "status": 200,
+      "entries": 10,
+      "dated": 10,
+      "newest": "2026-11-15T11:35:12+00:00",
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [
+        {
+          "title": "Firm linked to Jensen Huang's ex-lover reportedly brokered nearly $12 billion in Nvidia chip orders for China",
+          "link": "https://the-decoder.com/firm-linked-to-jensen-huangs-ex-lover-reportedly-brokered-nearly-12-billion-in-nvidia-chip-orders-for-china/",
+          "date": "Sun, 15 Nov 2026 11:35:12 +0000",
+          "summary_chars": 498,
+          "content_chars": 0
+        },
+        {
+          "title": "Australia's central bank finds AI hitting young workers first, especially in software and customer service",
+          "link": "https://the-decoder.com/australias-central-bank-finds-ai-hitting-young-workers-first-especially-in-software-and-customer-service/",
+          "date": "Sun, 15 Nov 2026 10:45:58 +0000",
+          "summary_chars": 611,
+          "content_chars": 0
+        },
+        {
+          "title": "Meituan releases a 1.6-trillion-parameter agent model that never touched an Nvidia GPU",
+          "link": "https://the-decoder.com/meituan-releases-a-1-6-trillion-parameter-agent-model-that-never-touched-an-nvidia-gpu/",
+          "date": "Sun, 15 Nov 2026 10:06:06 +0000",
+          "summary_chars": 450,
+          "content_chars": 0
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://eugeneyan.com/rss/",
+      "resolved_url": "https://eugeneyan.com/rss/",
+      "status": 200,
+      "entries": 214,
+      "dated": 214,
+      "newest": "2026-06-30T00:00:00+00:00",
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [
+        {
+          "title": "AI Engineer 2026 - Using LLMs to Secure Source Code",
+          "link": "https://eugeneyan.com/speaking/aie-2026",
+          "date": "Tue, 30 Jun 2026 00:00:00 +0000",
+          "summary_chars": 47,
+          "content_chars": 0
+        },
+        {
+          "title": "Patterns for Building Cybersecurity Evals",
+          "link": "https://eugeneyan.com/writing/cybersecurity-evals",
+          "date": "Sun, 21 Jun 2026 00:00:00 +0000",
+          "summary_chars": 79,
+          "content_chars": 0
+        },
+        {
+          "title": "Using LLMs to Secure Source Code",
+          "link": "https://eugeneyan.com/writing/secure-source-code",
+          "date": "Wed, 27 May 2026 00:00:00 +0000",
+          "summary_chars": 74,
+          "content_chars": 0
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://huyenchip.com/feed.xml",
+      "resolved_url": "https://huyenchip.com/feed.xml",
+      "status": 200,
+      "entries": 10,
+      "dated": 10,
+      "newest": "2025-01-16T00:00:00+00:00",
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [
+        {
+          "title": "Common pitfalls when building generative AI applications",
+          "link": "https://huyenchip.com//2025/01/16/ai-engineering-pitfalls.html",
+          "date": "Thu, 16 Jan 2025 00:00:00 +0000",
+          "summary_chars": 11505,
+          "content_chars": 0
+        },
+        {
+          "title": "Agents",
+          "link": "https://huyenchip.com//2025/01/07/agents.html",
+          "date": "Tue, 07 Jan 2025 00:00:00 +0000",
+          "summary_chars": 49580,
+          "content_chars": 0
+        },
+        {
+          "title": "Building A Generative AI Platform",
+          "link": "https://huyenchip.com//2024/07/25/genai-platform.html",
+          "date": "Thu, 25 Jul 2024 00:00:00 +0000",
+          "summary_chars": 50477,
+          "content_chars": 0
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://www.anthropic.com/engineering",
+      "resolved_url": "https://www.anthropic.com/engineering",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://www.anthropic.com/research",
+      "resolved_url": "https://www.anthropic.com/research",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://blog.langchain.com/",
+      "resolved_url": "https://www.langchain.com/blog",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://research.google/blog/",
+      "resolved_url": "https://research.google/blog/",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://www.deeplearning.ai/the-batch/",
+      "resolved_url": "https://www.deeplearning.ai/the-batch",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://tldr.tech/ai",
+      "resolved_url": "https://tldr.tech/ai",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://github.com/anthropics/claude-code/releases.atom",
+      "resolved_url": "https://github.com/anthropics/claude-code/releases.atom",
+      "status": 200,
+      "entries": 10,
+      "dated": 10,
+      "newest": "2026-11-13T20:40:01+00:00",
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [
+        {
+          "title": "v2.1.325",
+          "link": "https://github.com/anthropics/claude-code/releases/tag/v2.1.325",
+          "date": "2026-11-13T20:40:01Z",
+          "summary_chars": 19378,
+          "content_chars": 19378
+        },
+        {
+          "title": "v2.1.323",
+          "link": "https://github.com/anthropics/claude-code/releases/tag/v2.1.323",
+          "date": "2026-11-12T22:12:13Z",
+          "summary_chars": 40489,
+          "content_chars": 40489
+        },
+        {
+          "title": "v2.1.322",
+          "link": "https://github.com/anthropics/claude-code/releases/tag/v2.1.322",
+          "date": "2026-11-10T02:29:43Z",
+          "summary_chars": 126,
+          "content_chars": 126
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://github.com/openai/codex/releases.atom",
+      "resolved_url": "https://github.com/openai/codex/releases.atom",
+      "status": 200,
+      "entries": 10,
+      "dated": 10,
+      "newest": "2026-11-14T01:25:03+00:00",
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [
+        {
+          "title": "0.171.0-alpha.5",
+          "link": "https://github.com/openai/codex/releases/tag/rust-v0.171.0-alpha.5",
+          "date": "2026-11-14T01:25:03Z",
+          "summary_chars": 23,
+          "content_chars": 23
+        },
+        {
+          "title": "0.171.0-alpha.4",
+          "link": "https://github.com/openai/codex/releases/tag/rust-v0.171.0-alpha.4",
+          "date": "2026-11-13T19:02:32Z",
+          "summary_chars": 23,
+          "content_chars": 23
+        },
+        {
+          "title": "rust-v0.171.0-alpha.3",
+          "link": "https://github.com/openai/codex/releases/tag/rust-v0.171.0-alpha.3",
+          "date": "2026-11-13T04:36:47Z",
+          "summary_chars": 23,
+          "content_chars": 23
+        }
+      ],
+      "advertised_feeds": []
+    },
+    {
+      "requested_url": "https://rss.arxiv.org/atom/cs.AI",
+      "resolved_url": "https://rss.arxiv.org/atom/cs.AI",
+      "status": 200,
+      "entries": 0,
+      "dated": 0,
+      "newest": null,
+      "summary_empty": 0,
+      "content_richer": 0,
+      "first_entries": [],
+      "advertised_feeds": []
+    }
+  ],
+  "latent_space_overlap": {
+    "urls": [
+      "https://latent.space/feeds/all.xml",
+      "https://www.latent.space/feed"
+    ],
+    "entry_counts": [
+      20,
+      20
+    ],
+    "overlap_count": 20,
+    "same_link_sets": true
+  }
+}

@@ -1,0 +1,369 @@
+{
+  "checked_at": "2026-11-15T13:20:10.315642+00:00",
+  "mode": "Public HTTP collection/hydration only; no model, X or Telegram calls",
+  "sources": [
+    {
+      "source_id": "aggregator-ai-news-smol-ai",
+      "coverage": {
+        "source_id": "aggregator-ai-news-smol-ai",
+        "status": "ok",
+        "items": 100,
+        "fresh": 53,
+        "detail": ""
+      },
+      "dated": 100,
+      "candidates": 51,
+      "sample": [
+        {
+          "title": "[AINews] The No AI Slop Manifesto",
+          "url": "https://latent.space/p/ainews-the-no-ai-slop-manifesto",
+          "date": "2026-11-14T08:31:02+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        },
+        {
+          "title": "[AINews] Jensen Huang resigns after 33 years leading NVIDIA",
+          "url": "https://latent.space/p/ainews-jensen-huang-resigns-after-33-years-leading-nvidia",
+          "date": "2026-11-13T09:04:13+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": []
+    },
+    {
+      "source_id": "aggregator-hacker-news",
+      "coverage": {
+        "source_id": "aggregator-hacker-news",
+        "status": "ok",
+        "items": 16,
+        "fresh": 16,
+        "detail": ""
+      },
+      "dated": 16,
+      "candidates": 16,
+      "sample": [
+        {
+          "title": "Nvidia deliberately kept GPU prices high through circular financing deals",
+          "url": "https://techspot.com/news/114558-nvidia-deliberately-kept-gpu-prices-high-through-circular.html",
+          "date": "2026-11-14T22:26:30+00:00",
+          "date_basis": "submission",
+          "text_chars": 4123
+        },
+        {
+          "title": "Claude asked to renumber pages deletes professor's syllabus, year of notes",
+          "url": "https://tomshardware.com/tech-industry/artificial-intelligence/rogue-claude-ai-tasked-with-renumbering-pages-accidentally-deletes-law-professors-entire-syllabus-one-year-of-lecture-notes-youre-right-to-be-angry-i-deleted-your-files-through-my-own-carelessness-humbled-agent-admits",
+          "date": "2026-11-14T17:51:13+00:00",
+          "date_basis": "submission",
+          "text_chars": 0
+        }
+      ],
+      "hydration": [
+        {
+          "stage": "hydration",
+          "id": "9a523e1db268a3b62b6ee287",
+          "status": "hydrated"
+        },
+        {
+          "stage": "hydration",
+          "id": "1775d37e49b52ae87bb11eb3",
+          "status": "unavailable",
+          "detail": "ValueError"
+        }
+      ]
+    },
+    {
+      "source_id": "discovery-github-trending",
+      "coverage": {
+        "source_id": "discovery-github-trending",
+        "status": "ok",
+        "items": 23,
+        "fresh": 23,
+        "detail": ""
+      },
+      "dated": 23,
+      "candidates": 23,
+      "sample": [
+        {
+          "title": "Graphify-Labs/graphify",
+          "url": "https://github.com/Graphify-Labs/graphify",
+          "date": "2026-11-14T21:28:08+00:00",
+          "date_basis": "repository_update",
+          "text_chars": 11993
+        },
+        {
+          "title": "unclecode/crawl4ai",
+          "url": "https://github.com/unclecode/crawl4ai",
+          "date": "2026-11-13T13:32:17+00:00",
+          "date_basis": "repository_update",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": [
+        {
+          "stage": "hydration",
+          "id": "c290a2acf859c75ba01866cb",
+          "status": "hydrated"
+        },
+        {
+          "stage": "hydration",
+          "id": "d46d1480c37c463a902b46f4",
+          "status": "hydrated"
+        }
+      ]
+    },
+    {
+      "source_id": "analysis-interconnects",
+      "coverage": {
+        "source_id": "analysis-interconnects",
+        "status": "ok",
+        "items": 20,
+        "fresh": 1,
+        "detail": ""
+      },
+      "dated": 20,
+      "candidates": 1,
+      "sample": [
+        {
+          "title": "Open-source AI without Jensen",
+          "url": "https://interconnects.ai/p/open-source-ai-without-jensen",
+          "date": "2026-11-14T12:23:15+00:00",
+          "date_basis": "publication",
+          "text_chars": 8468
+        }
+      ],
+      "hydration": []
+    },
+    {
+      "source_id": "blog-hugging-face-blog",
+      "coverage": {
+        "source_id": "blog-hugging-face-blog",
+        "status": "ok",
+        "items": 25,
+        "fresh": 10,
+        "detail": ""
+      },
+      "dated": 25,
+      "candidates": 10,
+      "sample": [
+        {
+          "title": "Build a Robot Pick-and-Place Simulation with SimReady Assets",
+          "url": "https://huggingface.co/blog/nvidia/simready-assets-robot-pick-and-place",
+          "date": "2026-11-13T18:00:39+00:00",
+          "date_basis": "publication",
+          "text_chars": 11012
+        },
+        {
+          "title": "XYBench: Helping with the problem behind the question",
+          "url": "https://huggingface.co/blog/allenai/xybench",
+          "date": "2026-11-13T17:02:35+00:00",
+          "date_basis": "publication",
+          "text_chars": 8228
+        }
+      ],
+      "hydration": [
+        {
+          "stage": "hydration",
+          "id": "cdc8eef67bc55a0d0fa5ca86",
+          "status": "hydrated"
+        },
+        {
+          "stage": "hydration",
+          "id": "96c7f67bef86f8316048a87f",
+          "status": "hydrated"
+        }
+      ]
+    },
+    {
+      "source_id": "model-hub-qwen",
+      "coverage": {
+        "source_id": "model-hub-qwen",
+        "status": "ok",
+        "items": 25,
+        "fresh": 0,
+        "detail": ""
+      },
+      "dated": 25,
+      "candidates": 0,
+      "sample": [],
+      "hydration": []
+    },
+    {
+      "source_id": "lab-anthropic-engineering",
+      "coverage": {
+        "source_id": "lab-anthropic-engineering",
+        "status": "ok",
+        "items": 24,
+        "fresh": 1,
+        "detail": ""
+      },
+      "dated": 24,
+      "candidates": 1,
+      "sample": [
+        {
+          "title": "Building strong safety evaluations",
+          "url": "https://anthropic.com/research/building-strong-safety-evaluations",
+          "date": "2026-11-13T00:00:00+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": [
+        {
+          "stage": "hydration",
+          "id": "43af641572cb998c4f69a130",
+          "status": "hydrated"
+        }
+      ]
+    },
+    {
+      "source_id": "lab-anthropic-research",
+      "coverage": {
+        "source_id": "lab-anthropic-research",
+        "status": "ok",
+        "items": 24,
+        "fresh": 2,
+        "detail": ""
+      },
+      "dated": 24,
+      "candidates": 2,
+      "sample": [
+        {
+          "title": "Testing Claude on real-world electronics design",
+          "url": "https://anthropic.com/research/claude-electronics-design",
+          "date": "2026-11-09T00:00:00+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        },
+        {
+          "title": "Building strong safety evaluations",
+          "url": "https://anthropic.com/research/building-strong-safety-evaluations",
+          "date": "2026-11-13T00:00:00+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": [
+        {
+          "stage": "hydration",
+          "id": "ccd1af9e275b185007507ae2",
+          "status": "hydrated"
+        },
+        {
+          "stage": "hydration",
+          "id": "43af641572cb998c4f69a130",
+          "status": "hydrated"
+        }
+      ]
+    },
+    {
+      "source_id": "github-claude-code-releases",
+      "coverage": {
+        "source_id": "github-claude-code-releases",
+        "status": "ok",
+        "items": 3,
+        "fresh": 3,
+        "detail": ""
+      },
+      "dated": 3,
+      "candidates": 3,
+      "sample": [
+        {
+          "title": "v2.1.325",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.325",
+          "date": "2026-11-13T20:40:01+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        },
+        {
+          "title": "v2.1.323",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.323",
+          "date": "2026-11-12T22:12:13+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": []
+    },
+    {
+      "source_id": "github-codex-releases",
+      "coverage": {
+        "source_id": "github-codex-releases",
+        "status": "ok",
+        "items": 2,
+        "fresh": 2,
+        "detail": ""
+      },
+      "dated": 2,
+      "candidates": 2,
+      "sample": [
+        {
+          "title": "0.169.0",
+          "url": "https://github.com/openai/codex/releases/tag/rust-v0.169.0",
+          "date": "2026-11-13T08:39:10+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        },
+        {
+          "title": "0.168.0",
+          "url": "https://github.com/openai/codex/releases/tag/rust-v0.168.0",
+          "date": "2026-11-13T03:56:26+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": []
+    },
+    {
+      "source_id": "analysis-the-decoder",
+      "coverage": {
+        "source_id": "analysis-the-decoder",
+        "status": "ok",
+        "items": 10,
+        "fresh": 10,
+        "detail": ""
+      },
+      "dated": 10,
+      "candidates": 10,
+      "sample": [
+        {
+          "title": "Australia's central bank finds AI hitting young workers first, especially in software and customer service",
+          "url": "https://the-decoder.com/australias-central-bank-finds-ai-hitting-young-workers-first-especially-in-software-and-customer-service",
+          "date": "2026-11-15T10:45:58+00:00",
+          "date_basis": "publication",
+          "text_chars": 611
+        },
+        {
+          "title": "Jensen Huang's ouster likely traces back to Nvidia's risky business practices more than his personal life",
+          "url": "https://the-decoder.com/jensen-huangs-ouster-likely-traces-back-to-nvidias-risky-business-practices-more-than-his-personal-life",
+          "date": "2026-11-13T20:07:34+00:00",
+          "date_basis": "publication",
+          "text_chars": 590
+        }
+      ],
+      "hydration": []
+    },
+    {
+      "source_id": "analysis-import-ai",
+      "coverage": {
+        "source_id": "analysis-import-ai",
+        "status": "ok",
+        "items": 10,
+        "fresh": 1,
+        "detail": ""
+      },
+      "dated": 10,
+      "candidates": 1,
+      "sample": [
+        {
+          "title": "Import AI 480: Self-sustaining space economies; AI for science progress, and Meta builds perfect hands for a superintelligence",
+          "url": "https://jack-clark.net/2026/11/09/import-ai-480-self-sustaining-space-economies-ai-for-science-progress-and-meta-builds-perfect-hands-for-a-superintelligence",
+          "date": "2026-11-09T13:31:34+00:00",
+          "date_basis": "publication",
+          "text_chars": 11993
+        }
+      ],
+      "hydration": []
+    }
+  ]
+}

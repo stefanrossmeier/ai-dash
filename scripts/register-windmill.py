@@ -18,8 +18,17 @@ ROOT = Path(__file__).resolve().parents[1]
 FOLDER = ROOT / "workflows/windmill/f/ai_dash"
 
 
-def should_enable(report: dict, enable_all: bool, selected: list[str]) -> bool:
-    return report.get("enabled", True) and (enable_all or report["id"] in selected)
+def should_enable(
+    report: dict,
+    enable_all: bool,
+    selected: list[str],
+    *,
+    current_enabled: bool = False,
+    disabled: list[str] | tuple[str, ...] = (),
+) -> bool:
+    if not report.get("enabled", True) or report["id"] in disabled:
+        return False
+    return enable_all or report["id"] in selected or current_enabled
 
 
 def main():
@@ -37,7 +46,17 @@ def main():
     parser.add_argument(
         "--enable-report", action="append", default=[], help="Enable only the named report"
     )
+    parser.add_argument(
+        "--disable-report", action="append", default=[], help="Pause the named report"
+    )
     args = parser.parse_args()
+    if set(args.enable_report) & set(args.disable_report) or (args.enable and args.disable_report):
+        raise ValueError("cannot enable and disable the same reports")
+    configured = {
+        r["id"]: r for r in yaml.safe_load((ROOT / "config/reports.yaml").read_text())["reports"]
+    }
+    if (set(args.enable_report) | set(args.disable_report)) - configured.keys():
+        raise ValueError("unknown report requested for schedule enablement")
     profile = json.loads(args.profile_file.read_text())
     base = profile["remote"].rstrip("/") + "/api/w/" + profile["workspaceId"]
 
@@ -124,15 +143,19 @@ def main():
         flow["path"] = path
         exists = request("GET", "/flows/get/" + path, missing_ok=True) is not None
         request("POST", "/flows/update/" + path if exists else "/flows/create", flow)
-    configured = {
-        r["id"]: r for r in yaml.safe_load((ROOT / "config/reports.yaml").read_text())["reports"]
-    }
     for file in sorted(FOLDER.glob("*.schedule.yaml")):
         schedule = yaml.safe_load(file.read_text())
         path = "f/ai_dash/" + file.name.removesuffix(".schedule.yaml")
-        exists = request("GET", "/schedules/get/" + path, missing_ok=True) is not None
+        current_schedule = request("GET", "/schedules/get/" + path, missing_ok=True)
+        exists = current_schedule is not None
         report_id = schedule["script_path"].rsplit("/", 1)[-1]
-        enabled = should_enable(configured[report_id], args.enable, args.enable_report)
+        enabled = should_enable(
+            configured[report_id],
+            args.enable,
+            args.enable_report,
+            current_enabled=bool(current_schedule and current_schedule.get("enabled")),
+            disabled=args.disable_report,
+        )
         schedule.update(path=path, enabled=enabled)
         request("POST", "/schedules/update/" + path if exists else "/schedules/create", schedule)
         if exists:

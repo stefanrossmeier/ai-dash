@@ -11,16 +11,17 @@ min_score: 55
 x_enabled: false
 sources:
 - id: aggregator-ai-news-smol-ai
-  name: AI News / smol.ai
-  category: Aggregator
+  name: Latent Space / AINews
+  category: Analysis
   url: https://news.smol.ai/
   priority: P1
   kind: feed
   endpoint: https://latent.space/feeds/all.xml
   focus: Technical daily digest; models, research, OSS, X/Discord discussions
   enabled: true
-  note: Original URL redirects to latent.space/news/. Uses the publisher-advertised
-    all-content feed; duplicates with Latent Space are removed during processing.
+  note: Canonical publisher all-content feed. Full article bodies are read; AINews
+    issues also supply bounded linked-story discovery.
+  expand_roundups: true
 - id: aggregator-hacker-news
   name: Hacker News
   category: Aggregator
@@ -50,7 +51,8 @@ sources:
   endpoint: https://huggingface.co/api/models?sort=trendingScore&direction=-1&limit=25&full=true
   focus: New open-weight models, fine-tunes, quantizations
   enabled: true
-  note: ''
+  note: Repository modification dates are update signals; model cards supply evidence.
+    Never infer a release from modification alone.
 - id: discovery-hugging-face-papers
   name: Hugging Face Papers
   category: Discovery
@@ -62,7 +64,7 @@ sources:
   enabled: true
   note: ''
 - id: discovery-github-trending
-  name: GitHub Trending
+  name: Recently active AI repositories
   category: Discovery
   url: https://github.com/trending
   priority: P1
@@ -70,7 +72,8 @@ sources:
   endpoint: https://api.github.com/search/repositories
   focus: Emerging open-source AI projects
   enabled: true
-  note: ''
+  note: Searches established and new LLM repositories with recent pushes; activity
+    is discovery evidence, not a verified release.
 - id: research-arxiv-cs-cl
   name: arXiv cs.CL
   category: Research
@@ -142,8 +145,9 @@ sources:
   kind: feed
   endpoint: https://www.latent.space/feed
   focus: AI engineering, infrastructure, tools, technical interviews
-  enabled: true
-  note: ''
+  enabled: false
+  note: 'Archived alias: returns the same all-content feed as aggregator-ai-news-smol-ai.
+    Preserve provenance without counting duplicate coverage.'
 - id: analysis-semianalysis
   name: SemiAnalysis
   category: Analysis
@@ -394,40 +398,44 @@ sources:
   url: https://huggingface.co/Qwen
   priority: P1
   kind: hf_models
-  endpoint: https://huggingface.co/api/models?author=Qwen&sort=createdAt&direction=-1&limit=25&full=true
+  endpoint: https://huggingface.co/api/models?author=Qwen&sort=lastModified&direction=-1&limit=25&full=true
   focus: Qwen open-weight model releases and cards
   enabled: true
-  note: ''
+  note: Repository modification dates are update signals; model cards supply evidence.
+    Never infer a release from modification alone.
 - id: model-hub-deepseek
   name: DeepSeek
   category: Model hub
   url: https://huggingface.co/deepseek-ai
   priority: P1
   kind: hf_models
-  endpoint: https://huggingface.co/api/models?author=deepseek-ai&sort=createdAt&direction=-1&limit=25&full=true
+  endpoint: https://huggingface.co/api/models?author=deepseek-ai&sort=lastModified&direction=-1&limit=25&full=true
   focus: DeepSeek weights, model cards, technical reports
   enabled: true
-  note: ''
+  note: Repository modification dates are update signals; model cards supply evidence.
+    Never infer a release from modification alone.
 - id: model-hub-mistral
   name: Mistral
   category: Model hub
   url: https://huggingface.co/mistralai
   priority: P2
   kind: hf_models
-  endpoint: https://huggingface.co/api/models?author=mistralai&sort=createdAt&direction=-1&limit=25&full=true
+  endpoint: https://huggingface.co/api/models?author=mistralai&sort=lastModified&direction=-1&limit=25&full=true
   focus: Mistral open model weights and releases
   enabled: true
-  note: ''
+  note: Repository modification dates are update signals; model cards supply evidence.
+    Never infer a release from modification alone.
 - id: model-hub-meta-llama
   name: Meta Llama
   category: Model hub
   url: https://huggingface.co/meta-llama
   priority: P2
   kind: hf_models
-  endpoint: https://huggingface.co/api/models?author=meta-llama&sort=createdAt&direction=-1&limit=25&full=true
+  endpoint: https://huggingface.co/api/models?author=meta-llama&sort=lastModified&direction=-1&limit=25&full=true
   focus: Llama weights and model releases
   enabled: true
-  note: ''
+  note: Repository modification dates are update signals; model cards supply evidence.
+    Never infer a release from modification alone.
 - id: x-analyst-simon-willison
   name: Simon Willison
   category: X / analyst
@@ -1014,3 +1022,68 @@ sources:
   enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
+- id: lab-anthropic-engineering
+  name: Anthropic Engineering
+  category: Lab
+  url: https://www.anthropic.com/engineering
+  priority: P1
+  kind: html
+  endpoint: https://www.anthropic.com/engineering
+  focus: Primary agent infrastructure, evaluation and engineering findings
+  enabled: true
+  note: Verified during the 2026-11-15 news audit.
+  article_paths:
+  - /engineering
+  - /research
+- id: lab-anthropic-research
+  name: Anthropic Research
+  category: Lab
+  url: https://www.anthropic.com/research
+  priority: P1
+  kind: html
+  endpoint: https://www.anthropic.com/research
+  focus: Primary Claude research and evaluations
+  enabled: true
+  note: Verified during the 2026-11-15 news audit.
+- id: github-claude-code-releases
+  name: Claude Code Releases
+  category: GitHub
+  url: https://github.com/anthropics/claude-code/releases
+  priority: P1
+  kind: feed
+  endpoint: https://github.com/anthropics/claude-code/releases.atom
+  focus: Material coding-agent features, fixes and workflow changes
+  enabled: true
+  note: Verified during the 2026-11-15 news audit.
+- id: github-codex-releases
+  name: Codex Releases
+  category: GitHub
+  url: https://github.com/openai/codex/releases
+  priority: P1
+  kind: feed
+  endpoint: https://github.com/openai/codex/releases.atom
+  focus: Material coding-agent releases and engineering changes
+  enabled: true
+  note: Verified during the 2026-11-15 news audit.
+- id: analysis-the-decoder
+  name: THE DECODER
+  category: Analysis
+  url: https://the-decoder.com/
+  priority: P1
+  kind: feed
+  endpoint: https://the-decoder.com/feed/
+  focus: Independent reporting on AI developments, models, research and practical
+    impact
+  enabled: true
+  note: Verified during the 2026-11-15 news audit.
+- id: analysis-import-ai
+  name: Import AI
+  category: Analysis
+  url: https://jack-clark.net/
+  priority: P1
+  kind: feed
+  endpoint: https://jack-clark.net/feed/
+  focus: Weekly research significance, capabilities and industry perspective
+  enabled: true
+  note: Publisher WordPress feed verified with full bodies and dates. Weekly analysis;
+    author Jack Clark is an Anthropic co-founder.

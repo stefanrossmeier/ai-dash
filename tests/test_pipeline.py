@@ -37,6 +37,8 @@ def item(title="A new model", url="https://example.org/news", published=None):
         category="Lab",
         priority="P1",
         published_at=published or NOW - timedelta(hours=1),
+        text="New AI inference release with measured throughput and documented hardware support. "
+        * 8,
     )
 
 
@@ -118,7 +120,7 @@ def test_ranking_rejects_invented_ids(tmp_path):
         rank([item()], Settings(sources=[]), Fake(), prompt, [])
 
 
-def test_ranking_processes_all_batches_and_carries_selected_context(tmp_path):
+def test_ranking_processes_all_batches_without_provisional_history(tmp_path):
     import json
 
     prompt = tmp_path / "prompt.md"
@@ -128,6 +130,15 @@ def test_ranking_processes_all_batches_and_carries_selected_context(tmp_path):
     class Fake:
         def request(self, route, payload):
             user = json.loads(payload["messages"][1]["content"])
+            if payload["purpose"] == "ai-news-consolidation":
+                return {
+                    "content": {
+                        "groups": [
+                            {"representative": c["id"], "duplicates": []}
+                            for c in user["candidates"]
+                        ]
+                    }
+                }
             calls.append(user)
             return {
                 "content": {
@@ -148,7 +159,7 @@ def test_ranking_processes_all_batches_and_carries_selected_context(tmp_path):
     items = [item(f"Model {n}", f"https://example.org/{n}") for n in range(5)]
     result = rank(items, Settings(sources=[], ranking_batch_size=2), Fake(), prompt, [])
     assert len(result) == 5 and len(calls) == 3
-    assert len(calls[1]["already_covered"]) == 2
+    assert calls[1]["already_covered"] == []
 
 
 def test_x_accepts_only_cited_allowed_fresh_posts():
@@ -268,7 +279,7 @@ def test_registry_and_namespace_contract():
 
     root = Path(__file__).resolve().parents[1]
     settings = load_settings(root / "config/sources.yaml")
-    assert len(settings.sources) == 95
+    assert len(settings.sources) == 101
     assert all(s.kind != "x" or s.url.startswith("https://x.com/") for s in settings.sources)
     folder = root / "workflows/windmill/f/ai_dash"
     for path in folder.glob("*.schedule.yaml"):
@@ -340,7 +351,7 @@ def test_run_persists_before_send_and_second_run_dedupes(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         "ai_dash.pipeline.rank",
-        lambda items, *a: [
+        lambda items, *a, **kw: [
             Story(item=i, score=80, summary="A useful announcement.") for i in items
         ],
     )
@@ -480,6 +491,14 @@ def test_paper_cap_preserves_room_for_blogs_and_x(tmp_path):
     class Fake:
         def request(self, route, body):
             candidates = json.loads(body["messages"][1]["content"])["candidates"]
+            if body["purpose"] == "ai-news-consolidation":
+                return {
+                    "content": {
+                        "groups": [
+                            {"representative": c["id"], "duplicates": []} for c in candidates
+                        ]
+                    }
+                }
             return {
                 "content": {
                     "decisions": [

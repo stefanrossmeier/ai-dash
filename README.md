@@ -6,9 +6,9 @@ configuration, secrets and delivery history. Deploys independently on the deploy
 
 | Report | Sources | Berlin slots |
 | --- | --- | --- |
-| Company & Product Updates | 18 official lab/company/product blogs | 07:30, 17:30 |
-| Blogs & Analysis | 6 independent authors, newsletters and aggregators | 12:30 |
-| Research & Open Source | 22 paper, model, release and community sources | 15:30 |
+| Company & Product Updates | 20 official lab/company/product streams | 07:30, 17:30 |
+| Blogs & Analysis | 7 independent author, newsletter and reporting streams | 12:30 |
+| Research & Open Source | 24 paper, model, release and community sources | 15:30 |
 | X — AI Leaders & Evaluations | 3 complementary accounts | 20:30 |
 
 Configuration is in [config/reports.yaml](config/reports.yaml). These source groups
@@ -47,8 +47,12 @@ records zero new usage. No automatic fallback widens the watchlist.
 
 ## Delivery and editorial policy
 
-24-hour publication window, source dates required, canonical URL/title dedupe,
-semantic selection, English summaries, source attribution and direct links.
+Source dates required; bounded catch-up windows of 48 hours for company news,
+72 hours for research/OSS and seven days for analysis. X keeps its rolling 24-hour
+window. Messages show the actual publication, submission, curation or repository
+update date; update/curation timestamps never establish a new release.
+Canonical URL and scoped-title dedupe, semantic event consolidation, English
+summaries, source attribution and direct links.
 Research & Open Source permits at most six papers; papers never fill company/blog/X reports.
 Global history prevents the same announcement appearing repeatedly across reports.
 Empty normal editions are quiet, except the daily X report. `--example` labels a
@@ -81,18 +85,36 @@ public checkout. X previews count against the same daily retrieval budget.
 [Source provenance](docs/SOURCES.md) · [Deployment evidence](docs/DEPLOYMENT_STATUS.md).
 
 ```bash
-# On deployment-host, deploy ai-dash's standalone stack; schedules register disabled.
+# On deployment-host, deploy the standalone stack; new schedules start disabled.
+# Existing schedule enablement is preserved on updates.
 ./scripts/deploy-vps.sh
 # Enable each report only after its example has succeeded.
 python3 scripts/register-windmill.py --enable-report company
 # Or enable all four after their separate rollouts.
 python3 scripts/register-windmill.py --enable
+# Pause one report without changing the others.
+python3 scripts/register-windmill.py --disable-report blogs
 ```
 
 Flows live exclusively under `f/ai_dash`, with worker tag `aidash`. Start one flow
 with input `{"example": true}` to deliver its example immediately. Never reset
 history to force a sample. Source and model failures remain visible in private
 artifacts and per-report collection checkpoints.
+
+Feed bodies are preferred over teasers. A bounded public-article/model-card reader
+hydrates thin candidates (up to 40 article requests per report, ten-second request
+timeout, two-MB response cap); inaccessible text is never invented. AINews can
+supply up to eight linked discoveries per issue, accepted only after verifying
+their publisher dates. The duplicate Latent Space feed alias is archived.
+Ranking records a score/reason for every evidenced candidate; a global comparison
+then consolidates events before paper/story limits and a soft publisher-diversity
+preference. One additional cheap ranking-model call consolidates editions with
+multiple qualifying stories. Missing model decisions fail visibly instead of
+silently producing an empty edition. `ai-dash status` exposes latest report health;
+artifacts/checkpoints contain evidence gaps and per-candidate selection logs.
+
+The [news audit](docs/NEWS_AUDIT_2026-11-15.md) records the production baseline;
+[repair verification](docs/NEWS_REPAIR_2026-11-15.md) describes the changes and limits.
 
 Private data: `/var/code/ai-dash-data`. New bot credentials:
 `/var/code/ai-dash-runtime/secrets`. Back up data and encrypted secrets independently.

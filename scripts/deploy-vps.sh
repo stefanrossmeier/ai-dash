@@ -21,5 +21,5 @@ docker compose --project-name ai-dash --project-directory "$ROOT" \
   --env-file "$AI_DASH_RUNTIME/.env" -f "$ROOT/deploy/compose.ai-dash.yaml" \
   up -d --wait --wait-timeout 300
 python3 "$ROOT/scripts/bootstrap-windmill.py"
-# Definitions default to disabled, so deployment cannot unexpectedly start delivery.
+# New schedules default to disabled; updates preserve existing enablement.
 python3 "$ROOT/scripts/register-windmill.py"
