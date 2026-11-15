@@ -25,7 +25,9 @@ cd /var/code/ai-dash
 
 The deploy script generates a new database password once, builds the locked
 application image, starts only the `ai-dash` project, waits for health checks,
-bootstraps its Windmill workspace and registers definitions with schedules disabled.
+bootstraps its Windmill workspace and registers new schedules disabled. Updates
+preserve existing enablement; `--enable-report` and `--disable-report` affect only
+the named reports. A report explicitly paused in `config/reports.yaml` stays paused.
 It replaces Windmill's default administrator password on first startup. The private
 password is in `secrets/windmill_admin_password`; login email is `admin@windmill.dev`.
 All administration and registration use only this runtime's profile.

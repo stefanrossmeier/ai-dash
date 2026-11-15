@@ -1,5 +1,27 @@
 # Source provenance
 
+## News repair — 2026-11-15
+
+The live registry now retains the original 95 entries plus six verified additions:
+Anthropic Engineering, Anthropic Research, Claude Code releases, Codex releases,
+THE DECODER and Import AI. The original Latent Space alias is disabled because it
+returns exactly the same all-content stream as the canonical Latent Space / AINews
+row. Active report counts are 20 company, seven analysis, 24 research/OSS and three X.
+
+Full feed bodies are read before teasers; bounded hydration supplies article/model
+card evidence where needed. Source URL query parameters are preserved, including
+HF author, ordering and limit filters. Model-hub author endpoints sort by
+`lastModified`; GitHub discovery now means recently active repositories, not
+“Trending” or newly created projects. Repository updates and paper curation retain
+their timestamp basis and never establish a release by themselves.
+
+[Repair verification](NEWS_REPAIR_2026-11-15.md) and the linked evidence record
+the free public-source checks. TLDR AI remains a candidate requiring a verified
+archive adapter; it was not enabled from a landing page alone. No paid X watchlist
+or daily retrieval/delivery limit changed.
+
+The remaining sections describe the original registry and historical rollout.
+
 Imported on 2026-11-09 from the owner's existing Hermes installation, not generated
 from a model's recommendations:
 

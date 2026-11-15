@@ -1,0 +1,7 @@
+{
+  "feed_full_content_ignored": true,
+  "rc_without_hyphen_not_filtered": true,
+  "html_cap_keeps_old_before_new": true,
+  "late_unseen_story_dropped": true,
+  "unrelated_releases_collide_by_title": true
+}

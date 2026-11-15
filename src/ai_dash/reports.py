@@ -19,9 +19,10 @@ class Report(Model):
     focus: str
     max_stories: int = Field(default=12, ge=1, le=30)
     max_paper_stories: int = Field(default=6, ge=0, le=30)
-    max_per_source: int = Field(default=25, ge=1, le=25)
+    max_per_source: int = Field(default=25, ge=1, le=100)
     send_empty: bool = False
     x_only: bool = False
+    freshness_hours: int = Field(default=24, ge=1, le=168)
 
 
 class Reports(Model):
@@ -78,5 +79,6 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         x_retry_split=False,
         x_batch_size=3,
         send_empty=report.send_empty,
+        freshness_hours=report.freshness_hours,
     )
     return Settings.model_validate(data)

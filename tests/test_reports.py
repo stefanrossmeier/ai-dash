@@ -145,7 +145,7 @@ def test_empty_successful_x_search_is_quiet_report_not_outage(monkeypatch, tmp_p
         "ai_dash.pipeline.collect",
         lambda *a, **kw: ([], [Coverage(source_id="lab", status="empty")]),
     )
-    monkeypatch.setattr("ai_dash.pipeline.rank", lambda *a: [])
+    monkeypatch.setattr("ai_dash.pipeline.rank", lambda *a, **kw: [])
     a = build(
         Settings(sources=[], x_enabled=True, report_id="x_major", send_empty=True),
         Gateway("http://unused"),

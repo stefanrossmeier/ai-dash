@@ -25,6 +25,8 @@ class Source(Model):
     focus: str
     enabled: bool = True
     note: str = ""
+    expand_roundups: bool = False
+    article_paths: list[str] = []
 
     @field_validator("url", "endpoint")
     @classmethod
@@ -37,7 +39,7 @@ class Source(Model):
 class Settings(Model):
     timezone: str = "Europe/Berlin"
     slots: list[str] = ["07:30", "12:30", "17:30", "21:30"]
-    freshness_hours: int = Field(default=24, ge=1, le=24)
+    freshness_hours: int = Field(default=24, ge=1, le=168)
     history_days: int = Field(default=14, ge=1)
     max_per_source: int = Field(default=25, ge=1, le=100)
     max_stories: int = Field(default=30, ge=1, le=60)
@@ -56,6 +58,8 @@ class Settings(Model):
     example: bool = False
     request_timeout: int = Field(default=20, ge=1, le=60)
     workers: int = Field(default=5, ge=1, le=12)
+    hydration_max_requests: int = Field(default=40, ge=0, le=100)
+    hydration_timeout: int = Field(default=10, ge=1, le=30)
     sources: list[Source]
 
     @field_validator("timezone")
@@ -95,7 +99,12 @@ class Item(Model):
     source: str
     category: str
     priority: Literal["P1", "P2"]
-    text: str = Field(default="", max_length=4000)
+    text: str = Field(default="", max_length=12000)
+    date_basis: Literal["publication", "submission", "curation", "repository_update"] = (
+        "publication"
+    )
+    original_published_at: datetime | None = None
+    discovered_via: str = ""
 
     @field_validator("url")
     @classmethod
@@ -127,6 +136,7 @@ class Decision(Model):
     novelty: int = Field(ge=0, le=20)
     impact: int = Field(ge=0, le=20)
     summary: str = Field(min_length=1, max_length=650)
+    reason: str = Field(default="", max_length=400)
 
     @property
     def score(self) -> int:
@@ -135,6 +145,15 @@ class Decision(Model):
 
 class Selection(Model):
     decisions: list[Decision]
+
+
+class EventGroup(Model):
+    representative: str
+    duplicates: list[str]
+
+
+class Consolidation(Model):
+    groups: list[EventGroup]
 
 
 class Story(Model):
@@ -158,3 +177,5 @@ class Artifact(Model):
     coverage: list[Coverage]
     traces: list[dict]
     stats: dict[str, int]
+    selection_log: list[dict] = []
+    health_warnings: list[str] = []

@@ -123,7 +123,17 @@ class Store:
                 raise ValueError("message is not awaiting uncertain-delivery resolution")
 
     def status(self) -> dict:
+        reports = {}
+        for (raw,) in self.db.execute("SELECT artifact FROM editions ORDER BY rowid DESC"):
+            artifact = Artifact.model_validate_json(raw)
+            if artifact.report_id not in reports:
+                reports[artifact.report_id] = {
+                    "created_at": artifact.created_at.isoformat(),
+                    "selected": len(artifact.stories),
+                    "health_warnings": artifact.health_warnings,
+                }
         return {
+            "reports": reports,
             "editions": self.db.execute("SELECT COUNT(*) FROM editions").fetchone()[0],
             "outbox": dict(self.db.execute("SELECT status, COUNT(*) FROM outbox GROUP BY status")),
             "unresolved": [

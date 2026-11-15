@@ -12,6 +12,7 @@ import feedparser
 import httpx
 from bs4 import BeautifulSoup
 
+from ai_dash.content import article_evidence, excerpt
 from ai_dash.gateway import Gateway
 from ai_dash.models import Coverage, Item, Settings, Source
 from ai_dash.processing import canonical_url, identity
@@ -19,7 +20,8 @@ from ai_dash.processing import canonical_url, identity
 AI_WORDS = re.compile(
     r"\b(ai|llm|llms|gpt|claude|gemini|inference|transformer|transformers|agent|agents|"
     r"neural|machine learning|deep learning|language model|gpu|cuda|quantization|"
-    r"diffusion|qwen|deepseek|llama|mistral|hugging|rag|vllm|sglang)\b",
+    r"diffusion|qwen|deepseek|llama|mistral|hugging|rag|vllm|sglang|openai|anthropic|"
+    r"codex|copilot|cursor|reasoning|fine-tuning|post-training|jev)\b",
     re.I,
 )
 X_POST = re.compile(
@@ -65,7 +67,7 @@ def make_item(source: Source, title: str, url: str, date: object, text: str = ""
         source=source.name,
         category=source.category,
         priority=source.priority,
-        text=plain(text)[:4000],
+        text=excerpt(text),
     )
 
 
@@ -90,7 +92,11 @@ def parse_feed(source: Source, content: str, cap: int) -> tuple[list[Item], int]
         for e in entries
         if not (
             source.category == "GitHub"
-            and re.fullmatch(r"(?:b\d+(?::.*)?|.*(?:-rc|alpha|beta).*)", e.get("title", ""), re.I)
+            and re.search(
+                r"^b\d+(?::.*)?$|(?:\d[.-]?|[-.])(?:rc|alpha|beta|dev|preview)\.?\d*\b",
+                e.get("title", ""),
+                re.I,
+            )
         )
     ]
     eligible.sort(
@@ -103,8 +109,38 @@ def parse_feed(source: Source, content: str, cap: int) -> tuple[list[Item], int]
     items = []
     for e in selected:
         date = e.get("published") or e.get("updated")
-        item = make_item(source, e.get("title", ""), e.get("link", ""), date, e.get("summary", ""))
+        bodies = [e.get("summary", ""), *(c.get("value", "") for c in e.get("content", []))]
+        body = max(bodies, key=lambda value: len(plain(value)))
+        item = make_item(source, e.get("title", ""), e.get("link", ""), date, body)
         if item:
+            if source.expand_roundups and item.title.startswith("[AINews]"):
+                item = item.model_copy(update={"category": "Aggregator"})
+                # Roundup links are discovery hints. Hydration must establish the
+                # linked publisher's date before any of these can be selected.
+                links = {}
+                for anchor in BeautifulSoup(body, "html.parser").select("a[href]"):
+                    url = urljoin(item.url, str(anchor["href"]))
+                    host = (urlsplit(url).hostname or "").removeprefix("www.")
+                    title = plain(anchor.get_text(" "))
+                    if (
+                        urlsplit(url).scheme in {"https", "http"}
+                        and host not in {"latent.space", "x.com", "twitter.com", "discord.com"}
+                        and len(title) >= 20
+                        and len(title.split()) >= 4
+                    ):
+                        links.setdefault(canonical_url(url), title)
+                for url, title in list(links.items())[:8]:
+                    child = make_item(source, title, url, date)
+                    if child:
+                        items.append(
+                            child.model_copy(
+                                update={
+                                    "discovered_via": item.url,
+                                    "source": f"{urlsplit(url).hostname} (via {source.name})",
+                                    "category": "Aggregator",
+                                }
+                            )
+                        )
             items.append(item)
     if source.category == "GitHub":
         items = items[:3]
@@ -179,26 +215,30 @@ def html_items(source: Source, client: httpx.Client, text: str, cap: int) -> tup
             walk(json.loads(script.string or "{}"))
         except (ValueError, TypeError, KeyError):
             continue
-    if items:
-        return items[:cap], len(items)
     # Date verification is a hard gate: visit actual article links for metadata.
     base = urlsplit(source.url)
     links = {}
+    known_urls = {i.url for i in items}
     for anchor in soup.select("a[href]"):
         url = urljoin(source.url, str(anchor["href"]))
         p = urlsplit(url)
         title = plain(anchor.get_text(" "))
         if (
             p.hostname == base.hostname
-            and p.path.startswith(base.path.rstrip("/") + "/")
+            and any(
+                p.path.startswith(path.rstrip("/") + "/")
+                for path in (source.article_paths or [base.path])
+            )
             and p.path != base.path
             and len(title) >= 18
             and not p.fragment
+            and canonical_url(url) not in known_urls
         ):
             links.setdefault(url, title)
     for url, title in list(links.items())[: min(cap, 8)]:
         try:
-            article = BeautifulSoup(fetch(client, url).text, "html.parser")
+            article_html = fetch(client, url).text
+            article = BeautifulSoup(article_html, "html.parser")
             meta = article.select_one(
                 'meta[property="article:published_time"], meta[name="date"], time[datetime]'
             )
@@ -208,14 +248,22 @@ def html_items(source: Source, client: httpx.Client, text: str, cap: int) -> tup
                     walk(json.loads(script.string or "{}"))
                 continue
             description = article.select_one('meta[name="description"]')
+            body, _ = article_evidence(article_html)
             item = make_item(
-                source, title, url, date, str(description.get("content", "")) if description else ""
+                source,
+                title,
+                url,
+                date,
+                body or (str(description.get("content", "")) if description else ""),
             )
             if item:
                 items.append(item)
         except (httpx.HTTPError, ValueError, TypeError):
             continue
-    return items, len(links)
+    unique = {i.url: i for i in items}
+    return sorted(unique.values(), key=lambda i: i.published_at, reverse=True)[:cap], len(
+        links
+    ) + len(unique)
 
 
 def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[list[Item], Coverage]:
@@ -235,7 +283,9 @@ def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[lis
                 follow_redirects=True,
                 headers={"User-Agent": "ai-dash/0.1 (+AI-news-reader)"},
             ) as client:
-                params = {}
+                # Passing even an empty dict to httpx replaces the URL's query,
+                # dropping configured author, sorting and limit filters.
+                params = None
                 if source.kind == "hn":
                     params = {
                         "tags": "story",
@@ -244,7 +294,7 @@ def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[lis
                     }
                 elif source.kind == "github":
                     params = {
-                        "q": f"topic:llm created:>{cutoff.date()} stars:>20",
+                        "q": f"topic:llm pushed:>={cutoff.date()} stars:>20 archived:false",
                         "sort": "stars",
                         "per_page": 25,
                     }
@@ -281,23 +331,47 @@ def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[lis
                                 paper["title"],
                                 "https://huggingface.co/papers/" + paper["id"],
                             )
-                            date = paper.get("publishedAt") or row.get("publishedAt")
-                            text = paper.get("summary", "")
+                            date = row.get("publishedAt") or paper.get("publishedAt")
+                            text = (
+                                "Community paper curation, not necessarily new research. "
+                                f"Original publication: {paper.get('publishedAt', 'unknown')}. "
+                                + paper.get("summary", "")
+                            )
                         elif source.kind == "hf_models":
                             title = row.get("id", row.get("modelId", ""))
-                            url, date = "https://huggingface.co/" + title, row.get("createdAt")
+                            url, date = (
+                                "https://huggingface.co/" + title,
+                                row.get("lastModified") or row.get("createdAt"),
+                            )
                             text = (
-                                "New model repository; creation does not establish "
+                                "Model repository update; neither creation nor modification "
+                                "establishes "
                                 "a new model release. " + str(row.get("pipeline_tag", ""))
                             )
                         else:
                             title, url = row["full_name"], row["html_url"]
-                            date, text = row["created_at"], row.get("description") or ""
+                            date = row.get("pushed_at") or row["created_at"]
+                            text = "Recently active repository, not a verified release. " + (
+                                row.get("description") or ""
+                            )
                             if not AI_WORDS.search(title + " " + text):
                                 continue
                         raw_count += 1
                         item = make_item(source, title, url, date, text)
                         if item:
+                            if source.kind in {"hf_models", "github"}:
+                                item = item.model_copy(update={"date_basis": "repository_update"})
+                            elif source.kind == "hf_papers":
+                                item = item.model_copy(
+                                    update={
+                                        "date_basis": "curation",
+                                        "original_published_at": timestamp(
+                                            paper.get("publishedAt")
+                                        ),
+                                    }
+                                )
+                            elif source.kind == "hn":
+                                item = item.model_copy(update={"date_basis": "submission"})
                             items.append(item)
             status = "ok" if items else ("undated" if raw_count else "empty")
             if status != "ok" and attempt == 0:
