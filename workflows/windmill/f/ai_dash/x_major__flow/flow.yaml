@@ -1,9 +1,9 @@
-summary: X — AI Leaders & Evaluations
+summary: X — AI Voices
 description: Dedicated source-based AI report; persist before delivery.
 value:
   modules:
   - id: report
-    summary: X — AI Leaders & Evaluations
+    summary: X — AI Voices
     value:
       type: script
       path: f/ai_dash/run_digest

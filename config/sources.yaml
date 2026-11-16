@@ -448,6 +448,16 @@ sources:
   focus: Mistral model releases and infrastructure
   enabled: true
   note: ''
+- id: lab-qwen-blog-rss
+  name: Qwen Blog
+  category: Lab
+  url: https://qwenlm.github.io/blog/
+  priority: P1
+  kind: feed
+  endpoint: https://qwenlm.github.io/blog/index.xml
+  focus: Qwen model releases, technical reports and announcements
+  enabled: true
+  note: Official Qwen blog RSS; lab announcements without X dependence.
 - id: model-hub-qwen
   name: Qwen
   category: Model hub
@@ -500,7 +510,7 @@ sources:
   kind: x
   endpoint: https://x.com/simonw
   focus: Fast technical commentary, new tools and models
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-swyx-shawn-wang
@@ -511,7 +521,7 @@ sources:
   kind: x
   endpoint: https://x.com/swyx
   focus: AI engineering ecosystem, major releases, tooling
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-nathan-lambert
@@ -522,7 +532,7 @@ sources:
   kind: x
   endpoint: https://x.com/natolambert
   focus: Open-weight models, model training, research analysis
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-sebastian-raschka
@@ -533,7 +543,7 @@ sources:
   kind: x
   endpoint: https://x.com/rasbt
   focus: LLM research, architectures, training techniques
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-researcher-andrej-karpathy
@@ -555,7 +565,7 @@ sources:
   kind: x
   endpoint: https://x.com/ArtificialAnlys
   focus: Model evaluations, cost, inference performance
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-semianalysis
@@ -599,7 +609,7 @@ sources:
   kind: x
   endpoint: https://x.com/ggerganov
   focus: llama.cpp, GGUF, efficient local inference
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-oss-vllm
@@ -775,7 +785,7 @@ sources:
   kind: x
   endpoint: https://x.com/OpenAI
   focus: Official model and API announcements
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-anthropic
@@ -786,7 +796,7 @@ sources:
   kind: x
   endpoint: https://x.com/AnthropicAI
   focus: Claude releases, research and technical updates
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-google-deepmind
@@ -797,7 +807,7 @@ sources:
   kind: x
   endpoint: https://x.com/GoogleDeepMind
   focus: Gemini, research, model releases
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-mistral-ai
@@ -819,7 +829,7 @@ sources:
   kind: x
   endpoint: https://x.com/Alibaba_Qwen
   focus: Qwen models, weights, technical reports
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-deepseek
@@ -830,7 +840,7 @@ sources:
   kind: x
   endpoint: https://x.com/deepseek_ai
   focus: Model and research releases, open weights
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-kimi-moonshot-ai
@@ -896,7 +906,7 @@ sources:
   kind: x
   endpoint: https://x.com/maximelabonne
   focus: LLM fine-tuning, practical guides, model releases, notebooks
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-researcher-ilya-sutskever

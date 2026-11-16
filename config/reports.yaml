@@ -58,15 +58,15 @@ reports:
   max_per_source: 100
   min_score: 60
 - id: x_major
-  title: X — AI Leaders & Evaluations
+  title: X — AI Voices
   source_ids:
   - x-researcher-andrej-karpathy
-  - x-analyst-artificial-analysis
-  - x-model-lab-openai
-  - x-model-lab-anthropic
-  - x-model-lab-google-deepmind
-  - x-model-lab-qwen
-  - x-model-lab-deepseek
+  - x-analyst-swyx-shawn-wang
+  - x-analyst-nathan-lambert
+  - x-analyst-simon-willison
+  - x-analyst-sebastian-raschka
+  - x-analyst-maxime-labonne
+  - x-oss-georgi-gerganov
   slots:
   - '20:30'
   x_only: true
@@ -74,11 +74,13 @@ reports:
   max_stories: 6
   max_paper_stories: 0
   send_empty: true
-  focus: 'Top AI news from seven high-signal X sources: original technical insight
-    from Andrej Karpathy, independent evaluations from Artificial Analysis, and
-    official model/release announcements from OpenAI, Anthropic, Google DeepMind,
-    Qwen and DeepSeek. Prioritize frontier model releases and capability milestones.
-    Exclude reposts, memes and stories already delivered through other reports.'
+  focus: 'Original insight from seven influential, active individual AI voices: Andrej
+    Karpathy (LLM engineering), swyx/Shawn Wang (AI ecosystem news), Nathan Lambert
+    (frontier lab developments), Simon Willison (LLM tools and applications),
+    Sebastian Raschka (research and architectures), Maxime Labonne (open model
+    releases) and Georgi Gerganov (local inference). Prioritize current developments,
+    model releases and concrete technical news. Exclude memes, reposts, org account
+    announcements and stories already delivered through other reports.'
   enabled: true
   freshness_hours: 24
 

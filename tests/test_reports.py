@@ -21,14 +21,16 @@ def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
     # every other X source stays disabled so paid retrieval stays bounded.
     assert settings.x_enabled is False
     enabled_x = {s.id for s in settings.sources if s.kind == "x" and s.enabled}
+    # Individual voices only: lab/organizational X accounts are disabled; lab
+    # announcements arrive via the Lab-category blog sources in the company report.
     assert enabled_x == {
         "x-researcher-andrej-karpathy",
-        "x-analyst-artificial-analysis",
-        "x-model-lab-openai",
-        "x-model-lab-anthropic",
-        "x-model-lab-google-deepmind",
-        "x-model-lab-qwen",
-        "x-model-lab-deepseek",
+        "x-analyst-swyx-shawn-wang",
+        "x-analyst-nathan-lambert",
+        "x-analyst-simon-willison",
+        "x-analyst-sebastian-raschka",
+        "x-analyst-maxime-labonne",
+        "x-oss-georgi-gerganov",
     }
     sets = [{s.id for s in g.sources} for g in groups.values()]
     for i, left in enumerate(sets):
