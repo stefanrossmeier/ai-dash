@@ -13,27 +13,33 @@ from ai_dash.x_budget import XDailyBudget
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_reports_use_disjoint_sources_and_three_complementary_x_accounts():
+def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
     settings = load_settings(ROOT / "config/sources.yaml")
     reports = load_reports(ROOT / "config/reports.yaml")
     groups = {r.id: select_report(settings, reports, r.id) for r in reports.reports}
+    # The seven X watchlist accounts are enabled for the daily X report only;
+    # every other X source stays disabled so paid retrieval stays bounded.
     assert settings.x_enabled is False
-    assert all(not s.enabled for s in settings.sources if s.kind == "x")
+    enabled_x = {s.id for s in settings.sources if s.kind == "x" and s.enabled}
+    assert enabled_x == {
+        "x-researcher-andrej-karpathy",
+        "x-analyst-artificial-analysis",
+        "x-model-lab-openai",
+        "x-model-lab-anthropic",
+        "x-model-lab-google-deepmind",
+        "x-model-lab-qwen",
+        "x-model-lab-deepseek",
+    }
     sets = [{s.id for s in g.sources} for g in groups.values()]
     for i, left in enumerate(sets):
         for right in sets[i + 1 :]:
             assert not left & right
-    for key in ["company", "blogs", "research_oss"]:
+    for key in ["company", "blogs", "research_oss", "singularity", "ai_news"]:
         assert not groups[key].x_enabled
         assert all(s.kind != "x" for s in groups[key].sources)
     x = groups["x_major"]
-    assert x.x_enabled and len(x.sources) == 3
-    assert {s.id for s in x.sources} == {
-        "x-researcher-andrej-karpathy",
-        "x-researcher-fran-ois-chollet",
-        "x-analyst-artificial-analysis",
-    }
-    assert all(s.category != "X / model lab" for s in x.sources)
+    assert x.x_enabled and len(x.sources) == 7
+    assert {s.id for s in x.sources} == enabled_x
     assert len(x.slots) == 1 and x.max_per_source == 2 and not x.x_retry_split
 
 

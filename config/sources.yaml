@@ -47,6 +47,56 @@ sources:
   endpoint: https://www.reddit.com/r/LocalLLaMA/new.rss?limit=25
   focus: Local inference, quantization, open models, practical tests
   enabled: true
+  note: Reddit requires a full browser User-Agent from datacenter IPs.
+- id: community-r-singularity
+  name: r/singularity
+  category: Community
+  url: https://www.reddit.com/r/singularity/
+  priority: P1
+  kind: feed
+  endpoint: https://www.reddit.com/r/singularity/new.rss?limit=25
+  focus: AI capability milestones, frontier-model releases, AGI discourse, AI industry news
+  enabled: true
+  note: Reddit requires a full browser User-Agent from datacenter IPs.
+- id: news-techcrunch-ai
+  name: TechCrunch AI
+  category: News
+  url: https://techcrunch.com/category/artificial-intelligence/
+  priority: P1
+  kind: feed
+  endpoint: https://techcrunch.com/category/artificial-intelligence/feed/
+  focus: AI industry news, funding, product launches, model releases
+  enabled: true
+  note: ''
+- id: news-the-verge-ai
+  name: The Verge AI
+  category: News
+  url: https://www.theverge.com/ai-artificial-intelligence
+  priority: P1
+  kind: feed
+  endpoint: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+  focus: AI product news, industry moves, policy, frontier-lab announcements
+  enabled: true
+  note: ''
+- id: news-mit-technology-review-ai
+  name: MIT Technology Review AI
+  category: News
+  url: https://www.technologyreview.com/topic/artificial-intelligence/
+  priority: P1
+  kind: feed
+  endpoint: https://www.technologyreview.com/topic/artificial-intelligence/feed
+  focus: AI research coverage, policy, frontier-lab reporting
+  enabled: true
+  note: ''
+- id: news-arstechnica-ai
+  name: Ars Technica AI
+  category: News
+  url: https://arstechnica.com/ai/
+  priority: P1
+  kind: feed
+  endpoint: https://arstechnica.com/ai/feed/
+  focus: AI reporting, model releases, hardware, industry analysis
+  enabled: true
   note: ''
 - id: discovery-hugging-face-trending-models
   name: Hugging Face Trending Models
@@ -494,7 +544,7 @@ sources:
   kind: x
   endpoint: https://x.com/karpathy
   focus: LLM engineering, training, new technical ideas
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-artificial-analysis
@@ -505,7 +555,7 @@ sources:
   kind: x
   endpoint: https://x.com/ArtificialAnlys
   focus: Model evaluations, cost, inference performance
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-semianalysis
@@ -725,7 +775,7 @@ sources:
   kind: x
   endpoint: https://x.com/OpenAI
   focus: Official model and API announcements
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-anthropic
@@ -736,7 +786,7 @@ sources:
   kind: x
   endpoint: https://x.com/AnthropicAI
   focus: Claude releases, research and technical updates
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-google-deepmind
@@ -747,7 +797,7 @@ sources:
   kind: x
   endpoint: https://x.com/GoogleDeepMind
   focus: Gemini, research, model releases
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-mistral-ai
@@ -769,7 +819,7 @@ sources:
   kind: x
   endpoint: https://x.com/Alibaba_Qwen
   focus: Qwen models, weights, technical reports
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-deepseek
@@ -780,7 +830,7 @@ sources:
   kind: x
   endpoint: https://x.com/deepseek_ai
   focus: Model and research releases, open weights
-  enabled: false
+  enabled: true
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-model-lab-kimi-moonshot-ai
