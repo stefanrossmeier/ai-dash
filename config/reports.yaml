@@ -41,6 +41,8 @@ reports:
   - Discovery
   - Model hub
   - Community
+  exclude_ids:
+  - community-r-singularity
   source_ids:
   - aggregator-hacker-news
   slots:
@@ -59,8 +61,12 @@ reports:
   title: X — AI Leaders & Evaluations
   source_ids:
   - x-researcher-andrej-karpathy
-  - x-researcher-fran-ois-chollet
   - x-analyst-artificial-analysis
+  - x-model-lab-openai
+  - x-model-lab-anthropic
+  - x-model-lab-google-deepmind
+  - x-model-lab-qwen
+  - x-model-lab-deepseek
   slots:
   - '20:30'
   x_only: true
@@ -68,11 +74,51 @@ reports:
   max_stories: 6
   max_paper_stories: 0
   send_empty: true
-  focus: Original technical insights from Andrej Karpathy and François Chollet, and
-    new independent evaluations from Artificial Analysis. These supplement the configured
-    company blogs. Exclude company announcement reposts and stories already delivered
-    through blogs or model hubs. Attribute opinions and benchmark claims to the author.
-    Require material impact beyond routine maintenance or minor tool features; do
-    not fill the report with patch notes or small benchmark deltas.
+  focus: 'Top AI news from seven high-signal X sources: original technical insight
+    from Andrej Karpathy, independent evaluations from Artificial Analysis, and
+    official model/release announcements from OpenAI, Anthropic, Google DeepMind,
+    Qwen and DeepSeek. Prioritize frontier model releases and capability milestones.
+    Exclude reposts, memes and stories already delivered through other reports.'
+  enabled: true
+  freshness_hours: 24
+
+- id: singularity
+  title: Reddit — r/singularity Daily
+  source_ids:
+  - community-r-singularity
+  slots:
+  - 08:30
+  - '18:30'
+  max_per_source: 25
+  max_stories: 8
+  max_paper_stories: 0
+  min_score: 55
+  send_empty: false
+  focus: 'Community-surfaced AI news from r/singularity: frontier model releases,
+    capability milestones, notable industry moves and high-engagement AI developments.
+    Exclude memes, daily discussion threads, screenshots and doomer/utopia speculation
+    without concrete developments. Prefer posts linking primary sources.'
+  enabled: true
+  freshness_hours: 24
+
+- id: ai_news
+  title: AI News — Tech Press Digest
+  source_ids:
+  - news-techcrunch-ai
+  - news-the-verge-ai
+  - news-mit-technology-review-ai
+  - news-arstechnica-ai
+  slots:
+  - 09:15
+  - '19:15'
+  max_per_source: 15
+  max_stories: 10
+  max_paper_stories: 0
+  min_score: 55
+  send_empty: false
+  focus: 'Breaking AI news from the tech press: frontier model releases, major product
+    launches, industry and policy developments, notable research coverage. Two
+    editions per day. Prefer same-day primary developments over commentary and
+    analysis pieces. Exclude weekly digests and sponsored content.'
   enabled: true
   freshness_hours: 24

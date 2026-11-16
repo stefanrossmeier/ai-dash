@@ -1,0 +1,24 @@
+summary: AI News — Tech Press Digest
+description: Dedicated source-based AI report; persist before delivery.
+value:
+  modules:
+  - id: report
+    summary: AI News — Tech Press Digest
+    value:
+      type: script
+      path: f/ai_dash/run_digest
+      tag_override: aidash
+      input_transforms:
+        report:
+          type: static
+          value: ai_news
+        example:
+          type: javascript
+          expr: String(flow_input.example ?? false)
+schema:
+  type: object
+  properties:
+    example:
+      type: boolean
+      default: false
+  required: []

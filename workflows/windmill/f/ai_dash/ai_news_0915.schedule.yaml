@@ -1,0 +1,8 @@
+summary: AI News — Tech Press Digest 09:15
+schedule: 0 15 9 * * *
+timezone: Europe/Berlin
+enabled: false
+script_path: f/ai_dash/ai_news
+is_flow: true
+args: {}
+no_flow_overlap: true

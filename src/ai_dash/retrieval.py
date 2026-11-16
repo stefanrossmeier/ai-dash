@@ -72,8 +72,19 @@ def make_item(source: Source, title: str, url: str, date: object, text: str = ""
 
 
 def fetch(client: httpx.Client, url: str, **kwargs) -> httpx.Response:
-    # Plain browser UA for Reddit: the Hermes endpoint notes document its bot-UA blocking.
-    headers = {"User-Agent": "Mozilla/5.0"} if "reddit.com" in url else {}
+    # Full browser UA for Reddit: it 403s plain "Mozilla/5.0" and bot UAs from
+    # datacenter IPs; the full Chrome string passes (verified live 2026-11-16).
+    # Everything else keeps the default client UA.
+    if "reddit.com" in url:
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+            ),
+            "Accept": "application/rss+xml,application/xml,text/xml,*/*",
+        }
+    else:
+        headers = {}
     response = client.get(url, headers=headers, **kwargs)
     response.raise_for_status()
     if len(response.content) > 12_000_000:
@@ -403,8 +414,8 @@ def retrieve_x(
 ) -> tuple[list[Item], list[Coverage]]:
     if retry_split:
         raise ValueError("Paid X retrieval retries are disabled")
-    if len(sources) > 3:
-        raise ValueError("X retrieval is limited to three accounts")
+    if len(sources) > 7:
+        raise ValueError("X retrieval is limited to seven accounts")
     items, coverage = [], []
     start = now - timedelta(hours=settings.freshness_hours)
     for offset in range(0, len(sources), settings.x_batch_size):
