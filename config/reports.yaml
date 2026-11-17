@@ -70,10 +70,16 @@ reports:
   slots:
   - '20:30'
   x_only: true
-  max_per_source: 2
-  max_stories: 6
+  max_per_source: 3
+  max_stories: 12
   max_paper_stories: 0
   send_empty: true
+  min_score: 25
+  min_impact: 20
+  min_breadth: 15
+  min_novelty: 10
+  min_quality: 20
+  min_tier: 1
   focus: 'Original insight from seven influential, active individual AI voices: Andrej
     Karpathy (LLM engineering), swyx/Shawn Wang (AI ecosystem news), Nathan Lambert
     (frontier lab developments), Simon Willison (LLM tools and applications),

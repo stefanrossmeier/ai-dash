@@ -24,6 +24,11 @@ class Report(Model):
     x_only: bool = False
     freshness_hours: int = Field(default=24, ge=1, le=168)
     min_score: int | None = Field(default=None, ge=0, le=100)
+    min_impact: int | None = Field(default=None, ge=0, le=100)
+    min_breadth: int | None = Field(default=None, ge=0, le=100)
+    min_novelty: int | None = Field(default=None, ge=0, le=100)
+    min_quality: int | None = Field(default=None, ge=0, le=100)
+    min_tier: int | None = Field(default=None, ge=1, le=5)
 
 
 class Reports(Model):
@@ -78,10 +83,13 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         max_per_source=report.max_per_source,
         x_enabled=report.x_only,
         x_retry_split=False,
-        x_batch_size=3,
         send_empty=report.send_empty,
         freshness_hours=report.freshness_hours,
     )
     if report.min_score is not None:
         data["min_score"] = report.min_score
+    for gate in ("min_impact", "min_breadth", "min_novelty", "min_quality", "min_tier"):
+        value = getattr(report, gate)
+        if value is not None:
+            data[gate] = value
     return Settings.model_validate(data)

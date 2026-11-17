@@ -202,4 +202,4 @@ def test_model_and_threshold_config_are_independent_and_explicit():
     reports = load_reports(root / "config/reports.yaml")
     assert select_report(base, reports, "research_oss").min_score == 60
     assert select_report(base, reports, "company").min_score == 65
-    assert select_report(base, reports, "x_major").min_score == 65
+    assert select_report(base, reports, "x_major").min_score == 25
