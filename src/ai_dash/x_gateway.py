@@ -30,7 +30,7 @@ class SearchRequest(Model):
     purpose: str
     profile: str
     input: str = Field(max_length=5000)
-    allowed_x_handles: list[str] = Field(min_length=1, max_length=3)
+    allowed_x_handles: list[str] = Field(min_length=1, max_length=7)
     from_date: date
     to_date: date  # Exclusive: caller passes tomorrow to include today's posts.
     response_schema_name: str
