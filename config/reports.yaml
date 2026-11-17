@@ -70,6 +70,10 @@ reports:
   - x-news-clement-delangue
   - x-news-andrew-ng
   - x-news-rowan-cheung
+  - x-news-heybarsee
+  - x-news-kimmonismus
+  - x-news-bindu-reddy
+  - x-news-linus-ekenstam
   slots:
   - '20:30'
   x_only: true
@@ -89,8 +93,10 @@ reports:
     (frontier lab developments), Simon Willison (LLM tools and applications),
     akhaliq (fastest same-day research and model-release news), reach_vb (open-model
     releases), Min Choi (papers and product news), TheAIGRID (general AI news),
-    Clement Delangue (open-model and HF ecosystem news), Andrew Ng (industry news)
-    and Rowan Cheung (breaking AI news and launches).
+    Clement Delangue (open-model and HF ecosystem news), Andrew Ng (industry news),
+    Rowan Cheung (breaking AI news and launches), Barsee (AI tools and demos),
+    Chubby (frontier models, benchmarks, robotics), Bindu Reddy (benchmarks and
+    lab moves) and Linus Ekenstam (creative AI tools and product launches).
     The bucket should surface the day AI developments at volume; ranking selects
     the most important. Prioritize model releases, capability milestones, notable
     launches and concrete industry news. Exclude memes, reposts and stories already

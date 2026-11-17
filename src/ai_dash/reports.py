@@ -71,8 +71,8 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
             selected.append(source)
     if not selected:
         raise ValueError(f"report has no sources: {report_id}")
-    if report.x_only and len(selected) > 10:
-        raise ValueError("daily X watchlist is limited to ten accounts")
+    if report.x_only and len(selected) > 14:
+        raise ValueError("daily X watchlist is limited to fourteen accounts")
     data = settings.model_dump()
     data.update(
         sources=[s.model_dump() for s in selected],

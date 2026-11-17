@@ -532,6 +532,46 @@ sources:
   focus: Breaking AI news, product launches, model announcements; very high frequency
   enabled: true
   note: The Rundown AI founder; among the highest-frequency AI news posters.
+- id: x-news-heybarsee
+  name: Barsee
+  category: X / news
+  url: https://x.com/heyBarsee
+  priority: P1
+  kind: x
+  endpoint: https://x.com/heyBarsee
+  focus: Fast digestible summaries of new AI tools, viral demos and breaking industry news
+  enabled: true
+  note: High-frequency AI tool and demo news throughout the day.
+- id: x-news-kimmonismus
+  name: Chubby
+  category: X / news
+  url: https://x.com/kimmonismus
+  priority: P1
+  kind: x
+  endpoint: https://x.com/kimmonismus
+  focus: Frontier model updates, benchmarks, robotics and European/global AI news
+  enabled: true
+  note: Broad mix of frontier-model and robotics developments.
+- id: x-news-bindu-reddy
+  name: Bindu Reddy
+  category: X / news
+  url: https://x.com/BinduReddy
+  priority: P1
+  kind: x
+  endpoint: https://x.com/BinduReddy
+  focus: Model benchmarks, open- vs closed-source releases and major lab moves
+  enabled: true
+  note: Abacus.AI CEO; frequent candid benchmark and lab-news commentary.
+- id: x-news-linus-ekenstam
+  name: Linus Ekenstam
+  category: X / news
+  url: https://x.com/LinusEkenstam
+  priority: P1
+  kind: x
+  endpoint: https://x.com/LinusEkenstam
+  focus: New creative AI tools, interfaces and major product launches
+  enabled: true
+  note: Continuous updates on creative AI tools and product launches.
 - id: x-news-akhaliq
   name: akhaliq
   category: X / news
