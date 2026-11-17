@@ -29,6 +29,7 @@ class Report(Model):
     min_novelty: int | None = Field(default=None, ge=0, le=100)
     min_quality: int | None = Field(default=None, ge=0, le=100)
     min_tier: int | None = Field(default=None, ge=1, le=5)
+    omit_delivered: bool | None = None
 
 
 class Reports(Model):
@@ -69,8 +70,8 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
             selected.append(source)
     if not selected:
         raise ValueError(f"report has no sources: {report_id}")
-    if report.x_only and len(selected) > 7:
-        raise ValueError("daily X watchlist is limited to seven accounts")
+    if report.x_only and len(selected) > 10:
+        raise ValueError("daily X watchlist is limited to ten accounts")
     data = settings.model_dump()
     data.update(
         sources=[s.model_dump() for s in selected],
@@ -92,4 +93,6 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         value = getattr(report, gate)
         if value is not None:
             data[gate] = value
+    if report.omit_delivered is not None:
+        data["omit_delivered"] = report.omit_delivered
     return Settings.model_validate(data)

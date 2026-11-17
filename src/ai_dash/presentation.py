@@ -20,10 +20,7 @@ def render(artifact: Artifact, timezone: str) -> list[str]:
         header += "\nX results reused from today’s cache; no new paid retrieval."
     if not artifact.stories:
         hours = int((artifact.window_end - artifact.window_start).total_seconds() // 3600)
-        return [
-            header + f"\n\nNo new qualifying stories in the last {hours} hours. "
-            "Already-delivered stories are omitted."
-        ]
+        return [header + f"\n\nNo new qualifying stories in the last {hours} hours."]
     messages = []
     current = header
     for number, story in enumerate(artifact.stories, 1):

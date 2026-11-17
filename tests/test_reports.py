@@ -13,11 +13,11 @@ from ai_dash.x_budget import XDailyBudget
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
+def test_reports_use_disjoint_sources_and_ten_high_frequency_x_accounts():
     settings = load_settings(ROOT / "config/sources.yaml")
     reports = load_reports(ROOT / "config/reports.yaml")
     groups = {r.id: select_report(settings, reports, r.id) for r in reports.reports}
-    # The seven X watchlist accounts are enabled for the daily X report only;
+    # The ten X watchlist accounts are enabled for the daily X report only;
     # every other X source stays disabled so paid retrieval stays bounded.
     assert settings.x_enabled is False
     enabled_x = {s.id for s in settings.sources if s.kind == "x" and s.enabled}
@@ -31,7 +31,13 @@ def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
         "x-news-reach-vb",
         "x-news-min-choi",
         "x-news-the-ai-grid",
+        "x-news-clement-delangue",
+        "x-news-andrew-ng",
+        "x-news-rowan-cheung",
     }
+    # The X report re-delivers still-relevant stories; history omission is off.
+    assert groups["x_major"].omit_delivered is False
+    assert groups["company"].omit_delivered is True
     sets = [{s.id for s in g.sources} for g in groups.values()]
     for i, left in enumerate(sets):
         for right in sets[i + 1 :]:
@@ -40,7 +46,7 @@ def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
         assert not groups[key].x_enabled
         assert all(s.kind != "x" for s in groups[key].sources)
     x = groups["x_major"]
-    assert x.x_enabled and len(x.sources) == 7
+    assert x.x_enabled and len(x.sources) == 10
     assert {s.id for s in x.sources} == enabled_x
     assert len(x.slots) == 1 and x.max_per_source == 3 and not x.x_retry_split
 
@@ -106,7 +112,7 @@ def test_large_x_watchlists_fail_before_transport(tmp_path, monkeypatch):
     monkeypatch.setattr("ai_dash.gateway.httpx.post", fail)
     with pytest.raises(ValueError):
         Gateway("http://gateway", tmp_path).request(
-            "x-search", {"allowed_x_handles": [f"account{i}" for i in range(8)]}
+            "x-search", {"allowed_x_handles": [f"account{i}" for i in range(11)]}
         )
 
 
@@ -128,7 +134,7 @@ def test_report_examples_are_labelled_and_can_show_quiet_source_groups():
     )
     messages = render(a, "Europe/Berlin")
     assert len(messages) == 1 and "Blogs & Analysis" in messages[0] and "Example" in messages[0]
-    assert "Already-delivered" in messages[0]
+    assert "No new qualifying stories" in messages[0]
 
 
 def test_daily_x_delivery_is_limited_even_when_report_has_no_stories(tmp_path, monkeypatch):

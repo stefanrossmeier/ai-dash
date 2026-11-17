@@ -67,9 +67,13 @@ reports:
   - x-news-reach-vb
   - x-news-min-choi
   - x-news-the-ai-grid
+  - x-news-clement-delangue
+  - x-news-andrew-ng
+  - x-news-rowan-cheung
   slots:
   - '20:30'
   x_only: true
+  omit_delivered: false
   max_per_source: 3
   max_stories: 12
   max_paper_stories: 0
@@ -83,7 +87,9 @@ reports:
   focus: 'High-frequency AI news spreaders: swyx (ecosystem news), Nathan Lambert
     (frontier lab developments), Simon Willison (LLM tools and applications),
     akhaliq (fastest same-day research and model-release news), reach_vb (open-model
-    releases), Min Choi (papers and product news) and TheAIGRID (general AI news).
+    releases), Min Choi (papers and product news), TheAIGRID (general AI news),
+    Clement Delangue (open-model and HF ecosystem news), Andrew Ng (industry news)
+    and Rowan Cheung (breaking AI news and launches).
     The bucket should surface the day AI developments at volume; ranking selects
     the most important. Prioritize model releases, capability milestones, notable
     launches and concrete industry news. Exclude memes, reposts and stories already
