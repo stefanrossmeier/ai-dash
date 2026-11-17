@@ -124,8 +124,17 @@ def test_unsafe_provider_responses_fail_instead_of_becoming_quiet_editions(kind)
         )
     else:
         body["status"] = "incomplete"
-    with pytest.raises(ValueError):
-        xg.validate_response(body, request())
+    if kind in {"no_citation", "wrong_post_author"}:
+        # Per-post violations drop only the offending post instead of
+        # failing the whole batch (one bad post must not black out five
+        # accounts); nothing unsafe is returned either way.
+        content, audit = xg.validate_response(body, request())
+        assert content["posts"] == []
+        assert audit["dropped_posts"] >= 1
+        assert audit["scope_verified"] is True
+    else:
+        with pytest.raises(ValueError):
+            xg.validate_response(body, request())
 
 
 def test_a_real_empty_search_is_distinguished_from_no_search():
