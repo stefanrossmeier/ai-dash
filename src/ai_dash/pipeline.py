@@ -145,7 +145,11 @@ def run(
                     "messages_sent": 0,
                     "messages_resumed": resumed,
                 }
-            history = store.history(datetime.now(UTC), settings.history_days)
+            history = (
+                store.history(datetime.now(UTC), settings.history_days)
+                if settings.omit_delivered
+                else []
+            )
             artifact = build(
                 settings,
                 gateway,

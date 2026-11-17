@@ -502,6 +502,36 @@ sources:
   enabled: true
   note: Repository modification dates are update signals; model cards supply evidence.
     Never infer a release from modification alone.
+- id: x-news-clement-delangue
+  name: Clement Delangue
+  category: X / news
+  url: https://x.com/ClementDelangue
+  priority: P1
+  kind: x
+  endpoint: https://x.com/ClementDelangue
+  focus: Open-model releases, Hugging Face ecosystem, open-source AI news; frequent posts
+  enabled: true
+  note: Hugging Face co-founder; high-value open-AI news at high frequency.
+- id: x-news-andrew-ng
+  name: Andrew Ng
+  category: X / news
+  url: https://x.com/AndrewYNg
+  priority: P1
+  kind: x
+  endpoint: https://x.com/AndrewYNg
+  focus: AI industry news, The Batch newsletter highlights, applied AI developments
+  enabled: true
+  note: Regular industry news summaries and notable developments.
+- id: x-news-rowan-cheung
+  name: Rowan Cheung
+  category: X / news
+  url: https://x.com/rowancheung
+  priority: P1
+  kind: x
+  endpoint: https://x.com/rowancheung
+  focus: Breaking AI news, product launches, model announcements; very high frequency
+  enabled: true
+  note: The Rundown AI founder; among the highest-frequency AI news posters.
 - id: x-news-akhaliq
   name: akhaliq
   category: X / news

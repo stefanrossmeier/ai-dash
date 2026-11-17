@@ -71,8 +71,8 @@ class XDailyBudget:
             return spent
 
     def cached_or_reserve(self, handles: list[str]) -> dict | None:
-        if not handles or len(handles) > 7 or len({h.casefold() for h in handles}) != len(handles):
-            raise ValueError("X retrieval requires one to seven unique accounts")
+        if not handles or len(handles) > 10 or len({h.casefold() for h in handles}) != len(handles):
+            raise ValueError("X retrieval requires one to ten unique accounts")
         day = self.day()
         self.reserved_day = day
         cache = self.cache_path(day)

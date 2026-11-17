@@ -414,8 +414,8 @@ def retrieve_x(
 ) -> tuple[list[Item], list[Coverage]]:
     if retry_split:
         raise ValueError("Paid X retrieval retries are disabled")
-    if len(sources) > 7:
-        raise ValueError("X retrieval is limited to seven accounts")
+    if len(sources) > 10:
+        raise ValueError("X retrieval is limited to ten accounts")
     # One combined request for the whole watchlist. The daily budget permits
     # exactly one paid X request per day, so batching would only guarantee
     # that every batch after the first fails against the budget. A single
