@@ -132,8 +132,12 @@ def run(
         try:
             telegram.check(destination)
             resumed = flush(store, telegram, destination)
-            if settings.report_id == "x_major" and store.delivered_report_today(
-                settings.report_id, datetime.now(UTC), settings.timezone
+            if (
+                settings.report_id == "x_major"
+                and not settings.example
+                and store.delivered_report_today(
+                    settings.report_id, datetime.now(UTC), settings.timezone
+                )
             ):
                 return {
                     "report_id": settings.report_id,
