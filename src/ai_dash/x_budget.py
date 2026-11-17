@@ -11,15 +11,18 @@ from zoneinfo import ZoneInfo
 # retries and bounded test runs without an unguarded spend path.
 DAILY_COST_LIMIT_USD = 0.60
 
+# The cost ledger lives in its own table: a legacy `requests` table with
+# day as PRIMARY KEY cannot be migrated in place (sqlite cannot drop a
+# PRIMARY KEY), so it is simply abandoned where it exists.
+LEDGER_TABLE = "x_requests"
+
 
 class XDailyBudget:
     """Reserve paid X retrieval against a daily cost cap.
 
-    Each request reserves room under the day's limit before it runs; the
-    reservation is provisional (an estimate), and `record_cost` writes the
-    actual provider-reported cost afterwards. The day's cache still serves
-    identical-handle requests for free; a different watchlist in the same
-    day pays for a fresh request while budget remains.
+    Each fresh (uncached) request reserves headroom under the day's limit
+    before it runs; `record_cost` writes the actual provider-reported cost
+    afterwards. The day's cache file serves any request for free.
     """
 
     def __init__(self, root: Path, timezone: str = "Europe/Berlin") -> None:
@@ -35,7 +38,8 @@ class XDailyBudget:
 
     def _spent(self, db: sqlite3.Connection, day: str) -> float:
         rows = db.execute(
-            "SELECT COALESCE(SUM(cost_usd), 0) FROM requests WHERE day = ?", (day,)
+            f"SELECT COALESCE(SUM(cost_usd), 0) FROM {LEDGER_TABLE} WHERE day = ?",  # noqa: S608
+            (day,),
         ).fetchall()
         return float(rows[0][0]) if rows else 0.0
 
@@ -44,7 +48,7 @@ class XDailyBudget:
         with sqlite3.connect(self.root / "requests.sqlite") as db:
             db.execute("PRAGMA synchronous=FULL")
             db.execute(
-                """CREATE TABLE IF NOT EXISTS requests (
+                f"""CREATE TABLE IF NOT EXISTS {LEDGER_TABLE} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     day TEXT NOT NULL,
                     handles TEXT NOT NULL,
@@ -52,11 +56,6 @@ class XDailyBudget:
                     cost_usd REAL NOT NULL DEFAULT 0.0
                 )"""
             )
-            # Migrate the legacy one-request-per-day schema if present.
-            columns = {row[1] for row in db.execute("PRAGMA table_info(requests)")}
-            if "cost_usd" not in columns:
-                db.execute("ALTER TABLE requests ADD COLUMN cost_usd REAL NOT NULL DEFAULT 0.0")
-                db.execute("ALTER TABLE requests ADD COLUMN id INTEGER")
             spent = self._spent(db, day)
             if spent >= DAILY_COST_LIMIT_USD:
                 raise RuntimeError(
@@ -64,14 +63,9 @@ class XDailyBudget:
                     f"${DAILY_COST_LIMIT_USD:.2f}); no automatic paid retry"
                 )
             db.execute(
-                "INSERT INTO requests (day, handles, requested_at, cost_usd) VALUES (?, ?, ?, ?)",
-                (
-                    day,
-                    "reserved",
-                    datetime.now(UTC).isoformat(),
-                    # Provisional reservation: assume one typical request's cost.
-                    0.0,
-                ),
+                f"INSERT INTO {LEDGER_TABLE} (day, handles, requested_at, cost_usd) "
+                "VALUES (?, ?, ?, ?)",
+                (day, "reserved", datetime.now(UTC).isoformat(), 0.0),
             )
             db.commit()
             return spent
@@ -103,8 +97,8 @@ class XDailyBudget:
         effective_day = day or getattr(self, "reserved_day", self.day())
         with sqlite3.connect(self.root / "requests.sqlite") as db:
             db.execute(
-                "UPDATE requests SET cost_usd = ? WHERE id = "
-                "(SELECT MAX(id) FROM requests WHERE day = ?)",
+                f"UPDATE {LEDGER_TABLE} SET cost_usd = ? WHERE id = "
+                f"(SELECT MAX(id) FROM {LEDGER_TABLE} WHERE day = ?)",
                 (cost_usd, effective_day),
             )
             db.commit()
