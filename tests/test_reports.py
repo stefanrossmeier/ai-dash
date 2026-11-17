@@ -35,9 +35,12 @@ def test_reports_use_disjoint_sources_and_ten_high_frequency_x_accounts():
         "x-news-andrew-ng",
         "x-news-rowan-cheung",
     }
-    # The X report re-delivers still-relevant stories; history omission is off.
+    # The X report re-delivers still-relevant stories and lets the composite
+    # score decide on routine-labelled items; company keeps both gates.
     assert groups["x_major"].omit_delivered is False
     assert groups["company"].omit_delivered is True
+    assert groups["x_major"].reject_routine_updates is False
+    assert groups["company"].reject_routine_updates is True
     sets = [{s.id for s in g.sources} for g in groups.values()]
     for i, left in enumerate(sets):
         for right in sets[i + 1 :]:

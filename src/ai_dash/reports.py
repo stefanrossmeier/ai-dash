@@ -30,6 +30,7 @@ class Report(Model):
     min_quality: int | None = Field(default=None, ge=0, le=100)
     min_tier: int | None = Field(default=None, ge=1, le=5)
     omit_delivered: bool | None = None
+    reject_routine_updates: bool | None = None
 
 
 class Reports(Model):
@@ -95,4 +96,6 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
             data[gate] = value
     if report.omit_delivered is not None:
         data["omit_delivered"] = report.omit_delivered
+    if report.reject_routine_updates is not None:
+        data["reject_routine_updates"] = report.reject_routine_updates
     return Settings.model_validate(data)

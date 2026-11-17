@@ -74,6 +74,7 @@ reports:
   - '20:30'
   x_only: true
   omit_delivered: false
+  reject_routine_updates: false
   max_per_source: 3
   max_stories: 12
   max_paper_stories: 0
