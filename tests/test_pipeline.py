@@ -377,7 +377,7 @@ def test_release_build_noise_filtered_and_feed_cap_keeps_newest():
     assert count == 1 and items[0].title == "v2.0"
 
 
-def test_x_timeout_never_retries_paid_search():
+def test_x_timeout_retries_once_under_cost_budget():
     calls = []
 
     class Fake:
@@ -392,11 +392,12 @@ def test_x_timeout_never_retries_paid_search():
         for n in range(3)
     ]
     items, coverage = retrieve_x(sources, Settings(sources=sources), Fake(), NOW)
-    assert [len(c) for c in calls] == [3]
-    assert len(coverage) == 3 and all(c.status == "unavailable" for c in coverage)
+    # A transient timeout is retried exactly once; the retry succeeds.
+    assert [len(c) for c in calls] == [3, 3]
+    assert len(coverage) == 3 and all(c.status == "empty" for c in coverage)
 
 
-def test_x_outage_has_one_attempt():
+def test_x_outage_stops_after_one_bounded_retry():
     calls = []
 
     class Fake:
@@ -409,7 +410,8 @@ def test_x_outage_has_one_attempt():
         for n in range(3)
     ]
     items, coverage = retrieve_x(sources, Settings(sources=sources), Fake(), NOW)
-    assert len(calls) == 1
+    # A persistent outage gets exactly one retry, then the batch gives up.
+    assert len(calls) == 2
     assert len(coverage) == 3 and all(c.status == "unavailable" for c in coverage)
 
 
