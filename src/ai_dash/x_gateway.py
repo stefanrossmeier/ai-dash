@@ -54,7 +54,7 @@ class Post(Model):
 
 
 class Posts(Model):
-    posts: list[Post] = Field(max_length=6)
+    posts: list[Post] = Field(max_length=15)
 
 
 def configured_handles() -> set[str]:
@@ -217,20 +217,31 @@ def validate_response(body: dict, request: SearchRequest) -> tuple[dict, dict]:
         if (match := POST_URL.match(c))
         for url in [match.group(0)]
     }
-    counts = {}
+    # Per-post violations drop only the offending post; structural violations
+    # (body shape, search contract, query scope) still fail the whole response.
+    # One uncited or out-of-scope post must not black out the whole batch -
+    # that repeatedly cost five accounts a day of coverage.
+    kept: list[Post] = []
+    counts: dict[str, int] = {}
+    dropped = 0
     for post in parsed.posts:
         author = post.author_handle.lstrip("@").casefold()
         match = POST_URL.fullmatch(post.post_url)
         url_author = urlsplit(post.post_url).path.split("/")[1].casefold() if match else ""
         if author not in allowed or match is None or url_author != author:
-            raise ValueError("provider returned an out-of-scope author or non-post URL")
+            dropped += 1
+            continue
         if post.post_url.rsplit("/", 1)[-1] not in citation_ids:
-            raise ValueError("provider returned a post without citation evidence")
+            dropped += 1
+            continue
+        if counts.get(author, 0) >= 3:
+            dropped += 1
+            continue
         counts[author] = counts.get(author, 0) + 1
-        if counts[author] > 2:
-            raise ValueError("provider exceeded the two-post author limit")
+        kept.append(post)
+    audit["dropped_posts"] = dropped
     audit["scope_verified"] = True
-    return parsed.model_dump(), audit
+    return Posts(posts=kept).model_dump(), audit
 
 
 def call_openrouter(payload: dict) -> dict:
