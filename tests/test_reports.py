@@ -45,12 +45,22 @@ def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
     assert len(x.slots) == 1 and x.max_per_source == 3 and not x.x_retry_split
 
 
-def test_x_daily_reservation_survives_new_instances_and_failure(tmp_path, monkeypatch):
+def test_x_daily_budget_allows_multiple_requests_under_cost_cap(tmp_path, monkeypatch):
+    import ai_dash.x_budget as xb
+
     monkeypatch.setattr(XDailyBudget, "day", lambda _: "2026-11-09")
-    first = XDailyBudget(tmp_path)
-    assert first.cached_or_reserve(["OpenAI"]) is None
-    with pytest.raises(RuntimeError, match="limit reached"):
+    budget = XDailyBudget(tmp_path)
+    # Several paid requests fit while the day's recorded spend is under the cap.
+    for _n in range(3):
+        assert budget.cached_or_reserve(["OpenAI"]) is None
+        budget.record_cost(0.10)
+    assert xb.DAILY_COST_LIMIT_USD == 0.60
+    # Once recorded spend reaches the cap, further paid requests are refused.
+    assert budget.cached_or_reserve(["OpenAI"]) is None
+    budget.record_cost(0.30)
+    with pytest.raises(RuntimeError, match="cost limit reached"):
         XDailyBudget(tmp_path).cached_or_reserve(["OpenAI"])
+    # A new day resets the cap.
     monkeypatch.setattr(XDailyBudget, "day", lambda _: "2026-11-10")
     assert XDailyBudget(tmp_path).cached_or_reserve(["OpenAI"]) is None
 
@@ -65,11 +75,13 @@ def test_x_cache_reuses_results_with_zero_new_usage(tmp_path):
     result = XDailyBudget(tmp_path).cached_or_reserve(["openai"])
     assert result["cached"] and result["usage"]["cost_usd"] == 0
     assert result["original_usage"]["cost_usd"] == 0.12
-    with pytest.raises(RuntimeError, match="different watchlist"):
-        XDailyBudget(tmp_path).cached_or_reserve(["unwatched"])
+    # Any same-day request is served free from the cache; the cost cap only
+    # guards fresh paid requests after the cache is absent.
+    served = XDailyBudget(tmp_path).cached_or_reserve(["unwatched"])
+    assert served is not None and served["cached"]
 
 
-def test_x_gateway_never_makes_second_paid_request_after_transport_error(tmp_path, monkeypatch):
+def test_x_gateway_transport_error_leaves_budget_available_for_retry(tmp_path, monkeypatch):
     calls = []
 
     def fail(*a, **kw):
@@ -82,7 +94,9 @@ def test_x_gateway_never_makes_second_paid_request_after_transport_error(tmp_pat
             Gateway("http://gateway", tmp_path).request(
                 "x-search", {"allowed_x_handles": ["OpenAI"]}
             )
-    assert len(calls) == 1
+    # A transport failure costs nothing, so the retry reaches the gateway
+    # again instead of being blocked by a consumed one-shot daily attempt.
+    assert len(calls) == 2
 
 
 def test_large_x_watchlists_fail_before_transport(tmp_path, monkeypatch):

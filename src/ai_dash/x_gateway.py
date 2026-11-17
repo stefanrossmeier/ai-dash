@@ -303,6 +303,7 @@ def search(request: SearchRequest):
             "provider_metadata": audit,
         }
         budget.save(request.allowed_x_handles, result)
+        budget.record_cost(float(usage.get("cost", 0) or 0))
         return result
     except (ValueError, RuntimeError, OSError, KeyError) as exc:
         root.mkdir(parents=True, exist_ok=True)
