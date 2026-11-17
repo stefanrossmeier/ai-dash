@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 from datetime import UTC, datetime
@@ -33,8 +34,13 @@ class XDailyBudget:
     def day(self) -> str:
         return datetime.now(UTC).astimezone(ZoneInfo(self.timezone)).date().isoformat()
 
-    def cache_path(self, day: str) -> Path:
-        return self.root / f"{day}.json"
+    def cache_path(self, day: str, handles: list[str] | None = None) -> Path:
+        if handles is None:
+            return self.root / f"{day}.json"
+        digest = hashlib.sha256(
+            ",".join(sorted(h.casefold() for h in handles)).encode()
+        ).hexdigest()[:10]
+        return self.root / f"{day}-{digest}.json"
 
     def _spent(self, db: sqlite3.Connection, day: str) -> float:
         rows = db.execute(
@@ -75,7 +81,7 @@ class XDailyBudget:
             raise ValueError("X retrieval requires one to fourteen unique accounts")
         day = self.day()
         self.reserved_day = day
-        cache = self.cache_path(day)
+        cache = self.cache_path(day, handles)
         if cache.exists():
             saved = json.loads(cache.read_text())
             result = saved["response"]
@@ -105,7 +111,7 @@ class XDailyBudget:
 
     def save(self, handles: list[str], response: dict):
         day = getattr(self, "reserved_day", self.day())
-        path = self.cache_path(day)
+        path = self.cache_path(day, handles)
         temporary = path.with_suffix(".tmp")
         temporary.write_text(
             json.dumps({"handles": sorted(h.casefold() for h in handles), "response": response})

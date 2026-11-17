@@ -85,13 +85,15 @@ def test_x_cache_reuses_results_with_zero_new_usage(tmp_path):
         ["OpenAI", "AnthropicAI"],
         {"content": {"posts": []}, "usage": {"cost_usd": 0.12}, "latency_ms": 700},
     )
-    result = XDailyBudget(tmp_path).cached_or_reserve(["openai"])
+    result = XDailyBudget(tmp_path).cached_or_reserve(["openai", "anthropicai"])
     assert result["cached"] and result["usage"]["cost_usd"] == 0
     assert result["original_usage"]["cost_usd"] == 0.12
-    # Any same-day request is served free from the cache; the cost cap only
-    # guards fresh paid requests after the cache is absent.
-    served = XDailyBudget(tmp_path).cached_or_reserve(["unwatched"])
-    assert served is not None and served["cached"]
+    # A different handle-set has its own cache entry: it reserves a fresh paid
+    # request (affordable under the cost cap) instead of reusing this set's
+    # response. The same set is served free from its cache.
+    assert XDailyBudget(tmp_path).cached_or_reserve(["unwatched"]) is None
+    again = XDailyBudget(tmp_path).cached_or_reserve(["OpenAI", "AnthropicAI"])
+    assert again is not None and again["cached"]
 
 
 def test_x_gateway_transport_error_leaves_budget_available_for_retry(tmp_path, monkeypatch):

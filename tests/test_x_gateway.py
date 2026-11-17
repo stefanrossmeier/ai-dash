@@ -237,7 +237,7 @@ def test_application_routes_x_to_its_own_gateway_and_rejects_unverified_cache(
     gateway = Gateway("http://shared-chat:8080", tmp_path)
     gateway.request("x-search", {"allowed_x_handles": HANDLES})
     assert calls == ["http://own-x:8080/v1/x-search"]
-    cached = gateway.x_budget.cache_path(gateway.x_budget.day())
+    cached = gateway.x_budget.cache_path(gateway.x_budget.day(), HANDLES)
     value = json.loads(cached.read_text())
     value["response"]["provider_metadata"] = {}
     cached.write_text(json.dumps(value))
