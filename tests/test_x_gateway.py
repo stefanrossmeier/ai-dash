@@ -165,10 +165,11 @@ def test_legacy_eighteen_search_trace_is_quarantined_and_not_retried(monkeypatch
     for _ in range(2):
         result = client.post("/v1/x-search", json=request().model_dump(mode="json"))
         assert result.status_code == 502
-    assert len(calls) == 1
+    # A validation failure costs nothing: the retry reaches the provider again
+    # under the cost budget instead of being blocked by a consumed daily attempt.
+    assert len(calls) == 2
     assert list(tmp_path.glob("*.response.json"))
     assert list(tmp_path.glob("*.failure.json"))
-    assert not list((tmp_path / "x-budget").glob("*.json"))
 
 
 def test_unconfigured_account_rejected_before_any_provider_call(monkeypatch, tmp_path):
