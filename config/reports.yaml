@@ -60,13 +60,13 @@ reports:
 - id: x_major
   title: X — AI Voices
   source_ids:
-  - x-researcher-andrej-karpathy
   - x-analyst-swyx-shawn-wang
   - x-analyst-nathan-lambert
   - x-analyst-simon-willison
-  - x-analyst-sebastian-raschka
-  - x-analyst-maxime-labonne
-  - x-oss-georgi-gerganov
+  - x-news-akhaliq
+  - x-news-reach-vb
+  - x-news-min-choi
+  - x-news-the-ai-grid
   slots:
   - '20:30'
   x_only: true
@@ -80,13 +80,14 @@ reports:
   min_novelty: 10
   min_quality: 20
   min_tier: 1
-  focus: 'Original insight from seven influential, active individual AI voices: Andrej
-    Karpathy (LLM engineering), swyx/Shawn Wang (AI ecosystem news), Nathan Lambert
+  focus: 'High-frequency AI news spreaders: swyx (ecosystem news), Nathan Lambert
     (frontier lab developments), Simon Willison (LLM tools and applications),
-    Sebastian Raschka (research and architectures), Maxime Labonne (open model
-    releases) and Georgi Gerganov (local inference). Prioritize current developments,
-    model releases and concrete technical news. Exclude memes, reposts, org account
-    announcements and stories already delivered through other reports.'
+    akhaliq (fastest same-day research and model-release news), reach_vb (open-model
+    releases), Min Choi (papers and product news) and TheAIGRID (general AI news).
+    The bucket should surface the day AI developments at volume; ranking selects
+    the most important. Prioritize model releases, capability milestones, notable
+    launches and concrete industry news. Exclude memes, reposts and stories already
+    delivered through other reports.'
   enabled: true
   freshness_hours: 24
 

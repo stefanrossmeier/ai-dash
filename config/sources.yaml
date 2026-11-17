@@ -502,6 +502,46 @@ sources:
   enabled: true
   note: Repository modification dates are update signals; model cards supply evidence.
     Never infer a release from modification alone.
+- id: x-news-akhaliq
+  name: akhaliq
+  category: X / news
+  url: https://x.com/akhaliq
+  priority: P1
+  kind: x
+  endpoint: https://x.com/akhaliq
+  focus: Same-day AI research and model-release news; extremely high posting frequency
+  enabled: true
+  note: One of the fastest AI news spreaders on X.
+- id: x-news-reach-vb
+  name: reach_vb
+  category: X / news
+  url: https://x.com/reach_vb
+  priority: P1
+  kind: x
+  endpoint: https://x.com/reach_vb
+  focus: Open-model releases, Hugging Face ecosystem news; very high posting frequency
+  enabled: true
+  note: HF community voice; posts notable open-weight releases within minutes.
+- id: x-news-min-choi
+  name: Min Choi
+  category: X / news
+  url: https://x.com/minchoi
+  priority: P1
+  kind: x
+  endpoint: https://x.com/minchoi
+  focus: AI papers, product launches and industry news; high posting frequency
+  enabled: true
+  note: High-signal AI news and paper commentary at high volume.
+- id: x-news-the-ai-grid
+  name: TheAIGRID
+  category: X / news
+  url: https://x.com/TheAIGRID
+  priority: P1
+  kind: x
+  endpoint: https://x.com/TheAIGRID
+  focus: General AI news, industry developments, model announcements; high volume
+  enabled: true
+  note: Dedicated AI news channel; very frequent postings.
 - id: x-analyst-simon-willison
   name: Simon Willison
   category: X / analyst
@@ -543,7 +583,7 @@ sources:
   kind: x
   endpoint: https://x.com/rasbt
   focus: LLM research, architectures, training techniques
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-researcher-andrej-karpathy
@@ -554,7 +594,7 @@ sources:
   kind: x
   endpoint: https://x.com/karpathy
   focus: LLM engineering, training, new technical ideas
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-analyst-artificial-analysis
@@ -609,7 +649,7 @@ sources:
   kind: x
   endpoint: https://x.com/ggerganov
   focus: llama.cpp, GGUF, efficient local inference
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-oss-vllm
@@ -906,7 +946,7 @@ sources:
   kind: x
   endpoint: https://x.com/maximelabonne
   focus: LLM fine-tuning, practical guides, model releases, notebooks
-  enabled: true
+  enabled: false
   note: Archived Hermes watchlist entry. Paid retrieval is allowed only through the
     explicit small daily X report.
 - id: x-researcher-ilya-sutskever
