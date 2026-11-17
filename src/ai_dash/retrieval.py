@@ -416,13 +416,35 @@ def retrieve_x(
         raise ValueError("Paid X retrieval retries are disabled")
     if len(sources) > 14:
         raise ValueError("X retrieval is limited to fourteen accounts")
-    # One combined request for the whole watchlist. The daily budget permits
-    # exactly one paid X request per day, so batching would only guarantee
-    # that every batch after the first fails against the budget. A single
-    # (from:a OR from:b ...) query covers all accounts at the same cost.
+    # grok's X search loses recall when one OR-query spans too many accounts
+    # (observed live: a 14-handle query returned fewer items than a 10- or
+    # 7-handle one on the same day). Retrieve in batches of at most five
+    # accounts; the daily cost budget, not a request count, bounds spend.
     items: list[Item] = []
     coverage: list[Coverage] = []
     start = now - timedelta(hours=settings.freshness_hours)
+    for offset in range(0, len(sources), settings.x_batch_size):
+        items, coverage = _retrieve_x_batch(
+            sources[offset : offset + settings.x_batch_size],
+            settings,
+            gateway,
+            now,
+            start,
+            items,
+            coverage,
+        )
+    return items, coverage
+
+
+def _retrieve_x_batch(
+    sources: list[Source],
+    settings: Settings,
+    gateway: Gateway,
+    now: datetime,
+    start: datetime,
+    items: list[Item],
+    coverage: list[Coverage],
+) -> tuple[list[Item], list[Coverage]]:
     handles = {s.url.rstrip("/").rsplit("/", 1)[-1].casefold(): s for s in sources}
     schema = {
         "type": "object",
