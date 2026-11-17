@@ -42,7 +42,7 @@ def test_reports_use_disjoint_sources_and_seven_complementary_x_accounts():
     x = groups["x_major"]
     assert x.x_enabled and len(x.sources) == 7
     assert {s.id for s in x.sources} == enabled_x
-    assert len(x.slots) == 1 and x.max_per_source == 2 and not x.x_retry_split
+    assert len(x.slots) == 1 and x.max_per_source == 3 and not x.x_retry_split
 
 
 def test_x_daily_reservation_survives_new_instances_and_failure(tmp_path, monkeypatch):

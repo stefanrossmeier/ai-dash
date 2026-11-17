@@ -28,7 +28,7 @@ def selection_score(decision: ImpactDecision) -> float:
 def rejection_reasons(decision: ImpactDecision, settings: Settings) -> list[str]:
     checks = {
         "routine_update": decision.change_type == "routine_update",
-        "low_tier": decision.tier < 3,
+        "low_tier": decision.tier < settings.min_tier,
         "low_impact": decision.impact < settings.min_impact,
         "narrow_breadth": decision.breadth < settings.min_breadth,
         "low_novelty": decision.novelty < settings.min_novelty,

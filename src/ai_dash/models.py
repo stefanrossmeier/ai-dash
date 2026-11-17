@@ -49,11 +49,11 @@ class Settings(Model):
     min_breadth: int = Field(default=45, ge=0, le=100)
     min_novelty: int = Field(default=40, ge=0, le=100)
     min_quality: int = Field(default=60, ge=0, le=100)
+    min_tier: int = Field(default=3, ge=1, le=5)
     ranking_batch_size: int = Field(default=150, ge=1, le=250)
     ranking_excerpt_chars: int = Field(default=1200, ge=200, le=3000)
     ranking_alias: str = "rank-cheap"
     x_alias: str = "x-retrieve"
-    x_batch_size: int = Field(default=8, ge=1, le=20)
     x_enabled: bool = False
     x_retry_split: bool = False
     report_id: str = "legacy"
