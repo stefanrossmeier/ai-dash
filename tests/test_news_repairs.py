@@ -312,10 +312,17 @@ def test_missing_rank_decisions_fail_instead_of_silent_quiet_day(prompt):
     assert log[0]["status"] == "model_omitted"
 
 
-def test_consolidation_cannot_drop_or_repeat_events(prompt):
+def test_consolidation_inexact_output_falls_back_ungrouped(prompt):
+    # Consolidation is an optimization, never a delivery gate: an inexact
+    # grouping (dropped/repeated IDs) is retried once and then falls back to
+    # every story standing alone instead of killing the edition.
     gateway = FakeRanker(groups=[dict(representative="s0", duplicates=[])])
-    with pytest.raises(ValueError, match="every candidate"):
-        rank([item(0), item(1)], Settings(sources=[]), gateway, prompt, [])
+    audit = []
+    result = rank([item(0), item(1)], Settings(sources=[]), gateway, prompt, [], audit=audit)
+    assert len(result) == 2
+    entries = [a for a in audit if a.get("stage") == "consolidation"]
+    assert entries[0]["status"] == "inexact"
+    assert entries[-1]["status"] == "fallback_ungrouped"
 
 
 def test_selection_prefers_diverse_publishers_but_backfills(prompt):
