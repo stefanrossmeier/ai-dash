@@ -1,13 +1,15 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from types import SimpleNamespace
 
+import httpx
 import pytest
 
 from ai_dash.delivery import Rejected, flush
 from ai_dash.models import Artifact, Coverage, Item, Settings, Source, Story
 from ai_dash.presentation import render
 from ai_dash.processing import canonical_url, deduplicate, identity, rank
-from ai_dash.retrieval import parse_feed, retrieve_x, timestamp
+from ai_dash.retrieval import _nitter_rss_items, parse_feed, retrieve_x, timestamp
 from ai_dash.storage import Store, exclusive
 from tests.ranking_helpers import FakeImpactRanker
 
@@ -125,31 +127,35 @@ def test_ranking_processes_all_batches_without_provisional_history(tmp_path):
     assert calls[1]["already_covered"] == []
 
 
-def test_x_accepts_only_cited_allowed_fresh_posts():
-    snowflake = str((int((NOW - timedelta(hours=1)).timestamp() * 1000) - 1288834974657) << 22)
-    url = f"https://x.com/test/status/{snowflake}"
+def test_nitter_rss_parses_full_timeline_into_items(monkeypatch):
+    pub = (NOW - timedelta(hours=1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    feed = f"""<?xml version="1.0"?><rss><channel>
+    <item><title>GPT-7 is out</title><link>https://nitter.mie.foundation/swyx/status/123</link>
+    <guid>https://nitter.mie.foundation/swyx/status/123</guid><pubDate>{pub}</pubDate>
+    <description>&lt;p&gt;GPT-7 is out, weights on HF&lt;/p&gt;</description></item>
+    </channel></rss>"""
 
-    class Fake:
-        def request(self, *args):
-            return {
-                "content": {
-                    "posts": [
-                        dict(author_handle="test", post_url=url, post_text="A real announcement"),
-                        dict(author_handle="other", post_url=url, post_text="Wrong author"),
-                        dict(
-                            author_handle="test",
-                            post_url="https://x.com/test/status/1",
-                            post_text="Uncited",
-                        ),
-                    ]
-                },
-                "provider_metadata": {"citation_urls": [url]},
-            }
+    class MockClient:
+        def __init__(self, **kw):
+            pass
 
-    s = source().model_copy(update={"kind": "x", "url": "https://x.com/test"})
-    items, coverage = retrieve_x([s], Settings(sources=[s]), Fake(), NOW)
-    assert len(items) == 1 and coverage[0].fresh == 1
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def get(self, url):
+            return SimpleNamespace(text=feed, raise_for_status=lambda: None)
+
+    monkeypatch.setattr(httpx, "Client", MockClient)
+    s = source().model_copy(update={"kind": "x", "url": "https://x.com/swyx"})
+    items, error = _nitter_rss_items(s, Settings(sources=[s]), NOW)
+    assert error is None and len(items) == 1
+    # Nitter links map back to the canonical x.com status URL.
+    assert items[0].url == "https://x.com/swyx/status/123"
     assert items[0].published_at == NOW - timedelta(hours=1)
+    assert "GPT-7" in items[0].title
 
 
 def test_storage_persistence_before_delivery_and_sent_history(tmp_path, monkeypatch):
@@ -377,42 +383,27 @@ def test_release_build_noise_filtered_and_feed_cap_keeps_newest():
     assert count == 1 and items[0].title == "v2.0"
 
 
-def test_x_timeout_retries_once_under_cost_budget():
-    calls = []
+def test_x_rss_only_and_never_paid(monkeypatch):
+    class Boom:
+        def request(self, *args, **kwargs):
+            raise AssertionError("paid X retrieval is parked; RSS is the only path")
 
-    class Fake:
-        def request(self, route, body):
-            calls.append(body["allowed_x_handles"])
-            if len(calls) == 1:
-                raise RuntimeError("timeout")
-            return {"content": {"posts": []}, "provider_metadata": {"citation_urls": []}}
+    def fake_rss(source, settings, now):
+        if source.id == "a":
+            return ["an-item"], None
+        return [], "instance down"
 
+    monkeypatch.setattr("ai_dash.retrieval._nitter_rss_items", fake_rss)
     sources = [
-        source().model_copy(update={"id": f"x-{n}", "kind": "x", "url": f"https://x.com/test{n}"})
-        for n in range(3)
+        source().model_copy(update={"id": "a", "kind": "x", "url": "https://x.com/a"}),
+        source().model_copy(update={"id": "b", "kind": "x", "url": "https://x.com/b"}),
     ]
-    items, coverage = retrieve_x(sources, Settings(sources=sources), Fake(), NOW)
-    # A transient timeout is retried exactly once; the retry succeeds.
-    assert [len(c) for c in calls] == [3, 3]
-    assert len(coverage) == 3 and all(c.status == "empty" for c in coverage)
-
-
-def test_x_outage_stops_after_one_bounded_retry():
-    calls = []
-
-    class Fake:
-        def request(self, route, body):
-            calls.append(body["allowed_x_handles"])
-            raise RuntimeError("outage")
-
-    sources = [
-        source().model_copy(update={"id": f"x-{n}", "kind": "x", "url": f"https://x.com/test{n}"})
-        for n in range(3)
-    ]
-    items, coverage = retrieve_x(sources, Settings(sources=sources), Fake(), NOW)
-    # A persistent outage gets exactly one retry, then the batch gives up.
-    assert len(calls) == 2
-    assert len(coverage) == 3 and all(c.status == "unavailable" for c in coverage)
+    items, coverage = retrieve_x(sources, Settings(sources=sources), Boom(), NOW)
+    # Serving handle timelines via free RSS: no sampling, no paid requests,
+    # per-handle failure isolation instead of whole-batch loss.
+    assert items == ["an-item"]
+    assert coverage[0].status == "ok" and coverage[0].items == 1
+    assert coverage[1].status == "unavailable" and coverage[1].detail == "instance down"
 
 
 def test_ranking_requires_exact_keyed_slots(tmp_path):

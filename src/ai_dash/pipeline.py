@@ -27,6 +27,8 @@ def build(
 ) -> Artifact:
     now = datetime.now(UTC)
     start = now - timedelta(hours=settings.freshness_hours)
+    if settings.ranking_prompt:
+        prompt = prompt.parent / settings.ranking_prompt
     raw, coverage = collect(settings, gateway, now, no_x=no_x)
     selection_log = []
     if checkpoint is not None:

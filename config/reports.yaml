@@ -79,8 +79,12 @@ reports:
   x_only: true
   omit_delivered: false
   reject_routine_updates: false
-  max_per_source: 3
+  # Free Nitter RSS serves the full per-account timeline; the old cap of 3
+  # truncated high-volume accounts to a sliver of their day and the ranking
+  # then picked "top 3" of a sample. Cap high, let ranking filter crap.
+  max_per_source: 25
   max_stories: 12
+  ranking_prompt: x-editorial.md
   max_paper_stories: 0
   send_empty: true
   min_score: 25
