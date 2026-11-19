@@ -55,7 +55,9 @@ def test_reports_use_disjoint_sources_and_fourteen_high_frequency_x_accounts():
     x = groups["x_major"]
     assert x.x_enabled and len(x.sources) == 14
     assert {s.id for s in x.sources} == enabled_x
-    assert len(x.slots) == 1 and x.max_per_source == 3 and not x.x_retry_split
+    assert len(x.slots) == 1 and x.max_per_source == 25 and not x.x_retry_split
+    # Full timelines via free Nitter RSS + a dedicated X-calibrated ranking prompt.
+    assert x.ranking_prompt == "x-editorial.md"
 
 
 def test_x_daily_budget_allows_multiple_requests_under_cost_cap(tmp_path, monkeypatch):

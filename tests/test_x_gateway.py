@@ -1,14 +1,12 @@
 import copy
 import json
-from datetime import UTC, date, datetime
+from datetime import date
 
 import pytest
 from fastapi.testclient import TestClient
 
 from ai_dash import x_gateway as xg
 from ai_dash.gateway import Gateway
-from ai_dash.models import Settings, Source
-from ai_dash.retrieval import retrieve_x
 
 HANDLES = ["karpathy", "ArtificialAnlys", "fchollet"]
 QUERY = "(from:karpathy OR from:ArtificialAnlys OR from:fchollet) since:2026-11-08 until:2026-11-10"
@@ -193,34 +191,6 @@ def test_health_endpoint_does_not_contact_provider(monkeypatch, tmp_path):
     client, calls = setup_gateway(monkeypatch, tmp_path, response())
     assert client.get("/health").json()["status"] == "ok"
     assert not calls
-
-
-def test_current_utc_day_is_included_and_retrieval_never_retries():
-    now = datetime(2026, 11, 9, 21, tzinfo=UTC)
-    s = Source(
-        id="karpathy",
-        name="Karpathy",
-        category="X",
-        url="https://x.com/karpathy",
-        endpoint="https://x.com/karpathy",
-        focus="AI",
-        priority="P1",
-        kind="x",
-    )
-    calls = []
-
-    class Fake:
-        def request(self, route, payload):
-            calls.append(payload)
-            return {"content": {"posts": []}, "provider_metadata": {"citation_urls": []}}
-
-    retrieve_x([s], Settings(sources=[s]), Fake(), now)
-    assert len(calls) == 1
-    assert calls[0]["to_date"] == "2026-11-10"
-    assert "karpathy" in calls[0]["input"] and "2026-11-09T21:00:00+00:00" in calls[0]["input"]
-    with pytest.raises(ValueError, match="retries"):
-        retrieve_x([s], Settings(sources=[s]), Fake(), now, retry_split=True)
-    assert len(calls) == 1
 
 
 def test_application_routes_x_to_its_own_gateway_and_rejects_unverified_cache(

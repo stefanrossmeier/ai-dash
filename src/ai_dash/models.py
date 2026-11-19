@@ -56,6 +56,10 @@ class Settings(Model):
     ranking_batch_size: int = Field(default=150, ge=1, le=250)
     ranking_excerpt_chars: int = Field(default=1200, ge=200, le=3000)
     ranking_alias: str = "rank-cheap"
+    # Optional per-report ranking prompt filename, resolved next to the default
+    # editorial prompt. Lets a report replace the blog-calibrated prompt
+    # wholesale instead of only appending focus text.
+    ranking_prompt: str | None = None
     x_alias: str = "x-retrieve"
     x_enabled: bool = False
     x_retry_split: bool = False
