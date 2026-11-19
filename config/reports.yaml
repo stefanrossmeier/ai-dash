@@ -75,7 +75,11 @@ reports:
   - x-news-bindu-reddy
   - x-news-linus-ekenstam
   slots:
-  - '20:30'
+  # Free Nitter RSS retrieval: three full-timeline potpourri editions a day
+  # instead of one, in free slots (checked against every other report).
+  - '07:45'
+  - '11:45'
+  - '19:45'
   x_only: true
   omit_delivered: false
   reject_routine_updates: false
