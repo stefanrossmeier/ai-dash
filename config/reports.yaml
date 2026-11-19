@@ -85,9 +85,12 @@ reports:
   send_empty: true
   min_score: 25
   min_impact: 20
-  min_breadth: 15
+  # X posts are short and rarely carry methodology or broad context; the
+  # quality (evidence) and breadth gates are blog-post calibrated and
+  # systematically starve the potpourri report. Score and impact still gate.
+  min_breadth: 10
   min_novelty: 10
-  min_quality: 20
+  min_quality: 10
   min_tier: 1
   focus: 'High-frequency AI news spreaders: swyx (ecosystem news), Nathan Lambert
     (frontier lab developments), Simon Willison (LLM tools and applications),
