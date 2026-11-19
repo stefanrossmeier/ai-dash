@@ -1,0 +1,8 @@
+summary: X — AI Voices 19:45
+schedule: 0 45 19 * * *
+timezone: Europe/Berlin
+enabled: false
+script_path: f/ai_dash/x_major
+is_flow: true
+args: {}
+no_flow_overlap: true

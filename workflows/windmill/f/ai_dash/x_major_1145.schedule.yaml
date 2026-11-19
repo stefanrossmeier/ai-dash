@@ -1,5 +1,5 @@
-summary: X — AI Voices 20:30
-schedule: 0 30 20 * * *
+summary: X — AI Voices 11:45
+schedule: 0 45 11 * * *
 timezone: Europe/Berlin
 enabled: false
 script_path: f/ai_dash/x_major

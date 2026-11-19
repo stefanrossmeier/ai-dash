@@ -43,8 +43,8 @@ class Reports(Model):
             raise ValueError("report IDs must be unique")
         for report in self.reports:
             Settings(sources=[], slots=report.slots)
-            if report.x_only and len(report.slots) != 1:
-                raise ValueError("X report must have exactly one daily slot")
+            if report.x_only and not report.slots:
+                raise ValueError("X report needs at least one daily slot")
         return self
 
 
