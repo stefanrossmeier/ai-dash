@@ -136,9 +136,9 @@ def run(
             resumed = flush(store, telegram, destination)
             # The x_major once-per-day delivery guard was a leftover from the
             # single-slot era: with three daily slots it would let only the
-            # first edition deliver and silently skip 11:45 and 19:45. Content
-            # freshness is instead enforced per edition via omit_delivered
-            # history so each slot delivers only stories not yet sent today.
+            # first edition deliver and silently skip 11:45 and 19:45. Removed
+            # entirely - every slot delivers; repetition across a day's
+            # editions is accepted by design.
             history = (
                 store.history(datetime.now(UTC), settings.history_days)
                 if settings.omit_delivered
