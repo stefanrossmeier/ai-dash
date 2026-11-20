@@ -6,7 +6,6 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 from ai_dash.models import Artifact
 
@@ -56,21 +55,6 @@ class Store:
                 # Reserve all stories of partially delivered editions; the outbox resumes the rest.
                 result.extend({"title": s.item.title, "url": s.item.url} for s in artifact.stories)
         return result
-
-    def delivered_report_today(self, report_id: str, now: datetime, timezone: str) -> bool:
-        today = now.astimezone(ZoneInfo(timezone)).date()
-        for (raw,) in self.db.execute("""
-            SELECT artifact FROM editions e WHERE EXISTS (
-                SELECT 1 FROM outbox o WHERE o.run_id=e.run_id AND o.status='sent'
-            )
-        """):
-            artifact = Artifact.model_validate_json(raw)
-            if (
-                artifact.report_id == report_id
-                and artifact.created_at.astimezone(ZoneInfo(timezone)).date() == today
-            ):
-                return True
-        return False
 
     def persist(self, artifact: Artifact, messages: list[str], destination: str):
         folder = self.root / "artifacts" / artifact.created_at.strftime("%Y/%m/%d")

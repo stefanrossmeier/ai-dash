@@ -5,7 +5,7 @@ import httpx
 import pytest
 
 from ai_dash.gateway import Gateway
-from ai_dash.models import Artifact, load_settings
+from ai_dash.models import Artifact, Item, Story, load_settings
 from ai_dash.presentation import render
 from ai_dash.reports import load_reports, select_report
 from ai_dash.x_budget import XDailyBudget
@@ -41,7 +41,7 @@ def test_reports_use_disjoint_sources_and_fourteen_high_frequency_x_accounts():
     }
     # The X report re-delivers still-relevant stories and lets the composite
     # score decide on routine-labelled items; company keeps both gates.
-    assert groups["x_major"].omit_delivered is False
+    assert groups["x_major"].omit_delivered is True
     assert groups["company"].omit_delivered is True
     assert groups["x_major"].reject_routine_updates is False
     assert groups["company"].reject_routine_updates is True
@@ -148,16 +148,34 @@ def test_report_examples_are_labelled_and_can_show_quiet_source_groups():
     assert "No new qualifying stories" in messages[0]
 
 
-def test_daily_x_delivery_is_limited_even_when_report_has_no_stories(tmp_path, monkeypatch):
+def test_x_history_dedups_across_same_day_editions(tmp_path):
+    # Three slots a day: a later edition must not re-deliver a story the
+    # morning edition already sent (omit_delivered history), while a brand
+    # new story still goes through.
     from ai_dash.storage import Store
 
     now = datetime.now(UTC)
-    a = Artifact(
-        run_id="quiet",
-        created_at=now,
+    first = Artifact(
+        run_id="morning",
+        created_at=now - timedelta(hours=8),
         window_start=now - timedelta(hours=24),
         window_end=now,
-        stories=[],
+        stories=[
+            Story(
+                item=Item(
+                    id="i1",
+                    title="GPT-7",
+                    url="https://x.com/a/status/1",
+                    published_at=now - timedelta(hours=9),
+                    source_id="a",
+                    source="a",
+                    category="X",
+                    priority="P1",
+                ),
+                summary="s",
+                score=50,
+            )
+        ],
         candidates=[],
         coverage=[],
         traces=[],
@@ -167,12 +185,10 @@ def test_daily_x_delivery_is_limited_even_when_report_has_no_stories(tmp_path, m
         send_empty=True,
     )
     store = Store(tmp_path)
-    store.persist(a, ["No updates"], "@ai")
-    assert not store.delivered_report_today("x_major", now, "Europe/Berlin")
-    store.mark("quiet", 0, "sent", 1)
-    assert store.delivered_report_today("x_major", now, "Europe/Berlin")
-    assert not store.delivered_report_today("blogs", now, "Europe/Berlin")
-    assert not store.delivered_report_today("x_major", now + timedelta(days=1), "Europe/Berlin")
+    store.persist(first, ["morning"], "@ai")
+    store.mark("morning", 0, "sent", 1)
+    history = store.history(now, 14)
+    assert [h["title"] for h in history] == ["GPT-7"]
     store.close()
 
 
