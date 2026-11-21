@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import uuid
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -21,15 +22,23 @@ def _gateway_token() -> str | None:
     return value or None
 
 
-def _idempotency_key(payload: Mapping[str, object]) -> str:
-    """Stable logical-request ID: identical payloads reuse one key.
+# One nonce per process (one Windmill job run): retries inside the run share
+# it, a later run does not.
+_RUN_NONCE = uuid.uuid4().hex[:16]
 
-    A caller-level retry must replay the gateway's recorded result instead of
-    being charged again, so the key is derived from the request content — a
-    fresh random key per call would make every retry a new paid request.
+
+def _idempotency_key(payload: Mapping[str, object]) -> str:
+    """Logical-request ID: stable within one run, distinct for the next run.
+
+    The key is the canonical request content plus a per-process run nonce. A
+    retry inside the same run replays the gateway's recorded result instead of
+    being charged twice, while a fresh run (an operator rerun, or tomorrow's
+    scheduled edition) executes as a new request rather than replaying a
+    terminal failure forever.
     """
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
-    return f"ai-dash:{hashlib.sha256(canonical.encode('utf-8')).hexdigest()}"
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return f"ai-dash:{_RUN_NONCE}:{digest}"
 
 
 class Gateway:

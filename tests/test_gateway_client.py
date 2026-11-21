@@ -21,12 +21,16 @@ class _Response:
 class GatewayHeaderTests(unittest.TestCase):
     def test_identical_requests_reuse_the_idempotency_key(self) -> None:
         """A retry of one logical request must reuse its key, otherwise the
-        gateway records and charges it as a brand-new request."""
+        gateway records and charges it as a brand-new request. A new run (fresh
+        process nonce) must get a new key so reruns still execute."""
         payload = {"alias": "rank-cheap", "purpose": "ranking", "profile": "ai-dash"}
         self.assertEqual(_idempotency_key(payload), _idempotency_key(dict(payload)))
         self.assertNotEqual(
             _idempotency_key(payload), _idempotency_key({**payload, "user": "changed"})
         )
+        baseline = _idempotency_key(payload)
+        with patch("ai_dash.gateway._RUN_NONCE", "second-run"):
+            self.assertNotEqual(_idempotency_key(payload), baseline)
 
     def test_chat_sends_bearer_and_stable_key_x_search_stays_unauthenticated(self) -> None:
         with TemporaryDirectory() as tmp:
