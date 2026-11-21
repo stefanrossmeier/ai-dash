@@ -83,13 +83,18 @@ services:
       AI_DASH_HOME: /opt/ai-dash
       AI_DASH_DATA_DIR: /data/ai-dash
       AI_DASH_X_GATEWAY_URL: http://ai_dash_x_gateway:8080
-      AI_DASH_GATEWAY_URL: http://ai_dash_model_gateway:8080
+      # Dedicated llm-gateway instance (ai-dash-llm-gateway, joined to this
+      # network) replaces the old shared ranking gateway. Bearer token from
+      # the instance deployment; see docs/DEPLOYMENT.md.
+      AI_DASH_GATEWAY_URL: http://ai-dash-llm-gateway:8080
+      AI_DASH_GATEWAY_TOKEN_FILE: /run/ai-dash-secrets/gateway_token
       AI_DASH_TELEGRAM_TOKEN_FILE: /run/ai-dash-secrets/telegram_token
       AI_DASH_TELEGRAM_CHAT_ID_FILE: /run/ai-dash-secrets/telegram_chat_id
     volumes:
       - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
       - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/telegram_token:/run/ai-dash-secrets/telegram_token:ro
       - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/telegram_chat_id:/run/ai-dash-secrets/telegram_chat_id:ro
+      - ${AI_DASH_GATEWAY_TOKEN_SOURCE:-/var/code/llm-gateway-deployments/ai-dash/tokens/gateway.token}:/run/ai-dash-secrets/gateway_token:ro
       - worker_logs:/tmp/windmill/logs
     depends_on:
       windmill_server:

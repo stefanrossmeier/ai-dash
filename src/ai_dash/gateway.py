@@ -1,11 +1,22 @@
 from __future__ import annotations
 
 import os
+import uuid
 from pathlib import Path
 
 import httpx
 
 from ai_dash.x_budget import XDailyBudget
+
+
+def _gateway_token() -> str | None:
+    """Bearer token for the dedicated llm-gateway instance. Read from a private
+    file (AI_DASH_GATEWAY_TOKEN_FILE) or the environment; never logged."""
+    path = os.getenv("AI_DASH_GATEWAY_TOKEN_FILE")
+    if path:
+        return Path(path).read_text(encoding="utf-8").strip()
+    value = os.getenv("AI_DASH_GATEWAY_TOKEN", "").strip()
+    return value or None
 
 
 class Gateway:
@@ -14,8 +25,19 @@ class Gateway:
     def __init__(self, url: str, data_dir: Path | None = None, timezone: str = "Europe/Berlin"):
         self.url = url.rstrip("/")
         self.x_url = os.getenv("AI_DASH_X_GATEWAY_URL", "http://127.0.0.1:18081").rstrip("/")
+        self.token = _gateway_token()
         self.traces: list[dict] = []
         self.x_budget = XDailyBudget(data_dir, timezone) if data_dir is not None else None
+
+    def _headers(self, route: str) -> dict[str, str]:
+        if route == "x-search" or self.token is None:
+            return {}
+        # The llm-gateway compatibility wire authenticates the project principal
+        # and recovers requests by stable logical ID, so retries stay idempotent.
+        return {
+            "Authorization": f"Bearer {self.token}",
+            "Idempotency-Key": f"ai-dash:{uuid.uuid4()}",
+        }
 
     def request(self, route: str, payload: dict) -> dict:
         if route == "x-search":
@@ -31,6 +53,7 @@ class Gateway:
             response = httpx.post(
                 f"{self.x_url if route == 'x-search' else self.url}/v1/{route}",
                 json=payload,
+                headers=self._headers(route),
                 timeout=200 if route == "x-search" else 600,
             )
         except httpx.HTTPError:
