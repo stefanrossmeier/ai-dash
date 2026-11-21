@@ -21,7 +21,13 @@ def test_compose_owns_its_database_network_and_provider_secret():
     assert "daily" not in text
     assert "external:" not in text
     worker = compose["services"]["windmill_worker_aidash"]
-    assert worker["environment"]["AI_DASH_GATEWAY_URL"] == "http://ai_dash_model_gateway:8080"
+    assert worker["environment"]["AI_DASH_GATEWAY_URL"] == "http://ai-dash-llm-gateway:8080"
+    # The dedicated llm-gateway instance authenticates the project principal.
+    assert (
+        worker["environment"]["AI_DASH_GATEWAY_TOKEN_FILE"] == "/run/ai-dash-secrets/gateway_token"
+    )
+    mounts = str(worker.get("volumes"))
+    assert "gateway.token" in mounts, worker.get("volumes")
     assert not any("openrouter" in mount for mount in worker["volumes"])
     assert not any("secrets:ro" in mount for mount in worker["volumes"])
     for service in ("ai_dash_model_gateway", "ai_dash_x_gateway"):
