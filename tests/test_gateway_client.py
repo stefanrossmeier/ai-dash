@@ -48,9 +48,7 @@ class GatewayHeaderTests(unittest.TestCase):
 
                 def fake_post(url: str, *, json: dict, headers: dict | None = None, **kw: object):
                     seen.append({"url": url, "headers": headers or {}})
-                    return _Response(
-                        {"content": {}, "provider_metadata": {"scope_verified": True}}
-                    )
+                    return _Response({"content": {}, "provider_metadata": {"scope_verified": True}})
 
                 with patch("ai_dash.gateway.httpx.post", fake_post):
                     gateway = Gateway("http://ai-dash-llm-gateway:8080")
