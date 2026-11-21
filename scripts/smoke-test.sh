@@ -163,20 +163,24 @@ else
 fi
 
 # ------------------------------------------------- 6. failures since start
+# Data-availability outcomes are legitimate: an empty upstream window, or a
+# source whose items are all undated, makes a slot refuse an empty edition by
+# design. Everything else (persist, gateway, delivery) is infrastructure.
+DATA_AVAILABILITY='no source produced dated items|no qualifying'
 worker_log="$(dc logs windmill_worker_aidash 2>&1 || true)"
 infra_failures="$(grep 'did not succeed' <<<"$worker_log" \
-  | grep -v 'no qualifying' \
+  | grep -Ev "$DATA_AVAILABILITY" \
   | grep -c . || true)"
 data_warnings="$(grep 'did not succeed' <<<"$worker_log" \
-  | grep -c 'no qualifying' || true)"
+  | grep -Ec "$DATA_AVAILABILITY" || true)"
 if (( infra_failures == 0 )); then
   ok "no infrastructure job failures in worker log since container start"
 else
   fail "$infra_failures infrastructure job failure(s) in worker log since container start"
-  grep 'did not succeed' <<<"$worker_log" | grep -v 'no qualifying' | head -5 >&2
+  grep 'did not succeed' <<<"$worker_log" | grep -Ev "$DATA_AVAILABILITY" | head -5 >&2
 fi
 if (( data_warnings > 0 )); then
-  echo "WARN: $data_warnings data-availability failure(s) (empty windows; not infrastructure)"
+  echo "WARN: $data_warnings data-availability failure(s) (empty or undated windows; not infrastructure)"
 fi
 
 # ------------------------------------------------------------------ result

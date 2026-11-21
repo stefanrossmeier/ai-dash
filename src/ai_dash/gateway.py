@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import os
-import uuid
+from collections.abc import Mapping
 from pathlib import Path
 
 import httpx
@@ -19,6 +21,17 @@ def _gateway_token() -> str | None:
     return value or None
 
 
+def _idempotency_key(payload: Mapping[str, object]) -> str:
+    """Stable logical-request ID: identical payloads reuse one key.
+
+    A caller-level retry must replay the gateway's recorded result instead of
+    being charged again, so the key is derived from the request content — a
+    fresh random key per call would make every retry a new paid request.
+    """
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+    return f"ai-dash:{hashlib.sha256(canonical.encode('utf-8')).hexdigest()}"
+
+
 class Gateway:
     """Client for ai-dash's independently deployed ranking and bounded X gateways."""
 
@@ -29,14 +42,15 @@ class Gateway:
         self.traces: list[dict] = []
         self.x_budget = XDailyBudget(data_dir, timezone) if data_dir is not None else None
 
-    def _headers(self, route: str) -> dict[str, str]:
+    def _headers(self, route: str, payload: dict[str, object]) -> dict[str, str]:
         if route == "x-search" or self.token is None:
             return {}
         # The llm-gateway compatibility wire authenticates the project principal
-        # and recovers requests by stable logical ID, so retries stay idempotent.
+        # and recovers requests by a content-derived ID, so a retry of the same
+        # logical request replays the recorded result instead of paying twice.
         return {
             "Authorization": f"Bearer {self.token}",
-            "Idempotency-Key": f"ai-dash:{uuid.uuid4()}",
+            "Idempotency-Key": _idempotency_key(payload),
         }
 
     def request(self, route: str, payload: dict) -> dict:
@@ -53,7 +67,7 @@ class Gateway:
             response = httpx.post(
                 f"{self.x_url if route == 'x-search' else self.url}/v1/{route}",
                 json=payload,
-                headers=self._headers(route),
+                headers=self._headers(route, payload),
                 timeout=200 if route == "x-search" else 600,
             )
         except httpx.HTTPError:
