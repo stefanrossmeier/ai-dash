@@ -9,6 +9,7 @@ export AI_DASH_DATA_DIR="${AI_DASH_DATA_DIR:-/data/ai-dash}"
 # a sanitized environment, so the migrated worker env never reaches the job;
 # this default is what scheduled flows actually use. The Bearer token is read
 # by the client from the token file mounted into the worker.
+export AI_DASH_RUN_ID="${AI_DASH_RUN_ID:-${WM_ROOT_FLOW_JOB_ID:-${WM_JOB_ID:?Set AI_DASH_RUN_ID}}}"
 export AI_DASH_GATEWAY_URL="${AI_DASH_GATEWAY_URL:-http://ai-dash-llm-gateway:8080}"
 export AI_DASH_GATEWAY_TOKEN_FILE="${AI_DASH_GATEWAY_TOKEN_FILE:-/run/ai-dash-secrets/gateway_token}"
 export AI_DASH_TELEGRAM_TOKEN_FILE="${AI_DASH_TELEGRAM_TOKEN_FILE:-/run/ai-dash-secrets/telegram_token}"

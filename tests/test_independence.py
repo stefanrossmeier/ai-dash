@@ -4,11 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-import httpx
 import yaml
-from fastapi.testclient import TestClient
-
-from ai_dash import model_gateway as mg
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -19,13 +15,15 @@ def test_compose_owns_its_database_network_and_provider_secret():
     assert compose["name"] == "ai-dash"
     assert "db" in compose["services"]
     assert "daily" not in text
-    assert "external:" not in text
+    assert compose["networks"]["gateway"]["external"] is True
+    assert "AI_DASH_GATEWAY_NETWORK" in compose["networks"]["gateway"]["name"]
     worker = compose["services"]["windmill_worker_aidash"]
     assert worker["environment"]["AI_DASH_GATEWAY_URL"] == "http://ai-dash-llm-gateway:8080"
     # The dedicated llm-gateway instance authenticates the project principal.
     assert (
         worker["environment"]["AI_DASH_GATEWAY_TOKEN_FILE"] == "/run/ai-dash-secrets/gateway_token"
     )
+    assert worker["networks"] == ["default", "gateway"]
     mounts = str(worker.get("volumes"))
     assert "gateway.token" in mounts, worker.get("volumes")
     assert not any("openrouter" in mount for mount in worker["volumes"])
@@ -66,51 +64,6 @@ def test_runtime_initialization_is_private_and_preserves_existing_credentials(tm
     assert env.stat().st_mode & 0o777 == 0o600
     module.initialize(runtime)
     assert env.read_text() == original
-
-
-def test_ranking_uses_owned_config_validates_schema_and_attributes_to_ai_dash(monkeypatch):
-    monkeypatch.setenv("AI_DASH_MODEL_GATEWAY_CONFIG", str(ROOT / "config/model-gateway.yaml"))
-    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
-    calls = []
-
-    async def provider(**kwargs):
-        calls.append(kwargs)
-        return httpx.Response(
-            200,
-            json={
-                "id": "owned-generation",
-                "choices": [{"message": {"content": json.dumps({"decisions": []})}}],
-                "usage": {"cost": 0.001, "prompt_tokens": 10, "completion_tokens": 2},
-            },
-        )
-
-    monkeypatch.setattr(mg, "_post_openrouter", provider)
-    client = TestClient(mg.app)
-    payload = {
-        "alias": "rank-cheap",
-        "purpose": "independence-test",
-        "messages": [{"role": "user", "content": "test"}],
-        "response_schema": {
-            "type": "object",
-            "properties": {"decisions": {"type": "array"}},
-            "required": ["decisions"],
-        },
-    }
-    result = client.post("/v1/chat", json=payload)
-    assert result.status_code == 200
-    assert result.json()["model"] == "openai/gpt-6-luna"
-    assert result.json()["generation_id"] == "owned-generation"
-    assert calls[0]["headers"]["HTTP-Referer"].endswith("/ai-dash")
-    assert calls[0]["payload"]["response_format"]["json_schema"]["strict"] is True
-    payload["response_schema"]["required"] = ["missing"]
-    assert client.post("/v1/chat", json=payload).status_code == 502
-    count = len(calls)
-    payload["alias"] = "unknown"
-    assert client.post("/v1/chat", json=payload).status_code == 404
-    assert len(calls) == count
-    assert client.post("/v1/x-search", json={}).status_code == 404
-    assert client.get("/health").status_code == 200
-    assert len(calls) == count
 
 
 def test_bootstrap_profile_permissions_and_first_run_password_change(tmp_path, monkeypatch):
@@ -171,17 +124,3 @@ def test_bootstrap_profile_permissions_and_first_run_password_change(tmp_path, m
     count = calls.count("http://127.0.0.1:18090/api/users/tokens/create")
     module.main()
     assert calls.count("http://127.0.0.1:18090/api/users/tokens/create") == count
-
-
-def test_ranking_health_detects_missing_owned_config_or_key_without_provider_call(
-    tmp_path, monkeypatch
-):
-    monkeypatch.setenv("AI_DASH_MODEL_GATEWAY_CONFIG", str(tmp_path / "missing.yaml"))
-    client = TestClient(mg.app)
-    assert client.get("/health").status_code == 503
-    monkeypatch.setenv("AI_DASH_MODEL_GATEWAY_CONFIG", str(ROOT / "config/model-gateway.yaml"))
-    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
-    monkeypatch.delenv("OPENROUTER_API_KEY_FILE", raising=False)
-    assert client.get("/health").status_code == 503
-    monkeypatch.setenv("OPENROUTER_API_KEY", "owned-key")
-    assert client.get("/health").status_code == 200

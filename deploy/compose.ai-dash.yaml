@@ -1,4 +1,4 @@
-# Standalone stack: no external networks, volumes, configuration or services.
+# Independently owned stack and explicitly owned internal gateway network.
 name: ai-dash
 
 x-logging: &logging
@@ -72,6 +72,7 @@ services:
 
   windmill_worker_aidash:
     <<: *app
+    networks: [default, gateway]
     build:
       context: ${AI_DASH_SOURCE:-..}
       dockerfile: deploy/windmill-worker.Dockerfile
@@ -98,28 +99,14 @@ services:
     depends_on:
       windmill_server:
         condition: service_healthy
-      ai_dash_model_gateway:
-        condition: service_healthy
-
-  ai_dash_model_gateway:
-    <<: *app
-    entrypoint: [/opt/ai-dash/.venv/bin/uvicorn]
-    command: [ai_dash.model_gateway:app, --host, 0.0.0.0, --port, '8080']
-    environment:
-      AI_DASH_MODEL_GATEWAY_CONFIG: /opt/ai-dash/config/model-gateway.yaml
-      OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
-    volumes:
-      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/openrouter_api_key:/run/secrets/openrouter_api_key:ro
-    ports:
-      - '127.0.0.1:${AI_DASH_MODEL_PORT:-18082}:8080'
-    healthcheck:
-      test: [CMD, /opt/ai-dash/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
 
 
 volumes:
   db_data:
   worker_cache:
   worker_logs:
+
+networks:
+  gateway:
+    external: true
+    name: ${AI_DASH_GATEWAY_NETWORK:?Set the owned internal gateway network}

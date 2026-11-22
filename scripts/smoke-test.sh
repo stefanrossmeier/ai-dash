@@ -4,7 +4,7 @@
 # Verifies, without sending Telegram messages or making paid model calls:
 #   1. the source checkout is clean and on a recorded commit
 #   2. the full ai-dash stack is running (db, Windmill server, worker,
-#      the old model gateway and the dedicated
+#      the dedicated
 #      llm-gateway instance)
 #   3. Windmill answers on its loopback port; the llm-gateway instance
 #      authenticates the project principal on /ready
@@ -61,7 +61,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-for service in db windmill_server windmill_worker_aidash ai_dash_model_gateway; do
+for service in db windmill_server windmill_worker_aidash; do
   if dc ps --status running --services 2>/dev/null | grep -qx "$service"; then
     ok "service running: $service"
   else
@@ -71,9 +71,9 @@ done
 
 # Dedicated llm-gateway instance (separate container, joined to this
 # project's network; the ranking gateway since PR "rank-via-llm-gateway").
-if docker ps --format '{{.Names}}' 2>/dev/null | grep -qx ai-dash-llm-gateway \
-  && [[ "$(docker inspect -f '{{.State.Running}}' ai-dash-llm-gateway 2>/dev/null)" == "true" ]]; then
-  ok "service running: ai-dash-llm-gateway (dedicated instance)"
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -qx ai-dash-llm-gateway-1 \
+  && [[ "$(docker inspect -f '{{.State.Running}}' ai-dash-llm-gateway-1 2>/dev/null)" == "true" ]]; then
+  ok "service running: ai-dash-llm-gateway-1 (dedicated instance)"
 else
   fail "service not running: ai-dash-llm-gateway"
 fi

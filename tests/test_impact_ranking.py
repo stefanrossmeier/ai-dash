@@ -1,13 +1,9 @@
-import asyncio
 import json
 from datetime import UTC, datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
 
-import httpx
 import pytest
 
-from ai_dash.model_gateway import ChatRequest, chat
 from ai_dash.models import ImpactDecision, Item, Settings
 from ai_dash.processing import rank
 from ai_dash.ranking import rejection_reasons, selection_score
@@ -151,50 +147,12 @@ def test_shortlist_summary_validation_cannot_add_or_omit_items(tmp_path):
         rank([item], Settings(sources=[]), BadSummary(), prompt, [])
 
 
-def test_owned_gateway_forwards_low_reasoning_and_output_budget():
-    provider = AsyncMock(
-        return_value=httpx.Response(
-            200,
-            json={
-                "choices": [{"message": {"content": "{}"}}],
-                "usage": {"prompt_tokens": 1, "completion_tokens": 1},
-            },
-        )
-    )
-    config = {
-        "aliases": {
-            "rank-cheap": {
-                "provider": "openrouter",
-                "model": "openai/gpt-6-luna",
-                "max_attempts": 1,
-                "reasoning_effort": "low",
-                "max_output_tokens": 32768,
-            }
-        }
-    }
-    with (
-        patch("ai_dash.model_gateway._load_config", return_value=config),
-        patch("ai_dash.model_gateway._load_api_key", return_value="test"),
-        patch("ai_dash.model_gateway._post_openrouter", provider),
-    ):
-        result = asyncio.run(chat(ChatRequest(alias="rank-cheap", purpose="test", messages=[])))
-    payload = provider.call_args.kwargs["payload"]
-    assert payload["model"] == "openai/gpt-6-luna"
-    assert payload["reasoning"] == {"effort": "low", "exclude": True}
-    assert payload["max_tokens"] == 32768
-    assert result.provider_metadata["reasoning_effort"] == "low"
-
-
 def test_model_and_threshold_config_are_independent_and_explicit():
     import yaml
 
     root = Path(__file__).resolve().parents[1]
     source = yaml.safe_load((root / "config/sources.yaml").read_text())
-    model = yaml.safe_load((root / "config/model-gateway.yaml").read_text())["aliases"][
-        "rank-cheap"
-    ]
     assert source["min_score"] == 65 and source["ranking_batch_size"] == 150
-    assert model["model"] == "openai/gpt-6-luna" and model["reasoning_effort"] == "low"
     from ai_dash.models import load_settings
     from ai_dash.reports import load_reports, select_report
 
