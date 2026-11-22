@@ -1,14 +1,12 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-import httpx
 import pytest
 
 from ai_dash.gateway import Gateway
 from ai_dash.models import Artifact, load_settings
 from ai_dash.presentation import render
 from ai_dash.reports import load_reports, select_report
-from ai_dash.x_budget import XDailyBudget
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -55,76 +53,9 @@ def test_reports_use_disjoint_sources_and_fourteen_high_frequency_x_accounts():
     x = groups["x_major"]
     assert x.x_enabled and len(x.sources) == 14
     assert {s.id for s in x.sources} == enabled_x
-    assert x.slots == ["07:45", "11:45", "19:45"] and x.max_per_source == 25 and not x.x_retry_split
+    assert x.slots == ["07:45", "11:45", "19:45"] and x.max_per_source == 25
     # Full timelines via free Nitter RSS + a dedicated X-calibrated ranking prompt.
     assert x.ranking_prompt == "x-editorial.md"
-
-
-def test_x_daily_budget_allows_multiple_requests_under_cost_cap(tmp_path, monkeypatch):
-    import ai_dash.x_budget as xb
-
-    monkeypatch.setattr(XDailyBudget, "day", lambda _: "2026-11-09")
-    budget = XDailyBudget(tmp_path)
-    # Several paid requests fit while the day's recorded spend is under the cap.
-    for _n in range(3):
-        assert budget.cached_or_reserve(["OpenAI"]) is None
-        budget.record_cost(0.10)
-    assert xb.DAILY_COST_LIMIT_USD == 0.60
-    # Once recorded spend reaches the cap, further paid requests are refused.
-    assert budget.cached_or_reserve(["OpenAI"]) is None
-    budget.record_cost(0.30)
-    with pytest.raises(RuntimeError, match="cost limit reached"):
-        XDailyBudget(tmp_path).cached_or_reserve(["OpenAI"])
-    # A new day resets the cap.
-    monkeypatch.setattr(XDailyBudget, "day", lambda _: "2026-11-10")
-    assert XDailyBudget(tmp_path).cached_or_reserve(["OpenAI"]) is None
-
-
-def test_x_cache_reuses_results_with_zero_new_usage(tmp_path):
-    budget = XDailyBudget(tmp_path)
-    assert budget.cached_or_reserve(["OpenAI", "AnthropicAI"]) is None
-    budget.save(
-        ["OpenAI", "AnthropicAI"],
-        {"content": {"posts": []}, "usage": {"cost_usd": 0.12}, "latency_ms": 700},
-    )
-    result = XDailyBudget(tmp_path).cached_or_reserve(["openai", "anthropicai"])
-    assert result["cached"] and result["usage"]["cost_usd"] == 0
-    assert result["original_usage"]["cost_usd"] == 0.12
-    # A different handle-set has its own cache entry: it reserves a fresh paid
-    # request (affordable under the cost cap) instead of reusing this set's
-    # response. The same set is served free from its cache.
-    assert XDailyBudget(tmp_path).cached_or_reserve(["unwatched"]) is None
-    again = XDailyBudget(tmp_path).cached_or_reserve(["OpenAI", "AnthropicAI"])
-    assert again is not None and again["cached"]
-
-
-def test_x_gateway_transport_error_leaves_budget_available_for_retry(tmp_path, monkeypatch):
-    calls = []
-
-    def fail(*a, **kw):
-        calls.append(kw)
-        raise httpx.ReadTimeout("timeout")
-
-    monkeypatch.setattr("ai_dash.gateway.httpx.post", fail)
-    for _ in range(2):
-        with pytest.raises(RuntimeError):
-            Gateway("http://gateway", tmp_path).request(
-                "x-search", {"allowed_x_handles": ["OpenAI"]}
-            )
-    # A transport failure costs nothing, so the retry reaches the gateway
-    # again instead of being blocked by a consumed one-shot daily attempt.
-    assert len(calls) == 2
-
-
-def test_large_x_watchlists_fail_before_transport(tmp_path, monkeypatch):
-    def fail(*a, **kw):
-        pytest.fail("No network request allowed")
-
-    monkeypatch.setattr("ai_dash.gateway.httpx.post", fail)
-    with pytest.raises(ValueError):
-        Gateway("http://gateway", tmp_path).request(
-            "x-search", {"allowed_x_handles": [f"account{i}" for i in range(15)]}
-        )
 
 
 def test_report_examples_are_labelled_and_can_show_quiet_source_groups():

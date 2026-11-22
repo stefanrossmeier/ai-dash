@@ -8,7 +8,7 @@ export AI_DASH_DATA_SOURCE="${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}"
 export AI_DASH_SECRETS_SOURCE="${AI_DASH_SECRETS_SOURCE:-$AI_DASH_RUNTIME/secrets}"
 install -d -m 700 "$AI_DASH_DATA_SOURCE" "$AI_DASH_SECRETS_SOURCE"
 python3 "$ROOT/scripts/init-runtime.py"
-for secret in openrouter_api_key telegram_token telegram_chat_id; do
+for secret in telegram_token telegram_chat_id; do
   test -s "$AI_DASH_SECRETS_SOURCE/$secret" || {
     echo "Missing ai-dash secret: $AI_DASH_SECRETS_SOURCE/$secret" >&2
     exit 1

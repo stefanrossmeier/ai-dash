@@ -82,7 +82,6 @@ services:
       WORKER_TAGS: aidash
       AI_DASH_HOME: /opt/ai-dash
       AI_DASH_DATA_DIR: /data/ai-dash
-      AI_DASH_X_GATEWAY_URL: http://ai_dash_x_gateway:8080
       # Dedicated llm-gateway instance (ai-dash-llm-gateway, joined to this
       # network) replaces the old shared ranking gateway. Bearer token from
       # the instance deployment; see docs/DEPLOYMENT.md.
@@ -100,8 +99,6 @@ services:
       windmill_server:
         condition: service_healthy
       ai_dash_model_gateway:
-        condition: service_healthy
-      ai_dash_x_gateway:
         condition: service_healthy
 
   ai_dash_model_gateway:
@@ -121,25 +118,6 @@ services:
       timeout: 5s
       retries: 30
 
-  ai_dash_x_gateway:
-    <<: *app
-    entrypoint: [/opt/ai-dash/.venv/bin/uvicorn]
-    command: [ai_dash.x_gateway:app, --host, 0.0.0.0, --port, '8080']
-    environment:
-      AI_DASH_HOME: /opt/ai-dash
-      AI_DASH_X_PROVIDER_DATA: /data/ai-dash/x-provider
-      AI_DASH_X_MODEL: ${AI_DASH_X_MODEL:-x-ai/grok-4.3}
-      OPENROUTER_API_KEY_FILE: /run/secrets/openrouter_api_key
-    volumes:
-      - ${AI_DASH_DATA_SOURCE:-/var/code/ai-dash-data}:/data/ai-dash
-      - ${AI_DASH_SECRETS_SOURCE:-/var/code/ai-dash-runtime/secrets}/openrouter_api_key:/run/secrets/openrouter_api_key:ro
-    ports:
-      - '127.0.0.1:${AI_DASH_X_PORT:-18081}:8080'
-    healthcheck:
-      test: [CMD, /opt/ai-dash/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
 
 volumes:
   db_data:

@@ -85,7 +85,6 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         max_paper_stories=report.max_paper_stories,
         max_per_source=report.max_per_source,
         x_enabled=report.x_only,
-        x_retry_split=False,
         send_empty=report.send_empty,
         freshness_hours=report.freshness_hours,
     )

@@ -30,13 +30,8 @@ def test_compose_owns_its_database_network_and_provider_secret():
     assert "gateway.token" in mounts, worker.get("volumes")
     assert not any("openrouter" in mount for mount in worker["volumes"])
     assert not any("secrets:ro" in mount for mount in worker["volumes"])
-    for service in ("ai_dash_model_gateway", "ai_dash_x_gateway"):
-        assert (
-            "AI_DASH_SECRETS_SOURCE"
-            in compose["services"][service]["volumes"][
-                0 if service == "ai_dash_model_gateway" else 1
-            ]
-        )
+    assert "ai_dash_x_gateway" not in compose["services"]
+    assert "openrouter_api_key" not in str(worker)
     for service in compose["services"].values():
         for port in service.get("ports", []):
             assert port.startswith("127.0.0.1:")

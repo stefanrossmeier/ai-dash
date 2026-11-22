@@ -32,7 +32,7 @@ class GatewayHeaderTests(unittest.TestCase):
         with patch("ai_dash.gateway._RUN_NONCE", "second-run"):
             self.assertNotEqual(_idempotency_key(payload), baseline)
 
-    def test_chat_sends_bearer_and_stable_key_x_search_stays_unauthenticated(self) -> None:
+    def test_chat_sends_bearer_and_stable_key(self) -> None:
         with TemporaryDirectory() as tmp:
             token_file = Path(tmp) / "gateway.token"
             token_file.write_text("synthetic-token\n", encoding="utf-8")
@@ -40,7 +40,6 @@ class GatewayHeaderTests(unittest.TestCase):
                 "os.environ",
                 {
                     "AI_DASH_GATEWAY_TOKEN_FILE": str(token_file),
-                    "AI_DASH_X_GATEWAY_URL": "http://x-gateway:8080",
                 },
                 clear=False,
             ):
@@ -57,15 +56,13 @@ class GatewayHeaderTests(unittest.TestCase):
                     first = seen[-1]["headers"]
                     gateway.request("chat", dict(payload))
                     second = seen[-1]["headers"]
-                    # X search keeps ai-dash's own bounded gateway: no bearer,
-                    # no idempotency header.
-                    x_headers = gateway._headers("x-search", {"allowed_x_handles": ["a"]})
 
                 self.assertEqual(seen[0]["url"], "http://ai-dash-llm-gateway:8080/v1/chat")
                 self.assertEqual(first["Authorization"], "Bearer synthetic-token")
                 self.assertTrue(first["Idempotency-Key"].startswith("ai-dash:"))
                 self.assertEqual(first["Idempotency-Key"], second["Idempotency-Key"])
-                self.assertEqual(x_headers, {})
+                with self.assertRaisesRegex(ValueError, "free RSS"):
+                    gateway.request("x-search", {})
 
 
 if __name__ == "__main__":

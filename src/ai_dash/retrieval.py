@@ -482,11 +482,7 @@ def retrieve_x(
     settings: Settings,
     gateway: Gateway,
     now: datetime,
-    *,
-    retry_split: bool = False,
 ) -> tuple[list[Item], list[Coverage]]:
-    if retry_split:
-        raise ValueError("Paid X retrieval retries are disabled")
     if len(sources) > 14:
         raise ValueError("X retrieval is limited to fourteen accounts")
     # Free Nitter RSS only (decision 2026-11-19): grok retrieval is parked for
@@ -495,7 +491,6 @@ def retrieve_x(
     # serves full per-account timelines with no search recall loss and no
     # sampling cap; a handle an instance cannot serve is reported unavailable
     # (verified live 2026-11-19: 13 of 14 watchlist handles work on RSS).
-    # _retrieve_x_batch stays for a future opt-in paid report; nothing calls it.
     items: list[Item] = []
     coverage: list[Coverage] = []
     for source in sources:
@@ -519,9 +514,7 @@ def collect(settings: Settings, gateway: Gateway, now: datetime, *, no_x: bool =
     coverage = [status for _, status in results]
     x_sources = [s for s in settings.sources if s.kind == "x" and s.enabled]
     if settings.x_enabled and not no_x and x_sources:
-        x_items, x_coverage = retrieve_x(
-            x_sources, settings, gateway, now, retry_split=settings.x_retry_split
-        )
+        x_items, x_coverage = retrieve_x(x_sources, settings, gateway, now)
         items.extend(x_items)
         coverage = [c for c in coverage if c.status != "search_required"] + x_coverage
     return items, coverage

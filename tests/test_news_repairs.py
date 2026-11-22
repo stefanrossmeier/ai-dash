@@ -362,7 +362,10 @@ def test_outage_checkpoint_exists_before_failure(monkeypatch, tmp_path):
 def test_empty_evidence_is_logged_without_model_or_send(monkeypatch, tmp_path, prompt):
     monkeypatch.setattr(
         "ai_dash.pipeline.collect",
-        lambda *a, **kw: ([item(text="")], [Coverage(source_id="test", status="ok")]),
+        lambda *a, **kw: (
+            [item(text="", published_at=datetime.now(UTC) - timedelta(hours=1))],
+            [Coverage(source_id="test", status="ok")],
+        ),
     )
     gateway = FakeRanker()
     artifact = build(
@@ -422,7 +425,7 @@ def test_sources_and_catchup_are_enabled_without_changing_x_budget():
     assert groups["company"].freshness_hours == 48
     assert groups["research_oss"].freshness_hours == 72
     assert groups["x_major"].freshness_hours == 24
-    assert groups["x_major"].max_per_source == 25 and not groups["x_major"].x_retry_split
+    assert groups["x_major"].max_per_source == 25
     assert "analysis-latent-space" not in {s.id for s in groups["blogs"].sources}
     assert {"analysis-the-decoder", "analysis-import-ai"} <= {s.id for s in groups["blogs"].sources}
 

@@ -4,7 +4,7 @@
 # Verifies, without sending Telegram messages or making paid model calls:
 #   1. the source checkout is clean and on a recorded commit
 #   2. the full ai-dash stack is running (db, Windmill server, worker,
-#      the bounded x-gateway, the old model gateway and the dedicated
+#      the old model gateway and the dedicated
 #      llm-gateway instance)
 #   3. Windmill answers on its loopback port; the llm-gateway instance
 #      authenticates the project principal on /ready
@@ -61,7 +61,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-for service in db windmill_server windmill_worker_aidash ai_dash_x_gateway ai_dash_model_gateway; do
+for service in db windmill_server windmill_worker_aidash ai_dash_model_gateway; do
   if dc ps --status running --services 2>/dev/null | grep -qx "$service"; then
     ok "service running: $service"
   else
@@ -85,15 +85,6 @@ if [[ "$windmill_version" =~ ^\"?CE ]]; then
   ok "Windmill API answering: $windmill_version"
 else
   fail "Windmill API not answering on 127.0.0.1:$windmill_port"
-fi
-
-x_health="$(docker exec ai-dash-ai_dash_x_gateway-1 /opt/ai-dash/.venv/bin/python -c \
-  "import urllib.request; print(urllib.request.urlopen('http://localhost:8080/health', timeout=10).read().decode())" \
-  2>/dev/null || true)"
-if [[ "$x_health" == *'"ok"'* ]]; then
-  ok "bounded x-gateway healthy (in-container /health)"
-else
-  fail "bounded x-gateway not healthy: $x_health"
 fi
 
 # The llm-gateway instance authenticates the ai-dash principal over TCP.

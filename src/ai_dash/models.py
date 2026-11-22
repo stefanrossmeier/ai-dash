@@ -60,9 +60,7 @@ class Settings(Model):
     # editorial prompt. Lets a report replace the blog-calibrated prompt
     # wholesale instead of only appending focus text.
     ranking_prompt: str | None = None
-    x_alias: str = "x-retrieve"
     x_enabled: bool = False
-    x_retry_split: bool = False
     report_id: str = "legacy"
     report_title: str = "AI News"
     editorial_focus: str = "AI engineering developments"
