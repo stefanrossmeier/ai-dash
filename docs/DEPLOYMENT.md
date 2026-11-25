@@ -13,6 +13,14 @@ required alongside the package.
 
 Provision the project's own gateway using the
 [LLM Gateway deployment documentation](https://github.com/stefanrossmeier/llm-gateway/blob/main/docs/OPERATIONS.md).
+The reviewed gateway release is pinned in
+[`deploy/llm-gateway-release.json`](../deploy/llm-gateway-release.json) to
+`0.1.0a4`. Install its verified platform image by immutable identity. Provider
+definitions and model alias files belong to this project's gateway deployment;
+the application continues to call the configured `rank-cheap` model alias.
+The smoke check requires authenticated readiness to report the pinned version.
+Upgrade the gateway and its credential-free egress proxy together, preserving
+the existing ledger, secrets, grants, aliases and schedule enablement.
 It must expose the authenticated dashboard-compatible chat/recovery interfaces,
 the `rank-cheap` alias and readiness for the `ai-dash` principal. Its internal DNS
 name in the application network is `ai-dash-llm-gateway`. Provider keys and durable

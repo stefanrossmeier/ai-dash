@@ -18,6 +18,11 @@ runtime, credentials or operator profile is required.
 
 ## Setup and routine checks
 
+Gateway release update: `deploy/llm-gateway-release.json` pins `0.1.0a4`.
+The application retains its HTTP model alias contract; provider configuration is
+owned by its independent gateway. The smoke script verifies the pinned version
+through authenticated `/ready`. See [deployment](../DEPLOYMENT.md) for upgrades.
+
 ```sh
 uv sync --frozen --no-editable
 ./scripts/check.sh
