@@ -1,3 +1,6 @@
+# The prebuilt CE base has separate terms, including modification/wrapping
+# restrictions. This build template is not image redistribution clearance.
+# See THIRD_PARTY_NOTICES.md and docs/PUBLICATION.md before releasing an image.
 ARG WM_IMAGE=ghcr.io/windmill-labs/windmill:1.775.1
 FROM ${WM_IMAGE}
 USER root

@@ -4,17 +4,34 @@ version = "0.1.0"
 description = "AI engineering news digests on independent Windmill infrastructure"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+authors = [{ name = "Stefan Rossmeier" }]
+classifiers = ["Development Status :: 3 - Alpha", "Operating System :: POSIX"]
 dependencies = ["httpx>=0.28,<1", "jsonschema>=4.25,<5", "feedparser>=6.0,<7", "pydantic>=2.11,<3", "pyyaml>=6,<7", "beautifulsoup4>=4.13,<5", "fastapi>=0.116,<1", "uvicorn>=0.35,<1"]
+
+[project.urls]
+Repository = "https://github.com/stefanrossmeier/ai-dash"
+Documentation = "https://github.com/stefanrossmeier/ai-dash/blob/main/docs/README.md"
 
 [project.scripts]
 ai-dash = "ai_dash.cli:main"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling==1.33.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ai_dash"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/AGENTS.md",
+  "/docs/REVIEW_*.md",
+  "/docs/DEPLOYMENT_STATUS.md",
+  "/docs/NEWS_*.md",
+  "/docs/evidence/news-*",
+]
 
 [dependency-groups]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1"]

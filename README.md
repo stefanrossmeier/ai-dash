@@ -4,7 +4,9 @@ Self-hosted AI news briefings delivered to Telegram. AI Dash collects public fee
 articles, model hubs, releases, community posts and video uploads; ranks relevant
 developments; and keeps inspectable evidence of selection and delivery.
 
-This is a single-operator reference application. The repository is currently private.
+This is a single-operator reference application. Start with the
+[key-free quickstart](QUICKSTART.md). Source licensing and deployment-component
+licensing are separate; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## Reports
 
@@ -78,7 +80,7 @@ retrieving transcripts or claiming to summarize their contents.
 - [Repository map](docs/archdoc/REPO_MAP.md), [architecture](docs/archdoc/ARCHITECTURE.md),
   [interfaces](docs/archdoc/API_SURFACE.md), [operations](docs/archdoc/OPERATIONS.md)
 - [Source provenance](docs/SOURCES.md) and [impact policy](docs/IMPACT_RANKING.md)
-- [Privacy, security and publication review](docs/REVIEW_2026-11-25.md)
+- [Security policy](SECURITY.md) and [publication readiness](docs/PUBLICATION.md)
 
 Private ledgers, channel identifiers, delivery history, raw operational evidence
 and credentials belong outside published source. Never delete accounting state to
