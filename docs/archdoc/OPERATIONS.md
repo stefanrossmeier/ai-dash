@@ -1,15 +1,16 @@
 # AI Dash operations
 
-- Review Scope: full repository architecture refresh
+- Review Scope: delta — published history, provenance and evidence-link refresh
 - Doc Status: MAINTAINED
-- Last Updated: 2026-11-25T17:17:25Z
+- Last Updated: 2026-11-25T17:49:49Z
 - Updated By: agent using [ai-craftkit archdoc](https://github.com/stefanrossmeier/ai-craftkit/blob/ad6f29457e2a1fa43300f34a8f44691251f9c2a2/skills/archdoc/SKILL.md)
-- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
-- Source Revision: [7d61b9161c1894492cba77868f1b6da1d0cffbe3](https://github.com/stefanrossmeier/ai-dash/commit/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
+- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
+- Source Revision: [f5fd37128a569a908f31f21e2ae07047ea25b4cf](https://github.com/stefanrossmeier/ai-dash/commit/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
 - Source Basis: runtime/Compose configuration, deploy/register/smoke scripts, CLI, persistence, cadence and failure regressions.
 
 Unless marked otherwise, implementation descriptions below are **verified** against
-this revision. This is repository evidence, not a claim about live deployment.
+this revision. Source Revision identifies the inspected source snapshot, before
+this documentation update. This is repository evidence, not a claim about live deployment.
 
 Use [deployment](../DEPLOYMENT.md) for prerequisites,
 network/secret inputs and gateway provisioning. No other application's checkout,
@@ -57,9 +58,9 @@ Schedule edits belong in report config followed by workflow regeneration.
 `validate` and the offline gate need no service; `collect` needs source networking;
 model-backed `preview` needs authenticated inference; `run` additionally needs
 private state and Telegram. Windmill supplies run identity for scheduled jobs.
-Names/defaults are verified in [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/cli.py),
-[src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/gateway.py), [scripts/deploy-vps.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/deploy-vps.sh)
-and [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy/compose.ai-dash.yaml). See [interfaces](API_SURFACE.md)
+Names/defaults are verified in [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/cli.py),
+[src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/gateway.py), [scripts/deploy-vps.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/deploy-vps.sh)
+and [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/deploy/compose.ai-dash.yaml). See [interfaces](API_SURFACE.md)
 for credential validation and side effects. Do not paste values into diagnostics.
 
 ## Retrieval windows
@@ -127,17 +128,21 @@ deploy a reviewed commit and compare installed source, schedule states, readines
 and history continuity. A fleet backup/restore drill and service-level objectives
 remain operator work; this repository does not automate them end to end.
 
+Use the current public repository directly for development and deployment.
+Do not merge or push history from the frozen private archive into it; see the
+[history sanitization record](../HISTORY_SANITIZATION.md).
+
 ## Evidence, release checks and unresolved work
 
-Build evidence: [scripts/check.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/check.sh), [scripts/check-distributions.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/check-distributions.py)
-and [deploy/windmill-worker.Dockerfile](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy/windmill-worker.Dockerfile). The Docker build copies
+Build evidence: [scripts/check.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/check.sh), [scripts/check-distributions.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/check-distributions.py)
+and [deploy/windmill-worker.Dockerfile](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/deploy/windmill-worker.Dockerfile). The Docker build copies
 both license files required by package metadata before installing the application.
 A wheel alone omits policy/assets/workflows needed for full deployment.
 
-Runtime evidence: [scripts/init-runtime.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/init-runtime.py), [scripts/deploy-vps.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/deploy-vps.sh), [scripts/register-windmill.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/register-windmill.py) and [scripts/smoke-test.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/smoke-test.sh).
-Selection checkpoints and artifacts are written by [src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/pipeline.py);
-delivery/history states are owned by [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py).
-Cadence/DST behavior is covered in [tests/test_cadence.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_cadence.py).
+Runtime evidence: [scripts/init-runtime.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/init-runtime.py), [scripts/deploy-vps.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/deploy-vps.sh), [scripts/register-windmill.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/register-windmill.py) and [scripts/smoke-test.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/smoke-test.sh).
+Selection checkpoints and artifacts are written by [src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/pipeline.py);
+delivery/history states are owned by [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/storage.py).
+Cadence/DST behavior is covered in [tests/test_cadence.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_cadence.py).
 
 A total source outage fails before ranking; inspect coverage/checkpoints and repair
 access rather than weaken dates or generate invented news. A gateway outage or

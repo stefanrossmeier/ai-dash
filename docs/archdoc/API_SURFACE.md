@@ -1,15 +1,16 @@
 # AI Dash interfaces
 
-- Review Scope: full repository architecture refresh
+- Review Scope: delta — published history, provenance and evidence-link refresh
 - Doc Status: MAINTAINED
-- Last Updated: 2026-11-25T17:17:25Z
+- Last Updated: 2026-11-25T17:49:49Z
 - Updated By: agent using [ai-craftkit archdoc](https://github.com/stefanrossmeier/ai-craftkit/blob/ad6f29457e2a1fa43300f34a8f44691251f9c2a2/skills/archdoc/SKILL.md)
-- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
-- Source Revision: [7d61b9161c1894492cba77868f1b6da1d0cffbe3](https://github.com/stefanrossmeier/ai-dash/commit/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
+- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
+- Source Revision: [f5fd37128a569a908f31f21e2ae07047ea25b4cf](https://github.com/stefanrossmeier/ai-dash/commit/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
 - Source Basis: CLI arguments and error handling, Pydantic/config schemas, storage projection, integration clients, workflow registration and tests.
 
 Unless marked otherwise, implementation descriptions below are **verified** against
-this revision. This is repository evidence, not a claim about live deployment.
+this revision. Source Revision identifies the inspected source snapshot, before
+this documentation update. This is repository evidence, not a claim about live deployment.
 
 The application exposes a CLI, versioned configuration,
 private artifacts and integration clients. It does not serve an application HTTP API.
@@ -39,8 +40,8 @@ used with `run`.
 row pending does not authorize the next `run` to replay it: fresh-only processing
 discards old unsent rows. Inspect the channel before resolving uncertainty.
 
-Contract source: [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/cli.py) and the entry point in
-[pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/pyproject.toml). Operator and Windmill are the CLI consumers;
+Contract source: [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/cli.py) and the entry point in
+[pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/pyproject.toml). Operator and Windmill are the CLI consumers;
 local filesystem/OS permissions provide access control. There is no CLI login.
 Argument parsing errors use argparse's exit code 2; caught runtime/configuration
 errors use 1. The CLI is evolving alpha software, not a versioned RPC protocol.
@@ -60,7 +61,7 @@ can be acknowledged while selection remains empty. Top-level `editions`, `outbox
 and `unresolved` remain available. The projection omits message bodies and channel
 destinations, but health warnings/run identities are still operational diagnostics.
 It does not report the latest attempted run when failure occurred before persistence.
-Evidence/verification: [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py) and [tests/test_status.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_status.py).
+Evidence/verification: [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/storage.py) and [tests/test_status.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_status.py).
 
 ## Configuration and secrets
 
@@ -116,15 +117,15 @@ the bot token and must never be copied into logs or public evidence.
 
 ## Contract evidence and compatibility gaps
 
-Canonical schemas are [src/ai_dash/models.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/models.py) and [src/ai_dash/reports.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/reports.py);
+Canonical schemas are [src/ai_dash/models.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/models.py) and [src/ai_dash/reports.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/reports.py);
 there is no separate OpenAPI specification because the application serves no HTTP API.
-[src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/gateway.py) and [tests/test_gateway_client.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_gateway_client.py)
-cover the owned gateway client; [src/ai_dash/reddit.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/reddit.py) and [tests/test_reddit.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_reddit.py)
-cover Reddit credential/listing contracts. [src/ai_dash/presentation.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/presentation.py)
-and [src/ai_dash/delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/delivery.py) own Telegram rendering/transport,
-with acknowledgement/failure regressions in [tests/test_pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_pipeline.py).
+[src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/gateway.py) and [tests/test_gateway_client.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_gateway_client.py)
+cover the owned gateway client; [src/ai_dash/reddit.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/reddit.py) and [tests/test_reddit.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_reddit.py)
+cover Reddit credential/listing contracts. [src/ai_dash/presentation.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/presentation.py)
+and [src/ai_dash/delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/delivery.py) own Telegram rendering/transport,
+with acknowledgement/failure regressions in [tests/test_pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_pipeline.py).
 Windmill inputs and registration are defined in
-[workflows/windmill/f/ai_dash/run_digest.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/workflows/windmill/f/ai_dash/run_digest.sh) and [scripts/register-windmill.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/register-windmill.py).
+[workflows/windmill/f/ai_dash/run_digest.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/workflows/windmill/f/ai_dash/run_digest.sh) and [scripts/register-windmill.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/register-windmill.py).
 
 Artifact `schema_version` currently defaults to 1; defaults support some older
 records, but this is not a general migration or future-version rejection scheme.

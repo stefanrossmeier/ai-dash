@@ -1,15 +1,16 @@
 # AI Dash repository map
 
-- Review Scope: full repository architecture refresh
+- Review Scope: delta — published history, provenance and evidence-link refresh
 - Doc Status: MAINTAINED
-- Last Updated: 2026-11-25T17:17:25Z
+- Last Updated: 2026-11-25T17:49:49Z
 - Updated By: agent using [ai-craftkit archdoc](https://github.com/stefanrossmeier/ai-craftkit/blob/ad6f29457e2a1fa43300f34a8f44691251f9c2a2/skills/archdoc/SKILL.md)
-- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
-- Source Revision: [7d61b9161c1894492cba77868f1b6da1d0cffbe3](https://github.com/stefanrossmeier/ai-dash/commit/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
+- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
+- Source Revision: [f5fd37128a569a908f31f21e2ae07047ea25b4cf](https://github.com/stefanrossmeier/ai-dash/commit/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
 - Source Basis: README, AGENTS, manifests, modules, configuration, workflows, CI, tests and build scripts.
 
 Unless marked otherwise, implementation descriptions below are **verified** against
-this revision. This is repository evidence, not a claim about live deployment.
+this revision. Source Revision identifies the inspected source snapshot, before
+this documentation update. This is repository evidence, not a claim about live deployment.
 
 Deployment and publication checks have their own scope in the
 [publication review](../PUBLICATION.md).
@@ -36,6 +37,7 @@ the [README](../../README.md), [architecture](ARCHITECTURE.md), then the
 | `deploy/` | Application worker image and independently owned Compose stack |
 | `tests/` | Offline behavior, fault, source, network and gateway regressions |
 | `docs/evidence/` | Dated source/selection evidence, not current runtime state |
+| `docs/history/` | Original PR descriptions retained as dated development evidence |
 
 Private runtime directories own secrets, the Windmill profile, database and report
 state. Local `var/`, `dist/`, virtual environments and caches are ignored outputs.
@@ -44,12 +46,12 @@ also requires the checkout's configuration, prompts and workflows.
 
 ## Entry points and evidence
 
-The installed `ai-dash` command is `cli.main`, declared in [pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/pyproject.toml).
-Windmill enters through [workflows/windmill/f/ai_dash/run_digest.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/workflows/windmill/f/ai_dash/run_digest.sh),
+The installed `ai-dash` command is `cli.main`, declared in [pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/pyproject.toml).
+Windmill enters through [workflows/windmill/f/ai_dash/run_digest.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/workflows/windmill/f/ai_dash/run_digest.sh),
 which sets checkout/runtime defaults before calling `ai-dash run --report ID`.
 The package is an application/worker, not a supported general-purpose Python API.
 
-Navigation evidence: [src/ai_dash](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash), [config](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3/config), [assets](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3/assets), [deploy](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy), [scripts](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts), [tests](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests).
+Navigation evidence: [src/ai_dash](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash), [config](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf/config), [assets](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf/assets), [deploy](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf/deploy), [scripts](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts), [tests](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests).
 
 ## Commands and generated files
 
@@ -77,18 +79,20 @@ historical decision approval or permission for external actions.
 
 ## Verification and reading order
 
-The [scripts/check.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/check.sh) gate is defined alongside the
-[CI workflow](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/.github/workflows/ci.yml). Key-free checks require
-Python 3.12+ and `uv`; Linux/macOS locking uses POSIX `fcntl`. [pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/pyproject.toml)
+The [scripts/check.sh](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/scripts/check.sh) gate is defined alongside the
+[CI workflow](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/.github/workflows/ci.yml). Key-free checks require
+Python 3.12+ and `uv`; Linux/macOS locking uses POSIX `fcntl`. [pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/pyproject.toml)
 and `uv.lock` define Python packaging/dependencies. The source archive is checked
-against [publication-files.txt](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/publication-files.txt); `AGENTS.md` and the evolution guide
+against [publication-files.txt](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/publication-files.txt); `AGENTS.md` and the evolution guide
 are public-safe inputs, while dated operational dossiers are excluded.
 
-Representative regressions: [tests/test_cadence.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_cadence.py), [tests/test_fresh_delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_fresh_delivery.py), [tests/test_community_policy.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_community_policy.py), [tests/test_gateway_client.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_gateway_client.py), [tests/test_network_security.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_network_security.py), [tests/test_status.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_status.py), [tests/test_public_export.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_public_export.py).
+Representative regressions: [tests/test_cadence.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_cadence.py), [tests/test_fresh_delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_fresh_delivery.py), [tests/test_community_policy.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_community_policy.py), [tests/test_gateway_client.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_gateway_client.py), [tests/test_network_security.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_network_security.py), [tests/test_status.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_status.py), [tests/test_public_export.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_public_export.py).
 They establish bounded contracts, not live source availability or model quality.
 
 Read the README and this map first, then [architecture](ARCHITECTURE.md), the
 relevant [interface](API_SURFACE.md), and [operations](OPERATIONS.md). The
 [evolution guide](../EVOLUTION.md) explains historical claims and corrections.
+The [history sanitization record](../HISTORY_SANITIZATION.md) explains the current
+public history and the single active repository workflow.
 **Missing:** accepted architecture decision records; do not infer approved
 historical rationale from the current module layout.

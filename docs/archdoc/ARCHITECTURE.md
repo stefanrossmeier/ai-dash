@@ -1,15 +1,16 @@
 # AI Dash architecture
 
-- Review Scope: full repository architecture refresh
+- Review Scope: delta — published history, provenance and evidence-link refresh
 - Doc Status: MAINTAINED
-- Last Updated: 2026-11-25T17:17:25Z
+- Last Updated: 2026-11-25T17:49:49Z
 - Updated By: agent using [ai-craftkit archdoc](https://github.com/stefanrossmeier/ai-craftkit/blob/ad6f29457e2a1fa43300f34a8f44691251f9c2a2/skills/archdoc/SKILL.md)
-- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
-- Source Revision: [7d61b9161c1894492cba77868f1b6da1d0cffbe3](https://github.com/stefanrossmeier/ai-dash/commit/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
+- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
+- Source Revision: [f5fd37128a569a908f31f21e2ae07047ea25b4cf](https://github.com/stefanrossmeier/ai-dash/commit/f5fd37128a569a908f31f21e2ae07047ea25b4cf)
 - Source Basis: instruction and contribution requirements, domain/CLI/pipeline modules, adapters, storage, deployment and boundary regressions.
 
 Unless marked otherwise, implementation descriptions below are **verified** against
-this revision. This is repository evidence, not a claim about live deployment.
+this revision. Source Revision identifies the inspected source snapshot, before
+this documentation update. This is repository evidence, not a claim about live deployment.
 
 AI Dash owns AI-news acquisition, editorial selection,
 private report artifacts and Telegram delivery. Windmill schedules and executes
@@ -31,12 +32,12 @@ inbound application API.
 Internal collection, editorial selection, artifact/outbox persistence and Telegram
 transport belong to AI Dash. Windmill and the gateway have independent lifecycles;
 ordinary Python packages are in-process dependencies, not external services.
-Evidence: [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/cli.py), [src/ai_dash/retrieval.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/retrieval.py), [src/ai_dash/reddit.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/reddit.py), [src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/gateway.py), [src/ai_dash/delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/delivery.py), [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy/compose.ai-dash.yaml).
+Evidence: [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/cli.py), [src/ai_dash/retrieval.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/retrieval.py), [src/ai_dash/reddit.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/reddit.py), [src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/gateway.py), [src/ai_dash/delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/delivery.py), [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/deploy/compose.ai-dash.yaml).
 
 ## Drivers, constraints and strategy
 
-Explicit current requirements in [AGENTS.md](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/AGENTS.md) and
-[CONTRIBUTING.md](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/CONTRIBUTING.md) include runtime independence, private credentials,
+Explicit current requirements in [AGENTS.md](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/AGENTS.md) and
+[CONTRIBUTING.md](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/CONTRIBUTING.md) include runtime independence, private credentials,
 inspectable source evidence, persistence before delivery and retaining accounting
 history. These drive separate service ownership, structured records and a durable
 outbox. They do not establish an availability or factual-accuracy guarantee.
@@ -44,8 +45,8 @@ outbox. They do not establish an availability or factual-accuracy guarantee.
 Hard implementation constraints are Python 3.12+, POSIX file locking, a single
 shared SQLite state directory, Telegram message size/acknowledgement semantics,
 Windmill's job environment and a separately authenticated gateway. See
-[pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/pyproject.toml), [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py) and
-[src/ai_dash/presentation.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/presentation.py). Component licensing is a separate
+[pyproject.toml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/pyproject.toml), [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/storage.py) and
+[src/ai_dash/presentation.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/presentation.py). Component licensing is a separate
 constraint in [third-party notices](../../THIRD_PARTY_NOTICES.md).
 
 The solution strategy is a CLI-composed pipeline with bounded acquisition,
@@ -85,7 +86,7 @@ collection, hydration, processing, presentation and storage. `processing` calls
 ranking/gateway, while transport/storage modules do not import CLI composition.
 Domain models are shared contracts. Source adapters return data rather than
 sending messages; only the persisted outbox enters delivery. Evidence:
-[src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/cli.py), [src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/pipeline.py), [src/ai_dash/processing.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/processing.py), [src/ai_dash/models.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/models.py).
+[src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/cli.py), [src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/pipeline.py), [src/ai_dash/processing.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/processing.py), [src/ai_dash/models.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/models.py).
 Detailed contract ownership is in [interfaces](API_SURFACE.md); deployment and
 recovery procedures belong to [operations](OPERATIONS.md).
 
@@ -105,8 +106,8 @@ Publishers own source assertions; model outputs and collection caches are
 transient inputs until captured in a private artifact/checkpoint. AI Dash owns
 its selection and delivery records, not upstream facts. Gateway and Windmill state
 are authoritative in their services, not reconstructible from the application
-SQLite file. State evidence: [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py),
-[src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/pipeline.py) and [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy/compose.ai-dash.yaml).
+SQLite file. State evidence: [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/storage.py),
+[src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/pipeline.py) and [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/deploy/compose.ai-dash.yaml).
 
 An artifact file can survive a subsequent failed SQLite insert as an orphan; file
 and database writes are not a distributed transaction. The lock and SQLite model
@@ -154,11 +155,11 @@ outcomes retain their identity and are not treated as permission to spend again.
 
 | Current invariant | Concrete evidence |
 | --- | --- |
-| Reject unknown config/model fields and invented/missing ranking slots | [src/ai_dash/models.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/models.py); [tests/test_pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_pipeline.py) |
-| Serialize shared-state runs; persist before sending; never replay old unsent news | [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py); [tests/test_fresh_delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_fresh_delivery.py) |
-| Pin checked public addresses, validate redirects and bound response bodies | [src/ai_dash/network.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/network.py); [tests/test_network_security.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_network_security.py) |
-| Retain request identity after unknown inference outcomes; split only explicit pre-dispatch input limits | [src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/gateway.py); [tests/test_input_limits.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_input_limits.py) |
-| Keep selection and acknowledgement outcomes distinct | [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py); [tests/test_status.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_status.py) |
+| Reject unknown config/model fields and invented/missing ranking slots | [src/ai_dash/models.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/models.py); [tests/test_pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_pipeline.py) |
+| Serialize shared-state runs; persist before sending; never replay old unsent news | [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/storage.py); [tests/test_fresh_delivery.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_fresh_delivery.py) |
+| Pin checked public addresses, validate redirects and bound response bodies | [src/ai_dash/network.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/network.py); [tests/test_network_security.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_network_security.py) |
+| Retain request identity after unknown inference outcomes; split only explicit pre-dispatch input limits | [src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/gateway.py); [tests/test_input_limits.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_input_limits.py) |
+| Keep selection and acknowledgement outcomes distinct | [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/src/ai_dash/storage.py); [tests/test_status.py](https://github.com/stefanrossmeier/ai-dash/blob/f5fd37128a569a908f31f21e2ae07047ea25b4cf/tests/test_status.py) |
 
 The [evolution guide](../EVOLUTION.md) identifies old defects and requirement
 changes without recasting commits as accepted ADRs. **Missing:** an agreed service
