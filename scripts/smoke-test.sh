@@ -26,6 +26,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUNTIME="${AI_DASH_RUNTIME:-/var/code/ai-dash-runtime}"
 ENV_FILE="$RUNTIME/.env"
 GATEWAY_TIMEOUT=30
+GATEWAY_VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$ROOT/deploy/llm-gateway-release.json")"
+GATEWAY_VERSION_FRAGMENT="\"version\":\"$GATEWAY_VERSION\""
 
 passages=0
 failures=0
@@ -98,11 +100,11 @@ else
 token = open('/run/ai-dash-secrets/gateway_token').read().strip()
 req = urllib.request.Request('http://ai-dash-llm-gateway:8080/ready', headers={'Authorization': 'Bearer ' + token})
 print(urllib.request.urlopen(req, timeout=10).read().decode())" 2>/dev/null || true)"
-    [[ "$ready" == *'"project_id":"ai-dash"'* ]] && break
+    [[ "$ready" == *'"project_id":"ai-dash"'* && "$ready" == *"$GATEWAY_VERSION_FRAGMENT"* ]] && break
     sleep 2
   done
-  if [[ "$ready" == *'"project_id":"ai-dash"'* ]]; then
-    ok "llm-gateway instance ready and principal authenticated (project ai-dash)"
+  if [[ "$ready" == *'"project_id":"ai-dash"'* && "$ready" == *"$GATEWAY_VERSION_FRAGMENT"* ]]; then
+    ok "llm-gateway $GATEWAY_VERSION ready and principal authenticated (project ai-dash)"
   else
     fail "llm-gateway instance not ready after ${GATEWAY_TIMEOUT}s (last: '$ready')"
   fi
