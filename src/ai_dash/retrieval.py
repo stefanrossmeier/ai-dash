@@ -24,6 +24,7 @@ from ai_dash.models import (
     YouTubeChannel,
     load_youtube_channels,
 )
+from ai_dash.network import bounded_get, public_client
 from ai_dash.processing import canonical_url, identity
 
 AI_WORDS = re.compile(
@@ -81,7 +82,7 @@ def fetch(client: httpx.Client, url: str, **kwargs) -> httpx.Response:
     # Full browser UA for Reddit: it 403s plain "Mozilla/5.0" and bot UAs from
     # datacenter IPs; the full Chrome string passes (verified live 2026-11-16).
     # Everything else keeps the default client UA.
-    if "reddit.com" in url:
+    if (urlsplit(url).hostname or "").removeprefix("www.") == "reddit.com":
         headers = {
             "User-Agent": (
                 "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -91,11 +92,7 @@ def fetch(client: httpx.Client, url: str, **kwargs) -> httpx.Response:
         }
     else:
         headers = {}
-    response = client.get(url, headers=headers, **kwargs)
-    response.raise_for_status()
-    if len(response.content) > 12_000_000:
-        raise ValueError("source response exceeds 12 MB")
-    return response
+    return bounded_get(client, url, headers=headers, **kwargs)
 
 
 def parse_feed(source: Source, content: str, cap: int) -> tuple[list[Item], int]:
@@ -299,10 +296,13 @@ def retrieve_one(
     cutoff = now - timedelta(hours=settings.freshness_hours)
     for attempt in range(2):
         try:
-            with httpx.Client(
+            with public_client(
                 timeout=settings.request_timeout,
                 follow_redirects=True,
-                headers={"User-Agent": "ai-dash/0.1 (+AI-news-reader)"},
+                headers={
+                    "User-Agent": "ai-dash/0.1 (+AI-news-reader)",
+                    "Accept-Encoding": "identity",
+                },
             ) as client:
                 # Passing even an empty dict to httpx replaces the URL's query,
                 # dropping configured author, sorting and limit filters.
@@ -461,7 +461,7 @@ def retrieve_youtube(
         if not channel.enabled:
             return [], Coverage(source_id=coverage_id, status="disabled")
         try:
-            with httpx.Client(
+            with public_client(
                 timeout=settings.request_timeout,
                 follow_redirects=True,
                 headers={"User-Agent": "ai-dash/0.1 (+AI-news-reader)"},
@@ -526,13 +526,12 @@ def _nitter_rss_items(
     for instance in NITTER_INSTANCES:
         url = f"{instance}/{handle}/rss"
         try:
-            with httpx.Client(
+            with public_client(
                 timeout=settings.request_timeout,
                 follow_redirects=True,
-                headers={"User-Agent": NITTER_UA},
+                headers={"User-Agent": NITTER_UA, "Accept-Encoding": "identity"},
             ) as client:
-                response = client.get(url)
-                response.raise_for_status()
+                response = fetch(client, url)
                 feed = feedparser.parse(response.text)
             if feed.bozo and not feed.entries:
                 raise ValueError("invalid nitter feed")

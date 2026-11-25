@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import ipaddress
 import json
-import socket
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin, urlsplit
 
@@ -12,6 +10,7 @@ import httpx
 from bs4 import BeautifulSoup
 
 from ai_dash.models import Item, Settings
+from ai_dash.network import public_client, public_url, readable_encoding
 
 
 def excerpt(value: str, limit: int = 12000) -> str:
@@ -27,21 +26,6 @@ def excerpt(value: str, limit: int = 12000) -> str:
     return text[:size] + " [...] " + text[middle : middle + size] + " [...] " + text[-size:]
 
 
-def public_url(url: str) -> None:
-    parsed = urlsplit(url)
-    if (
-        parsed.scheme not in {"http", "https"}
-        or not parsed.hostname
-        or parsed.username
-        or parsed.password
-        or parsed.port not in {None, 80, 443}
-    ):
-        raise ValueError("unsupported article URL")
-    addresses = socket.getaddrinfo(parsed.hostname, parsed.port or 443, type=socket.SOCK_STREAM)
-    if not addresses or any(not ipaddress.ip_address(row[4][0]).is_global for row in addresses):
-        raise ValueError("article host is not public")
-
-
 def read_article(client: httpx.Client, url: str) -> str:
     for _ in range(5):
         public_url(url)
@@ -50,12 +34,13 @@ def read_article(client: httpx.Client, url: str) -> str:
                 url = urljoin(url, response.headers["location"])
                 continue
             response.raise_for_status()
+            readable_encoding(response)
             content_type = response.headers.get("content-type", "").split(";")[0]
             if content_type not in {"text/html", "text/plain", "text/markdown", ""}:
                 raise ValueError("article is not readable text")
             chunks = []
             size = 0
-            for chunk in response.iter_bytes():
+            for chunk in response.iter_bytes(chunk_size=65536):
                 size += len(chunk)
                 if size > 2_000_000:
                     raise ValueError("article exceeds evidence budget")
@@ -120,8 +105,9 @@ def hydrate(items: list[Item], settings: Settings) -> tuple[list[Item], list[dic
         }:
             url += "/raw/main/README.md"
         try:
-            with httpx.Client(
-                timeout=settings.hydration_timeout, headers={"User-Agent": "ai-dash/0.1"}
+            with public_client(
+                timeout=settings.hydration_timeout,
+                headers={"User-Agent": "ai-dash/0.1", "Accept-Encoding": "identity"},
             ) as client:
                 html = read_article(client, url)
             if url.endswith("/raw/main/README.md"):

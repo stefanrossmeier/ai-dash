@@ -479,7 +479,7 @@ def test_discovery_uses_activity_or_curation_dates_without_claiming_new_release(
         )
 
     monkeypatch.setattr(
-        "ai_dash.retrieval.httpx.Client",
+        "ai_dash.retrieval.public_client",
         lambda **kw: original_client(transport=httpx.MockTransport(handler), **kw),
     )
     endpoint = "https://example.org/api?author=Qwen&sort=lastModified&limit=25"
@@ -509,17 +509,16 @@ def test_html_cards_do_not_hide_newer_link_discovery():
     <a href="/blog/old">Older pinned engineering article</a></article>
     <a href="/blog/new">Newer important engineering article</a>"""
 
-    class Client:
-        def get(self, url, **kw):
-            assert url == "https://example.org/blog/new"
-            return httpx.Response(
-                200,
-                request=httpx.Request("GET", url),
-                text='<meta property="article:published_time" content="2026-11-15T10:00:00Z">'
-                f"<article>{FACTS * 10}</article>",
-            )
+    def handler(request):
+        assert str(request.url) == "https://example.org/blog/new"
+        return httpx.Response(
+            200,
+            text='<meta property="article:published_time" content="2026-11-15T10:00:00Z">'
+            f"<article>{FACTS * 10}</article>",
+        )
 
-    items, _ = html_items(source(), Client(), html, 1)
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        items, _ = html_items(source(), client, html, 1)
     assert len(items) == 1 and items[0].url == "https://example.org/blog/new"
 
 

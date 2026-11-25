@@ -1,6 +1,5 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from types import SimpleNamespace
 
 import httpx
 import pytest
@@ -135,20 +134,12 @@ def test_nitter_rss_parses_full_timeline_into_items(monkeypatch):
     <description>&lt;p&gt;GPT-7 is out, weights on HF&lt;/p&gt;</description></item>
     </channel></rss>"""
 
-    class MockClient:
-        def __init__(self, **kw):
-            pass
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *exc):
-            return False
-
-        def get(self, url):
-            return SimpleNamespace(text=feed, raise_for_status=lambda: None)
-
-    monkeypatch.setattr(httpx, "Client", MockClient)
+    monkeypatch.setattr(
+        "ai_dash.retrieval.public_client",
+        lambda **kw: httpx.Client(
+            transport=httpx.MockTransport(lambda r: httpx.Response(200, text=feed)), **kw
+        ),
+    )
     s = source().model_copy(update={"kind": "x", "url": "https://x.com/swyx"})
     items, error = _nitter_rss_items(s, Settings(sources=[s]), NOW)
     assert error is None and len(items) == 1
@@ -272,28 +263,23 @@ def test_registry_and_namespace_contract():
 def test_html_uses_only_publisher_advertised_feed():
     from ai_dash.retrieval import html_items
 
-    class Response:
-        text = """<rss><channel><item><title>A real release</title>
+    feed = """<rss><channel><item><title>A real release</title>
         <link>https://example.org/new</link><pubDate>Mon, 09 Nov 2026 17:00:00 +0000</pubDate>
         </item></channel></rss>"""
-        content = text.encode()
-
-        def raise_for_status(self):
-            pass
 
     calls = []
 
-    class Client:
-        def get(self, url, **kwargs):
-            calls.append(url)
-            return Response()
+    def handler(request):
+        calls.append(str(request.url))
+        return httpx.Response(200, text=feed)
 
-    items, _ = html_items(
-        source(),
-        Client(),
-        '<link rel="alternate" type="application/rss+xml" href="/actual-feed">',
-        25,
-    )
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        items, _ = html_items(
+            source(),
+            client,
+            '<link rel="alternate" type="application/rss+xml" href="/actual-feed">',
+            25,
+        )
     assert calls == ["https://example.org/actual-feed"]
     assert len(items) == 1
 

@@ -83,30 +83,16 @@ def test_youtube_channel_failures_are_isolated_and_reported(tmp_path, monkeypatc
     (tmp_path / "youtube_channels.yaml").write_text(yaml.safe_dump({"channels": channel_config}))
     monkeypatch.setenv("AI_DASH_HOME", str(tmp_path))
 
-    class Response:
-        text = FEED
-        content = FEED.encode()
+    def handler(request):
+        assert str(request.url).startswith("https://www.youtube.com/feeds/videos.xml?")
+        if request.url.params["channel_id"] == "UCdoTbckiMelGtWvGMfhlkgQ":
+            raise httpx.ConnectError("channel unavailable")
+        return httpx.Response(200, text=FEED)
 
-        def raise_for_status(self):
-            pass
-
-    class MockClient:
-        def __init__(self, **kwargs):
-            pass
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *exc):
-            return False
-
-        def get(self, url, *, params, headers):
-            assert url == "https://www.youtube.com/feeds/videos.xml"
-            if params["channel_id"] == "UCdoTbckiMelGtWvGMfhlkgQ":
-                raise httpx.ConnectError("channel unavailable")
-            return Response()
-
-    monkeypatch.setattr("ai_dash.retrieval.httpx.Client", MockClient)
+    monkeypatch.setattr(
+        "ai_dash.retrieval.public_client",
+        lambda **kw: httpx.Client(transport=httpx.MockTransport(handler), **kw),
+    )
     items, coverage = collect(
         Settings(sources=[youtube_source()]),
         SimpleNamespace(),
