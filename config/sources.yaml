@@ -12,6 +12,7 @@ min_impact: 60
 min_breadth: 45
 min_novelty: 40
 min_quality: 60
+# Explicit gateway size rejections automatically split batches without dropping items.
 ranking_batch_size: 150
 ranking_excerpt_chars: 1200
 x_enabled: false
@@ -53,11 +54,11 @@ sources:
   category: Community
   url: https://www.reddit.com/r/singularity/
   priority: P1
-  kind: feed
-  endpoint: https://www.reddit.com/r/singularity/new.rss?limit=25
+  kind: reddit
+  endpoint: https://oauth.reddit.com/r/singularity/new
   focus: AI capability milestones, frontier-model releases, AGI discourse, AI industry news
   enabled: true
-  note: Reddit requires a full browser User-Agent from datacenter IPs.
+  note: Approved Reddit OAuth using ai-dash-owned private credential files.
 - id: news-techcrunch-ai
   name: TechCrunch AI
   category: News

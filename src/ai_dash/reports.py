@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 import yaml
 from pydantic import Field, model_validator
 
+from ai_dash.cadence import freshness_for_slots
 from ai_dash.models import Model, Settings
 
 
@@ -23,7 +25,6 @@ class Report(Model):
     send_empty: bool = False
     no_llm: bool = False
     x_only: bool = False
-    freshness_hours: int = Field(default=24, ge=1, le=168)
     min_score: int | None = Field(default=None, ge=0, le=100)
     min_impact: int | None = Field(default=None, ge=0, le=100)
     min_breadth: int | None = Field(default=None, ge=0, le=100)
@@ -53,7 +54,9 @@ def load_reports(path: Path) -> Reports:
     return Reports.model_validate(yaml.safe_load(path.read_text()))
 
 
-def select_report(settings: Settings, reports: Reports, report_id: str) -> Settings:
+def select_report(
+    settings: Settings, reports: Reports, report_id: str, *, now: datetime | None = None
+) -> Settings:
     report = next((r for r in reports.reports if r.id == report_id), None)
     if report is None:
         raise ValueError(f"unknown report: {report_id}")
@@ -88,7 +91,7 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         x_enabled=report.x_only,
         send_empty=report.send_empty,
         no_llm=report.no_llm,
-        freshness_hours=report.freshness_hours,
+        freshness_hours=freshness_for_slots(report.slots, settings.timezone, now),
     )
     if report.min_score is not None:
         data["min_score"] = report.min_score

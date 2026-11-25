@@ -26,6 +26,7 @@ from ai_dash.models import (
 )
 from ai_dash.network import bounded_get, public_client
 from ai_dash.processing import canonical_url, identity
+from ai_dash.reddit import retrieve_reddit
 
 AI_WORDS = re.compile(
     r"\b(ai|llm|llms|gpt|claude|gemini|inference|transformer|transformers|agent|agents|"
@@ -293,6 +294,8 @@ def retrieve_one(
         return [], Coverage(source_id=source.id, status="search_required")
     if source.kind == "youtube":
         return retrieve_youtube(source, settings, now)
+    if source.kind == "reddit":
+        return retrieve_reddit(source, settings, now)
     cutoff = now - timedelta(hours=settings.freshness_hours)
     for attempt in range(2):
         try:

@@ -9,6 +9,10 @@ from pathlib import Path
 import httpx
 
 
+class GatewayInputLimitError(RuntimeError):
+    """An explicit gateway rejection before provider dispatch; safe to split."""
+
+
 def _gateway_token() -> str | None:
     """Bearer token for the dedicated llm-gateway instance. Read from a private
     file (AI_DASH_GATEWAY_TOKEN_FILE) or the environment; never logged."""
@@ -45,6 +49,10 @@ class Gateway:
         self.url = url.rstrip("/")
         self.token = _gateway_token()
         self.traces: list[dict] = []
+        # Match the owned gateway's conservative UTF-8 bound, with framing room.
+        self.input_limit_bytes = int(os.getenv("AI_DASH_GATEWAY_INPUT_LIMIT", "262144"))
+        if self.input_limit_bytes < 4096:
+            raise ValueError("AI_DASH_GATEWAY_INPUT_LIMIT must be at least 4096")
 
     def _headers(self, route: str, payload: dict[str, object]) -> dict[str, str]:
         if not self.token:
@@ -61,6 +69,9 @@ class Gateway:
         if route != "chat":
             raise ValueError("Only chat inference is supported; X retrieval uses free RSS")
         payload = {**payload, "run_id": _run_id()}
+        size = len(json.dumps(payload, ensure_ascii=True, separators=(",", ":")).encode())
+        if size + 4096 > self.input_limit_bytes:
+            raise GatewayInputLimitError("gateway input preflight limit")
         headers = self._headers(route, payload)
         try:
             response = httpx.post(
@@ -82,6 +93,20 @@ class Gateway:
                     f"gateway transport lost; recover request {identifier}"
                 ) from None
         if response.is_error or response.status_code == 202:
+            if response.status_code in {413, 422}:
+                try:
+                    error = response.json().get("error")
+                    code = error.get("code") if isinstance(error, dict) else error
+                except (ValueError, AttributeError):
+                    code = None
+                if isinstance(code, str) and code in {
+                    "input_token_limit",
+                    "input_size_limit",
+                    "request_body_too_large",
+                }:
+                    raise GatewayInputLimitError(
+                        f"gateway input limit ({code}); request {headers['Idempotency-Key']}"
+                    )
             raise RuntimeError(
                 f"gateway HTTP {response.status_code}; request {headers['Idempotency-Key']}"
             )
