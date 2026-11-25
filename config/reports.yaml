@@ -124,12 +124,20 @@ reports:
   max_per_source: 25
   max_stories: 8
   max_paper_stories: 0
-  min_score: 55
+  ranking_prompt: reddit-editorial.md
+  min_score: 40
+  min_impact: 30
+  min_breadth: 20
+  min_novelty: 20
+  min_quality: 30
+  min_tier: 2
   send_empty: false
   focus: 'Community-surfaced AI news from r/singularity: frontier model releases,
-    capability milestones, notable industry moves and high-engagement AI developments.
-    Exclude memes, daily discussion threads, screenshots and doomer/utopia speculation
-    without concrete developments. Prefer posts linking primary sources.'
+    research claims, notable industry moves and substantive discussion about AI
+    capabilities and consequences. Surface interesting concrete claims with explicit
+    attribution and uncertainty; independent confirmation is not required to report
+    that a claim is being discussed. Exclude memes, spam and content-free speculation.
+    Prefer linked primary evidence without turning unverified claims into facts.'
   enabled: true
 
 - id: ai_news

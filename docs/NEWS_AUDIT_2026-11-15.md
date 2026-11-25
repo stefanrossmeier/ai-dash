@@ -1,5 +1,8 @@
 # AI Dash news quality and delivery audit — 15 November 2026
 
+Historical investigation. Findings below refer to the inspected 15 November
+revision, before later repairs. See [current operations](archdoc/OPERATIONS.md).
+
 ## Conclusion
 
 The main failure is **collecting too little usable evidence before selection**. Good

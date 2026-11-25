@@ -1,5 +1,9 @@
 # News selection repair — 15 November 2026
 
+Historical repair report. Its multi-day catch-up policy has since been replaced
+by [cadence-derived windows](archdoc/OPERATIONS.md). Test counts and provider
+settings below describe the dated repair, not current deployment acceptance.
+
 The [audit](NEWS_AUDIT_2026-11-15.md) found that successful Telegram delivery was
 being fed a weak candidate pool. This change repairs evidence collection and
 selection rather than targeting a message quota.

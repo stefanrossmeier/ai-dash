@@ -25,7 +25,6 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUNTIME="${AI_DASH_RUNTIME:-/var/code/ai-dash-runtime}"
 ENV_FILE="$RUNTIME/.env"
-GATEWAY_TOKEN_SOURCE="${AI_DASH_GATEWAY_TOKEN_SOURCE:-/var/code/llm-gateway-deployments/ai-dash/tokens/gateway.token}"
 GATEWAY_TIMEOUT=30
 
 passages=0
@@ -61,7 +60,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-for service in db windmill_server windmill_worker_aidash; do
+for service in db windmill_server windmill_worker windmill_worker_aidash; do
   if dc ps --status running --services 2>/dev/null | grep -qx "$service"; then
     ok "service running: $service"
   else
@@ -88,8 +87,8 @@ else
 fi
 
 # The llm-gateway instance authenticates the ai-dash principal over TCP.
-if [[ ! -r "$GATEWAY_TOKEN_SOURCE" ]]; then
-  fail "gateway token unreadable: $GATEWAY_TOKEN_SOURCE"
+if ! dc exec -T windmill_worker_aidash test -r /run/ai-dash-secrets/gateway_token; then
+  fail "gateway token unreadable by the application worker"
 else
   deadline=$((SECONDS + GATEWAY_TIMEOUT))
   ready=""

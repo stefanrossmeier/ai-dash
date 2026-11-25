@@ -1,5 +1,19 @@
 # Source provenance
 
+## Current configuration
+
+The registry contains 119 entries, including archived and manual sources. Current
+report membership is 21 company, seven analysis, 24 research/OSS, fourteen X,
+one Reddit OAuth listing, four tech-press feeds and one YouTube channel registry.
+The latter expands into the five enabled channels in `config/youtube_channels.yaml`.
+Membership counts are not measurements of source availability.
+
+`config/sources.yaml`, `config/reports.yaml` and the YouTube registry are the live
+inputs. X uses free Nitter RSS; model-backed ranking remains paid. Reddit's
+r/singularity report uses approved OAuth with project-owned credential files.
+Reports use cadence-derived windows rather than the older multi-day lookbacks.
+Read the remaining dated sections as historical provenance.
+
 ## News repair — 2026-11-15
 
 The live registry now retains the original 95 entries plus six verified additions:
@@ -25,13 +39,10 @@ The remaining sections describe the original registry and historical rollout.
 Imported on 2026-11-09 from the owner's existing Hermes installation, not generated
 from a model's recommendations:
 
-1. Local reference repository: `hermes-config`,
-   `machines/source-machine/hermes/skills/devops/ai-news-pipeline/SKILL.md`.
-2. Endpoint notes in that skill's `references/source-endpoints.md`.
-3. The skill names `~/.hermes/ai-news/sources.md` as its authoritative registry.
-   That file is not included in the hermes-config checkout. It was read from the
-   configured SSH host `source-host` (`~/.hermes/ai-news/sources.md`).
-4. An exact snapshot is committed as `docs/hermes-sources.md` (95 rows).
+1. The owner's Hermes `ai-news-pipeline` skill and its endpoint notes.
+2. That installation's authoritative source registry, captured with the owner's
+   access. The private host and machine paths are not needed to use this project.
+3. The resulting 95-row snapshot committed as `docs/hermes-sources.md`.
 
 `scripts/import-hermes-sources.py` deterministically converts the snapshot into
 `config/sources.yaml`. Blog-to-feed adaptations are the endpoints documented in

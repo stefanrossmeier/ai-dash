@@ -98,6 +98,7 @@ def test_oauth_paginates_and_filters_window_without_exposing_tokens(credentials,
     assert len(items) == coverage.items == coverage.fresh == 2
     assert coverage.status == "ok"
     assert all(i.date_basis == "submission" for i in items)
+    assert all(i.linked_url == "https://publisher.example/release" for i in items)
     assert all(NOW - timedelta(hours=12) <= i.published_at < NOW for i in items)
     assert "fixture-secret" not in str(items) + str(coverage)
     assert "fixture-access-token" not in str(items) + str(coverage)
@@ -149,3 +150,27 @@ def test_empty_listing_is_healthy_empty_not_unavailable(credentials, monkeypatch
     install_transport(monkeypatch, handler)
     items, coverage = retrieve_reddit(source(), Settings(sources=[]), NOW)
     assert items == [] and coverage.status == "empty"
+
+
+def test_crosspost_retains_discussion_and_original_primary_link(credentials, monkeypatch):
+    def handler(request):
+        if request.method == "POST":
+            return httpx.Response(200, json={"access_token": "fixture-access-token"})
+        row = post(
+            "crosspost",
+            selftext="",
+            url="https://www.reddit.com/r/other/comments/original/story/",
+            crosspost_parent_list=[
+                {
+                    "selftext": "Original explanation and its limitations.",
+                    "url": "https://publisher.example/original",
+                }
+            ],
+        )
+        return httpx.Response(200, json={"data": {"children": [row], "after": None}})
+
+    install_transport(monkeypatch, handler)
+    items, _ = retrieve_reddit(source(), Settings(sources=[]), NOW)
+    assert items[0].linked_url == "https://publisher.example/original"
+    assert "Original explanation and its limitations" in items[0].text
+    assert "/r/singularity/comments/crosspost/" in items[0].url
