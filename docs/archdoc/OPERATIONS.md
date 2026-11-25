@@ -1,6 +1,17 @@
 # AI Dash operations
 
-Reviewed 25 November 2026. Use [deployment](../DEPLOYMENT.md) for prerequisites,
+- Review Scope: full repository architecture refresh
+- Doc Status: MAINTAINED
+- Last Updated: 2026-11-25T17:17:25Z
+- Updated By: agent using [ai-craftkit archdoc](https://github.com/stefanrossmeier/ai-craftkit/blob/ad6f29457e2a1fa43300f34a8f44691251f9c2a2/skills/archdoc/SKILL.md)
+- Source Repository: [ai-dash tree](https://github.com/stefanrossmeier/ai-dash/tree/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
+- Source Revision: [7d61b9161c1894492cba77868f1b6da1d0cffbe3](https://github.com/stefanrossmeier/ai-dash/commit/7d61b9161c1894492cba77868f1b6da1d0cffbe3)
+- Source Basis: runtime/Compose configuration, deploy/register/smoke scripts, CLI, persistence, cadence and failure regressions.
+
+Unless marked otherwise, implementation descriptions below are **verified** against
+this revision. This is repository evidence, not a claim about live deployment.
+
+Use [deployment](../DEPLOYMENT.md) for prerequisites,
 network/secret inputs and gateway provisioning. No other application's checkout,
 runtime, credentials or operator profile is required.
 
@@ -32,6 +43,25 @@ with `scripts/register-windmill.py --enable` or `--enable-report ID`. Selective
 pauses use `--disable-report ID`. Registration uses only the owned runtime profile.
 Schedule edits belong in report config followed by workflow regeneration.
 
+## Configuration and execution modes
+
+| Input | Source and purpose |
+| --- | --- |
+| `AI_DASH_HOME`, `AI_DASH_DATA_DIR` | Checkout assets and private state roots; CLI defaults to `.` and `./var` |
+| `AI_DASH_GATEWAY_URL`, `AI_DASH_GATEWAY_TOKEN_FILE`, `AI_DASH_RUN_ID` | Owned gateway, bearer file and stable manual inference identity |
+| `AI_DASH_TELEGRAM_TOKEN_FILE`, `AI_DASH_TELEGRAM_CHAT_ID_FILE` | Independent bot and destination; required for run/check |
+| `AI_DASH_REDDIT_CLIENT_ID_FILE`, `AI_DASH_REDDIT_CLIENT_SECRET_FILE`, `AI_DASH_REDDIT_USER_AGENT_FILE` | Private credentials/contact configuration for Reddit collection |
+| `AI_DASH_RUNTIME`, `AI_DASH_SOURCE`, `AI_DASH_DATA_SOURCE`, `AI_DASH_SECRETS_SOURCE` | Deployment script inputs; separate checkout/runtime/data/secret paths |
+| `AI_DASH_GATEWAY_NETWORK`, `AI_DASH_GATEWAY_TOKEN_SOURCE`, `WM_IMAGE` | Compose gateway boundary, private token mount and upstream base |
+
+`validate` and the offline gate need no service; `collect` needs source networking;
+model-backed `preview` needs authenticated inference; `run` additionally needs
+private state and Telegram. Windmill supplies run identity for scheduled jobs.
+Names/defaults are verified in [src/ai_dash/cli.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/cli.py),
+[src/ai_dash/gateway.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/gateway.py), [scripts/deploy-vps.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/deploy-vps.sh)
+and [deploy/compose.ai-dash.yaml](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy/compose.ai-dash.yaml). See [interfaces](API_SURFACE.md)
+for credential validation and side effects. Do not paste values into diagnostics.
+
 ## Retrieval windows
 
 The configured timezone is Europe/Berlin. Each report uses the interval between
@@ -59,7 +89,10 @@ and recorded infrastructure errors. The gateway token is read in the worker,
 where its permissions apply. This makes no paid inference or Telegram send.
 
 `ai-dash check-telegram` checks permissions without posting. `ai-dash status`
-reports latest persisted report health and outbox counts. Private collection
+reports latest persisted selection and delivery outcomes, part acknowledgements,
+report warnings and outbox counts. The smoke check prints per-report outcomes as
+`INFO`, separately from infrastructure pass/fail. `no_qualifying_stories` warrants
+inspection when unexpected; `acknowledged` is an API receipt, not a client notification. Private collection
 checkpoints retain failure evidence even before an artifact is persisted. Inspect
 Windmill failures as well: a failed run may have no new persisted edition.
 
@@ -93,3 +126,29 @@ For upgrades, verify a clean checkout, record the prior commit, back up state,
 deploy a reviewed commit and compare installed source, schedule states, readiness
 and history continuity. A fleet backup/restore drill and service-level objectives
 remain operator work; this repository does not automate them end to end.
+
+## Evidence, release checks and unresolved work
+
+Build evidence: [scripts/check.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/check.sh), [scripts/check-distributions.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/check-distributions.py)
+and [deploy/windmill-worker.Dockerfile](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/deploy/windmill-worker.Dockerfile). The Docker build copies
+both license files required by package metadata before installing the application.
+A wheel alone omits policy/assets/workflows needed for full deployment.
+
+Runtime evidence: [scripts/init-runtime.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/init-runtime.py), [scripts/deploy-vps.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/deploy-vps.sh), [scripts/register-windmill.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/register-windmill.py) and [scripts/smoke-test.sh](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/scripts/smoke-test.sh).
+Selection checkpoints and artifacts are written by [src/ai_dash/pipeline.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/pipeline.py);
+delivery/history states are owned by [src/ai_dash/storage.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/src/ai_dash/storage.py).
+Cadence/DST behavior is covered in [tests/test_cadence.py](https://github.com/stefanrossmeier/ai-dash/blob/7d61b9161c1894492cba77868f1b6da1d0cffbe3/tests/test_cadence.py).
+
+A total source outage fails before ranking; inspect coverage/checkpoints and repair
+access rather than weaken dates or generate invented news. A gateway outage or
+unknown response requires request recovery with the same identity; readiness alone
+does not prove remaining allowance or model quality. A Telegram failure can be
+uncertain even when the next infrastructure check passes; inspect channel and
+edition/outbox evidence before interpreting recovery.
+
+**Missing:** automated complete restore verification, service-level objectives and
+a separate built-in operator alert destination. **Unresolved:** the default root
+worker, inherited image advisories and permitted upstream image modification/
+distribution route. The [publication review](../PUBLICATION.md) scopes that evidence;
+a successful deployment does not establish image-release approval. This document
+records repository procedures, not the result of a particular live deployment.
