@@ -1,0 +1,26 @@
+channels:
+  - id: ai_engineer
+    display_name: AI Engineer
+    handle: "@aidotengineer"
+    channel_id: UCLKPca3kwwd-B59HNr-_lvA
+    enabled: true
+  - id: julian_ivanov
+    display_name: Julian Ivanov | KI-Automatisierung
+    handle: "@Julian-Ivanov"
+    channel_id: UCdoTbckiMelGtWvGMfhlkgQ
+    enabled: true
+  - id: the_ai_automators
+    display_name: The AI Automators
+    handle: "@theaiautomators"
+    channel_id: UCwvXnrOCRlhokHlJwohf2OA
+    enabled: true
+  - id: jam_with_ai
+    display_name: Jam With AI | Shirin Khosravi Jam
+    handle: "@jamwithai"
+    channel_id: UCqbneebdpn4ytLZG9EklhNg
+    enabled: true
+  - id: matt_pocock
+    display_name: Matt Pocock
+    handle: "@mattpocockuk"
+    channel_id: UCswG6FSbgZjbWtdf_hMLaow
+    enabled: true

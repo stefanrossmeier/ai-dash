@@ -21,6 +21,7 @@ class Report(Model):
     max_paper_stories: int = Field(default=6, ge=0, le=30)
     max_per_source: int = Field(default=25, ge=1, le=100)
     send_empty: bool = False
+    no_llm: bool = False
     x_only: bool = False
     freshness_hours: int = Field(default=24, ge=1, le=168)
     min_score: int | None = Field(default=None, ge=0, le=100)
@@ -86,6 +87,7 @@ def select_report(settings: Settings, reports: Reports, report_id: str) -> Setti
         max_per_source=report.max_per_source,
         x_enabled=report.x_only,
         send_empty=report.send_empty,
+        no_llm=report.no_llm,
         freshness_hours=report.freshness_hours,
     )
     if report.min_score is not None:

@@ -248,7 +248,7 @@ def test_registry_and_namespace_contract():
 
     root = Path(__file__).resolve().parents[1]
     settings = load_settings(root / "config/sources.yaml")
-    assert len(settings.sources) == 118
+    assert len(settings.sources) == 119
     assert all(s.kind != "x" or s.url.startswith("https://x.com/") for s in settings.sources)
     folder = root / "workflows/windmill/f/ai_dash"
     for path in folder.glob("*.schedule.yaml"):
@@ -261,6 +261,7 @@ def test_registry_and_namespace_contract():
             "f/ai_dash/x_major",
             "f/ai_dash/singularity",
             "f/ai_dash/ai_news",
+            "f/ai_dash/youtube",
         }
         assert schedule["timezone"] == settings.timezone
         assert schedule["no_flow_overlap"] is True
