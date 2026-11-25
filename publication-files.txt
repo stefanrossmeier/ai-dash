@@ -4,6 +4,7 @@
 .github/workflows/ci.yml
 .gitignore
 .python-version
+AGENTS.md
 CONTRIBUTING.md
 LICENSE
 QUICKSTART.md
@@ -21,6 +22,7 @@ src
 tests
 workflows
 docs/README.md
+docs/EVOLUTION.md
 docs/PUBLICATION.md
 docs/SOURCES.md
 docs/DEPLOYMENT.md

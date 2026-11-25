@@ -53,7 +53,6 @@ source. Registration owns runtime enablement and preserves existing settings.
 The Hermes importer reconstructs an old registry snapshot and overwrites the live
 source file; it is not an additive synchronization command.
 
-The operational checkout uses `AGENTS.md` for owner-specific instructions; that
-file is omitted from the clean source export. Public contribution guidance is in
-`CONTRIBUTING.md`. These guides describe implementation and do not establish
+Contributor and agent guidance is in `AGENTS.md` and `CONTRIBUTING.md`; both
+retain actual contributor authorship and are included in the reviewed source export. These guides describe implementation and do not establish
 historical decision approval or permission for external actions.

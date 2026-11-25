@@ -9,6 +9,7 @@ Start with the [key-free quickstart](../QUICKSTART.md), then the
 | [Architecture](archdoc/ARCHITECTURE.md) | Boundaries, state ownership, execution and limitations |
 | [Interfaces](archdoc/API_SURFACE.md) | CLI, configuration, gateway, artifacts and delivery contracts |
 | [Operations](archdoc/OPERATIONS.md) | Setup, schedules, diagnostics, backups and recovery |
+| [Evolution](EVOLUTION.md) | Problems, fixes, evidence and the limits of historical claims |
 | [Independence](INDEPENDENCE.md) | Ownership of services, credentials and model policy |
 | [Telegram](TELEGRAM.md) | Provision a separate bot and channel |
 | [Sources](SOURCES.md) | Current adapters, registry and provenance |
@@ -20,4 +21,6 @@ Start with the [key-free quickstart](../QUICKSTART.md), then the
 
 Dated operational investigations remain in the private development history. They
 are not current setup instructions and are excluded from the reviewed clean source
-export, together with raw production snapshots and owner-specific agent instructions.
+export, together with raw production snapshots. Public-safe contributor and agent
+guidance is included. The Git history is preserved; the export is an optional
+packaging format, not a replacement for that history.

@@ -75,12 +75,12 @@ requirement changes; others fixed defects. Preserve that distinction. Dated
 statements about free X editions also need the current clarification that RSS
 collection is free while inference can cost money.
 
-The appropriate response is a concise, evidenced evolution narrative linking the
-problem, observation, changed decision, validation and remaining limit. Do not
+The [evolution guide](EVOLUTION.md) links the problem, observation, changed
+behavior, validation and remaining limit. Do not
 rewrite old defects out of existence or present old claims as current guarantees.
 Squashing routine fixups may improve readability, but flattening the whole history
-would remove useful evidence. Owner-only instructions, including fixed commit
-identity requirements, also need review before inviting public contributors.
+would remove useful evidence. Contributor and agent instructions now preserve real authorship and point to the
+architecture guides; they no longer require contributors to impersonate the owner.
 
 ## Runtime image evidence
 
@@ -126,8 +126,8 @@ Component-term questions are detailed in [third-party notices](../THIRD_PARTY_NO
 ## Clean source candidate
 
 `publication-files.txt` selects current code, config, prompts, synthetic tests,
-workflows, public-facing docs and the compact dated ranking calibration. It omits
-owner-specific `AGENTS.md`, the private portfolio review, raw production snapshots,
+workflows, public-facing docs and the compact dated ranking calibration. It includes public-safe `AGENTS.md` guidance and omits
+the private portfolio review, raw production snapshots,
 dated operational dossiers and every Git/PR/Actions history. Historical files
 remain in the operational checkout and its private history.
 
@@ -145,7 +145,7 @@ and links, requires a passing redacted secret scan and refuses to overwrite an
 archive or receipt. The archive has no Git database. Its sidecar receipt records
 the source revision, archive hash and per-file hashes; retain it for review.
 
-Ordinary source-distribution builds also exclude the owner instructions and dated
+Ordinary source-distribution builds also exclude dated
 operational dossiers. The quality gate inspects the actual source/wheel archives,
 rejects members outside `publication-files.txt` and checks license metadata/files.
 This closes a separate packaging gap: the earlier default source distribution

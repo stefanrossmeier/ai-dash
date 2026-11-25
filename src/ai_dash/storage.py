@@ -120,9 +120,41 @@ class Store:
         for (raw,) in self.db.execute("SELECT artifact FROM editions ORDER BY rowid DESC"):
             artifact = Artifact.model_validate_json(raw)
             if artifact.report_id not in reports:
+                states = dict(
+                    self.db.execute(
+                        "SELECT status, COUNT(*) FROM outbox WHERE run_id=? GROUP BY status",
+                        (artifact.run_id,),
+                    )
+                )
+                parts = sum(states.values())
+                acknowledged = states.get("sent", 0)
+                if states.get("sending", 0) or states.get("discarded_uncertain", 0):
+                    outcome = "uncertain"
+                elif parts and acknowledged == parts:
+                    outcome = "acknowledged"
+                elif acknowledged:
+                    outcome = "partial"
+                elif states.get("pending", 0):
+                    outcome = "pending"
+                elif parts:
+                    outcome = "discarded"
+                else:
+                    outcome = "missing" if artifact.stories else "not_required"
                 reports[artifact.report_id] = {
+                    "run_id": artifact.run_id,
                     "created_at": artifact.created_at.isoformat(),
+                    "example": artifact.example,
+                    "candidates": len(artifact.candidates),
                     "selected": len(artifact.stories),
+                    "selection_outcome": "selected"
+                    if artifact.stories
+                    else "no_qualifying_stories",
+                    "delivery": {
+                        "outcome": outcome,
+                        "parts": parts,
+                        "acknowledged": acknowledged,
+                        "states": states,
+                    },
                     "health_warnings": artifact.health_warnings,
                 }
         return {
