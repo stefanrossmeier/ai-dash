@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 from ai_dash.content import excerpt
-from ai_dash.gateway import Gateway
+from ai_dash.gateway import Gateway, GatewayInputLimitError
 from ai_dash.models import ImpactDecision, Item, Settings, Story
 
 
@@ -55,6 +55,34 @@ def keyed_schema(name: str, slots: list[str], value: dict) -> dict:
     }
 
 
+def bounded_chat(gateway: Gateway, payload: dict, field: str) -> dict:
+    """Split only explicit pre-dispatch size rejections; retain every candidate."""
+    try:
+        return gateway.request("chat", payload)
+    except GatewayInputLimitError:
+        user = json.loads(payload["messages"][-1]["content"])
+        candidates = user["candidates"]
+        if len(candidates) <= 1:
+            raise
+        middle = len(candidates) // 2
+        combined = {}
+        for batch in (candidates[:middle], candidates[middle:]):
+            body = json.loads(json.dumps(payload))
+            body["messages"][-1]["content"] = json.dumps({**user, "candidates": batch})
+            slots = {item["id"] for item in batch}
+            schema = body["response_schema"]["properties"][field]
+            schema["properties"] = {
+                key: value for key, value in schema["properties"].items() if key in slots
+            }
+            schema["required"] = [key for key in schema["required"] if key in slots]
+            response = bounded_chat(gateway, body, field)
+            values = response["content"].get(field)
+            if not isinstance(values, dict) or set(values) != slots:
+                raise ValueError(f"{field} omitted or returned unknown candidate slots") from None
+            combined.update(values)
+        return {"content": {field: combined}}
+
+
 def evaluate(
     items: list[Item],
     settings: Settings,
@@ -78,8 +106,8 @@ def evaluate(
             }
             for slot, item in by_slot.items()
         ]
-        response = gateway.request(
-            "chat",
+        response = bounded_chat(
+            gateway,
             {
                 "alias": settings.ranking_alias,
                 "purpose": "ai-news-ranking",
@@ -106,6 +134,7 @@ def evaluate(
                     "evaluations", list(by_slot), ImpactDecision.model_json_schema()
                 ),
             },
+            "evaluations",
         )
         raw = response["content"].get("evaluations")
         if not isinstance(raw, dict) or set(raw) != set(by_slot):
@@ -139,8 +168,8 @@ def summarize(stories: list[Story], settings: Settings, gateway: Gateway) -> lis
     if not stories:
         return []
     by_slot = {f"s{n}": story for n, story in enumerate(stories)}
-    response = gateway.request(
-        "chat",
+    response = bounded_chat(
+        gateway,
         {
             "alias": settings.ranking_alias,
             "purpose": "ai-news-summaries",
@@ -188,6 +217,7 @@ def summarize(stories: list[Story], settings: Settings, gateway: Gateway) -> lis
                 },
             ),
         },
+        "summaries",
     )
     raw = response["content"].get("summaries")
     if not isinstance(raw, dict) or set(raw) != set(by_slot):

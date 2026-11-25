@@ -417,14 +417,14 @@ def test_schedule_updates_preserve_other_reports_and_respect_pauses():
     assert not policy(report | {"enabled": False}, True, [], current_enabled=True)
 
 
-def test_sources_and_catchup_are_enabled_without_changing_x_budget():
+def test_sources_use_cadence_windows_without_changing_x_retrieval():
     settings = load_settings(ROOT / "config/sources.yaml")
     reports = load_reports(ROOT / "config/reports.yaml")
     groups = {r.id: select_report(settings, reports, r.id) for r in reports.reports}
-    assert groups["blogs"].freshness_hours == 168
-    assert groups["company"].freshness_hours == 48
-    assert groups["research_oss"].freshness_hours == 72
-    assert groups["x_major"].freshness_hours == 24
+    assert groups["blogs"].freshness_hours == 25
+    assert groups["company"].freshness_hours in {12, 16}
+    assert groups["research_oss"].freshness_hours == 25
+    assert groups["x_major"].freshness_hours in {6, 10, 14}
     assert groups["x_major"].max_per_source == 25
     assert "analysis-latent-space" not in {s.id for s in groups["blogs"].sources}
     assert {"analysis-the-decoder", "analysis-import-ai"} <= {s.id for s in groups["blogs"].sources}

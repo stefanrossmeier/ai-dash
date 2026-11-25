@@ -8,8 +8,9 @@ provider gateways were removed. Ranking, summarization and consolidation still
 use the authenticated project LLM gateway and can incur model cost.
 
 Reports, source lists, thresholds and schedule slots are defined in
-`config/reports.yaml` and `config/sources.yaml`. Application history/outbox protects
-delivery retries; each logical inference uses durable job/run identity.
+`config/reports.yaml` and `config/sources.yaml`. Retrieval windows follow each report's
+cadence with a small overlap. Failed unsent editions are discarded; the next run
+retrieves fresh data. Each logical inference uses durable job/run identity.
 
 ```sh
 uv sync --frozen

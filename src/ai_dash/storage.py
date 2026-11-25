@@ -52,7 +52,7 @@ class Store:
         """):
             artifact = Artifact.model_validate_json(raw)
             if artifact.created_at >= now - timedelta(days=days):
-                # Reserve all stories of partially delivered editions; the outbox resumes the rest.
+                # Retain delivered editions in history; unsent parts are never replayed.
                 result.extend({"title": s.item.title, "url": s.item.url} for s in artifact.stories)
         return result
 
@@ -85,8 +85,17 @@ class Store:
         return self.db.execute("""
             SELECT o.run_id, o.part, o.body, o.status, e.destination
             FROM outbox o JOIN editions e USING(run_id)
-            WHERE o.status != 'sent' ORDER BY e.rowid, o.part
+            WHERE o.status IN ('pending', 'sending') ORDER BY e.rowid, o.part
         """).fetchall()
+
+    def discard_unsent(self) -> int:
+        """Keep the audit trail, but never replay an older failed edition."""
+        with self.db:
+            return self.db.execute("""
+                UPDATE outbox SET status=CASE WHEN status='sending'
+                    THEN 'discarded_uncertain' ELSE 'discarded' END
+                WHERE status IN ('pending', 'sending')
+            """).rowcount
 
     def mark(self, run_id: str, part: int, state: str, message_id: int | None = None):
         with self.db:

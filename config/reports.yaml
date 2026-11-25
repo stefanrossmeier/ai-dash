@@ -15,7 +15,6 @@ reports:
     and inference infrastructure. Require a concrete new development; exclude generic
     marketing. Require material impact beyond routine maintenance or minor tool features;
     do not fill the report with patch notes or small benchmark deltas.
-  freshness_hours: 48
 - id: blogs
   title: Blogs & Analysis
   categories:
@@ -32,7 +31,6 @@ reports:
     exclude unrelated programming posts and recycled announcements. Require material
     impact beyond routine maintenance or minor tool features; do not fill the report
     with patch notes or small benchmark deltas.
-  freshness_hours: 168
 - id: research_oss
   title: Research & Open Source
   categories:
@@ -54,7 +52,6 @@ reports:
     submission from a validated model release. Keep practical engineering relevance
     high. Require material impact beyond routine maintenance or minor tool features;
     do not fill the report with patch notes or small benchmark deltas.
-  freshness_hours: 72
   max_per_source: 100
   min_score: 60
 - id: x_major
@@ -81,7 +78,7 @@ reports:
   - '11:45'
   - '19:45'
   x_only: true
-  # Every slot delivers the full 24h potpourri. Duplication across the day's
+  # Every slot retrieves its cadence-sized window. Duplication across the day's
   # editions is accepted by design - the reader gets the report at 07:45,
   # 11:45 and 19:45, never a skipped or thinned edition.
   omit_delivered: false
@@ -116,7 +113,6 @@ reports:
     launches and concrete industry news. Exclude memes, reposts and stories already
     delivered through other reports.'
   enabled: true
-  freshness_hours: 24
 
 - id: singularity
   title: Reddit — r/singularity Daily
@@ -135,7 +131,6 @@ reports:
     Exclude memes, daily discussion threads, screenshots and doomer/utopia speculation
     without concrete developments. Prefer posts linking primary sources.'
   enabled: true
-  freshness_hours: 24
 
 - id: ai_news
   title: AI News — Tech Press Digest
@@ -157,7 +152,6 @@ reports:
     editions per day. Prefer same-day primary developments over commentary and
     analysis pieces. Exclude weekly digests and sponsored content.'
   enabled: true
-  freshness_hours: 24
 
 - id: youtube
   title: YouTube — New Videos
@@ -171,4 +165,3 @@ reports:
   no_llm: true
   focus: New video uploads from the configured YouTube channels
   enabled: true
-  freshness_hours: 24

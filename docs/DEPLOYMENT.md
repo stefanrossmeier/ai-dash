@@ -24,3 +24,21 @@ application state, schedule enablement and the database. Provision its gateway
 independently from the reviewed release and attach the application worker to the
 owned internal gateway network. Use authenticated readiness checks before enabling
 jobs. Never run `down -v` or delete accounting state to regain allowance.
+
+Every report derives its retrieval window from its own daily slots. Daily reports
+use the preceding scheduled interval plus one hour (normally 25 hours); more
+frequent reports use the preceding interval plus two hours. Uneven schedules and
+daylight-saving changes use the actual preceding interval. X and YouTube use the
+same policy. There is no multi-day catch-up window.
+
+Unsent editions are retained for audit as `discarded` or `discarded_uncertain`.
+They are never replayed on a subsequent run. Each run discards any interrupted
+send before checking Telegram and retrieving fresh data. Successful messages
+remain in delivery history. A failed send still marks the run failed for monitoring.
+
+The active gateway input allowance is 262144. The client uses
+`AI_DASH_GATEWAY_INPUT_LIMIT` (default 262144) with framing headroom to split
+oversized ranking and summary batches. Explicit gateway input-limit rejections
+also split recursively without dropping candidates. Unknown outcomes and unrelated
+errors are never retried through this path. Keep this setting aligned with the
+project-owned gateway policy; spending caps and provider credentials remain there.

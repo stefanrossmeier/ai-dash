@@ -155,8 +155,8 @@ def run(
     with exclusive(data_dir):
         store = Store(data_dir)
         try:
+            discarded = store.discard_unsent()
             telegram.check(destination)
-            resumed = flush(store, telegram, destination)
             # The x_major once-per-day delivery guard was a leftover from the
             # single-slot era: with three daily slots it would let only the
             # first edition deliver and silently skip 11:45 and 19:45. Removed
@@ -177,14 +177,19 @@ def run(
             )
             messages = render(artifact, settings.timezone)
             path = store.persist(artifact, messages, destination)
-            sent = flush(store, telegram, destination)
+            try:
+                sent = flush(store, telegram, destination)
+            except Exception:
+                store.discard_unsent()
+                raise
             for warning in artifact.health_warnings:
                 logging.warning("AI Dash %s: %s", settings.report_id, warning)
             return {
                 "run_id": artifact.run_id,
                 "artifact_path": str(path),
                 "messages_sent": sent,
-                "messages_resumed": resumed,
+                "messages_resumed": 0,
+                "messages_discarded": discarded,
                 "stats": artifact.stats,
                 "health_warnings": artifact.health_warnings,
             }

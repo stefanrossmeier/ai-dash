@@ -57,7 +57,7 @@ def test_reports_use_disjoint_sources_and_fourteen_high_frequency_x_accounts():
     # Full timelines via free Nitter RSS + a dedicated X-calibrated ranking prompt.
     assert x.ranking_prompt == "x-editorial.md"
     youtube = groups["youtube"]
-    assert youtube.no_llm and youtube.freshness_hours == 24
+    assert youtube.no_llm and youtube.freshness_hours == 25
     assert youtube.slots == ["19:30"] and youtube.send_empty
     assert [source.id for source in youtube.sources] == ["youtube-channels"]
 
