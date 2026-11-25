@@ -8,3 +8,4 @@ uv run --no-sync pytest -q
 uv run --no-sync ai-dash validate
 uv run --no-sync python scripts/render-windmill.py --check
 uv build
+uv run --no-sync python scripts/check-distributions.py

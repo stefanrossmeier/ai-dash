@@ -24,6 +24,15 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/ai_dash"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/AGENTS.md",
+  "/docs/REVIEW_*.md",
+  "/docs/DEPLOYMENT_STATUS.md",
+  "/docs/NEWS_*.md",
+  "/docs/evidence/news-*",
+]
+
 [dependency-groups]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
 

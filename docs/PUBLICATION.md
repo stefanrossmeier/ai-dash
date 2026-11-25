@@ -110,6 +110,13 @@ and links, requires a passing redacted secret scan and refuses to overwrite an
 archive or receipt. The archive has no Git database. Its sidecar receipt records
 the source revision, archive hash and per-file hashes; retain it for review.
 
+Ordinary source-distribution builds also exclude the owner instructions and dated
+operational dossiers. The quality gate inspects the actual source/wheel archives,
+rejects members outside `publication-files.txt` and checks license metadata/files.
+This closes a separate packaging gap: the earlier default source distribution
+included the operational review and production snapshot even when source files
+contained no credentials. Do not release an artifact that bypasses this gate.
+
 Unpack the candidate in a fresh directory and run [the quickstart](../QUICKSTART.md)
 and `./scripts/check.sh`. Verify local Markdown links, included license metadata,
 file hashes and the absence of excluded histories/runtime data. A source candidate
