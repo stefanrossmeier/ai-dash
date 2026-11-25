@@ -6,7 +6,7 @@ FROM ${WM_IMAGE}
 USER root
 ENV AI_DASH_HOME=/opt/ai-dash
 WORKDIR /opt/ai-dash
-COPY pyproject.toml uv.lock README.md .python-version ./
+COPY pyproject.toml uv.lock README.md LICENSE THIRD_PARTY_NOTICES.md .python-version ./
 COPY src ./src
 COPY config ./config
 COPY assets ./assets

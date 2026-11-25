@@ -1,10 +1,23 @@
+```text
+     █████╗ ██╗    ██████╗  █████╗ ███████╗██╗  ██╗
+    ██╔══██╗██║    ██╔══██╗██╔══██╗██╔════╝██║  ██║
+    ███████║██║    ██║  ██║███████║███████╗███████║
+    ██╔══██║██║    ██║  ██║██╔══██║╚════██║██╔══██║
+    ██║  ██║██║    ██████╔╝██║  ██║███████║██║  ██║
+    ╚═╝  ╚═╝╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+
+              Self-hosted AI news briefings
+
+      source evidence · editorial selection · Telegram delivery
+```
+
 # AI Dash
 
 Self-hosted AI news briefings delivered to Telegram. AI Dash collects public feeds,
 articles, model hubs, releases, community posts and video uploads; ranks relevant
 developments; and keeps inspectable evidence of selection and delivery.
 
-This is a single-operator reference application. Start with the
+This is a single-operator reference application, not a hardened multi-tenant service. Start with the
 [key-free quickstart](QUICKSTART.md). Source licensing and deployment-component
 licensing are separate; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
@@ -76,11 +89,15 @@ retrieving transcripts or claiming to summarize their contents.
 
 ## Documentation
 
-- [Documentation index](docs/README.md)
+- [Documentation index](docs/README.md) and [system evolution](docs/EVOLUTION.md)
 - [Repository map](docs/archdoc/REPO_MAP.md), [architecture](docs/archdoc/ARCHITECTURE.md),
   [interfaces](docs/archdoc/API_SURFACE.md), [operations](docs/archdoc/OPERATIONS.md)
 - [Source provenance](docs/SOURCES.md) and [impact policy](docs/IMPACT_RANKING.md)
 - [Security policy](SECURITY.md) and [publication readiness](docs/PUBLICATION.md)
+
+A completed job can select zero stories. Status distinguishes selection from
+acknowledged message parts; neither a green job nor an acknowledged send proves
+source completeness, factual accuracy or a Telegram client notification.
 
 Private ledgers, channel identifiers, delivery history, raw operational evidence
 and credentials belong outside published source. Never delete accounting state to

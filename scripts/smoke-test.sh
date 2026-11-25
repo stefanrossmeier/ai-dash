@@ -9,8 +9,8 @@
 #   3. Windmill answers on its loopback port; the llm-gateway instance
 #      authenticates the project principal on /ready
 #   4. every rendered schedule exists and is enabled
-#   5. git works against the mounted data repo from inside a job-like
-#      sanitized environment
+#   5. state is readable; latest persisted selection and delivery outcomes
+#      are reported separately from infrastructure readiness
 #   6. no infrastructure job failures are recorded since container start
 #
 # Mirrors daily-dash's scripts/smoke-test.sh (its 'dubious ownership'
@@ -150,6 +150,29 @@ if [[ "$worker_state" =~ ^[0-9]+$ ]]; then
   ok "worker can read /data/ai-dash/state.sqlite (editions: $worker_state)"
 else
   fail "worker cannot read /data/ai-dash/state.sqlite: $worker_state"
+fi
+
+# Outcome diagnostics are not an infrastructure PASS or proof of useful reporting.
+# Use the public status projection; never print destinations or message bodies.
+if outcome_report="$(dc exec -T windmill_worker_aidash \
+  /opt/ai-dash/.venv/bin/python -c '
+from pathlib import Path
+from ai_dash.storage import Store
+store = Store(Path("/data/ai-dash"))
+try:
+    for report, row in store.status()["reports"].items():
+        delivery = row["delivery"]
+        print("INFO: latest persisted report={} at={} example={} candidates={} selected={} "
+              "selection={} delivery={} acknowledged={}/{}".format(
+                  report, row["created_at"], row["example"], row["candidates"], row["selected"],
+                  row["selection_outcome"], delivery["outcome"], delivery["acknowledged"],
+                  delivery["parts"]))
+finally:
+    store.close()
+' 2>/dev/null)"; then
+  printf '%s\n' "$outcome_report"
+else
+  fail "cannot inspect persisted report outcomes"
 fi
 
 # ------------------------------------------------- 6. failures since start
