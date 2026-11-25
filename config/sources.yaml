@@ -98,6 +98,16 @@ sources:
   focus: AI reporting, model releases, hardware, industry analysis
   enabled: true
   note: ''
+- id: youtube-channels
+  name: YouTube Channels
+  category: YouTube
+  url: https://www.youtube.com/
+  priority: P1
+  kind: youtube
+  endpoint: https://www.youtube.com/feeds/videos.xml
+  focus: New uploads from the configured YouTube channels
+  channel_config: config/youtube_channels.yaml
+  enabled: true
 - id: discovery-hugging-face-trending-models
   name: Hugging Face Trending Models
   category: Discovery

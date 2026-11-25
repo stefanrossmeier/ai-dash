@@ -158,3 +158,17 @@ reports:
     analysis pieces. Exclude weekly digests and sponsored content.'
   enabled: true
   freshness_hours: 24
+
+- id: youtube
+  title: YouTube — New Videos
+  source_ids:
+  - youtube-channels
+  slots:
+  - '19:30'
+  max_stories: 30
+  max_paper_stories: 0
+  send_empty: true
+  no_llm: true
+  focus: New video uploads from the configured YouTube channels
+  enabled: true
+  freshness_hours: 24

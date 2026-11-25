@@ -32,10 +32,13 @@ def render(artifact: Artifact, timezone: str) -> list[str]:
             "repository_update": "Repository updated",
         }[item.date_basis]
         dated = item.published_at.astimezone(ZoneInfo(timezone)).strftime("%d %b · %H:%M %Z")
-        block = (
-            f"{number}. {item.title}\n{story.summary}\n{item.source} · {item.category}\n"
-            f"{date_label} {dated}\n{item.url}"
-        )
+        if artifact.no_llm:
+            block = f"{number}. {item.title}\n{item.source}\n{date_label} {dated}\n{item.url}"
+        else:
+            block = (
+                f"{number}. {item.title}\n{story.summary}\n{item.source} · {item.category}\n"
+                f"{date_label} {dated}\n{item.url}"
+            )
         if len(block.encode("utf-16-le")) // 2 > 3500:
             raise ValueError("story exceeds Telegram message budget")
         proposed = current + "\n\n" + block

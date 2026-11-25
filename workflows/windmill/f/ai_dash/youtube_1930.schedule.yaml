@@ -1,0 +1,8 @@
+summary: YouTube — New Videos 19:30
+schedule: 0 30 19 * * *
+timezone: Europe/Berlin
+enabled: false
+script_path: f/ai_dash/youtube
+is_flow: true
+args: {}
+no_flow_overlap: true

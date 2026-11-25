@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
+from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
 import feedparser
@@ -14,7 +16,14 @@ from bs4 import BeautifulSoup
 
 from ai_dash.content import article_evidence, excerpt
 from ai_dash.gateway import Gateway
-from ai_dash.models import Coverage, Item, Settings, Source
+from ai_dash.models import (
+    Coverage,
+    Item,
+    Settings,
+    Source,
+    YouTubeChannel,
+    load_youtube_channels,
+)
 from ai_dash.processing import canonical_url, identity
 
 AI_WORDS = re.compile(
@@ -274,7 +283,9 @@ def html_items(source: Source, client: httpx.Client, text: str, cap: int) -> tup
     ) + len(unique)
 
 
-def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[list[Item], Coverage]:
+def retrieve_one(
+    source: Source, settings: Settings, now: datetime
+) -> tuple[list[Item], Coverage | list[Coverage]]:
     if not source.enabled or source.kind == "manual":
         return [], Coverage(
             source_id=source.id,
@@ -283,6 +294,8 @@ def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[lis
         )
     if source.kind == "x":
         return [], Coverage(source_id=source.id, status="search_required")
+    if source.kind == "youtube":
+        return retrieve_youtube(source, settings, now)
     cutoff = now - timedelta(hours=settings.freshness_hours)
     for attempt in range(2):
         try:
@@ -401,6 +414,87 @@ def retrieve_one(source: Source, settings: Settings, now: datetime) -> tuple[lis
     raise AssertionError("unreachable")
 
 
+def parse_youtube_feed(
+    source: Source, channel: YouTubeChannel, content: str, now: datetime, freshness_hours: int
+) -> list[Item]:
+    feed = feedparser.parse(content)
+    if not feed.entries and feed.bozo:
+        raise ValueError("invalid YouTube feed")
+    author = plain(feed.feed.get("author", "")) or channel.display_name
+    channel_source = source.model_copy(update={"name": author})
+    cutoff = now - timedelta(hours=freshness_hours)
+    items = []
+    for entry in feed.entries:
+        video_id = entry.get("yt_videoid")
+        if not video_id:
+            raw_id = str(entry.get("id", ""))
+            if raw_id.startswith("yt:video:"):
+                video_id = raw_id.removeprefix("yt:video:")
+        published = timestamp(entry.get("published") or entry.get("updated"))
+        title = plain(entry.get("title", ""))
+        if not video_id or not title or published is None or not cutoff <= published < now:
+            continue
+        url = f"https://www.youtube.com/watch?v={video_id}"
+        items.append(
+            Item(
+                id=identity(url),
+                title=title[:500],
+                url=url,
+                published_at=published,
+                source_id=source.id,
+                source=channel_source.name,
+                category=source.category,
+                priority=source.priority,
+            )
+        )
+    return sorted(items, key=lambda item: item.published_at, reverse=True)
+
+
+def retrieve_youtube(
+    source: Source, settings: Settings, now: datetime
+) -> tuple[list[Item], list[Coverage]]:
+    home = Path(os.getenv("AI_DASH_HOME", "."))
+    channels = load_youtube_channels(home / str(source.channel_config))
+
+    def collect_channel(channel: YouTubeChannel) -> tuple[list[Item], Coverage]:
+        coverage_id = f"{source.id}:{channel.id}"
+        if not channel.enabled:
+            return [], Coverage(source_id=coverage_id, status="disabled")
+        try:
+            with httpx.Client(
+                timeout=settings.request_timeout,
+                follow_redirects=True,
+                headers={"User-Agent": "ai-dash/0.1 (+AI-news-reader)"},
+            ) as client:
+                response = fetch(
+                    client,
+                    source.endpoint,
+                    params={"channel_id": channel.channel_id},
+                )
+            items = parse_youtube_feed(
+                source, channel, response.text, now, settings.freshness_hours
+            )
+            return items, Coverage(
+                source_id=coverage_id,
+                status="ok" if items else "empty",
+                items=len(items),
+                fresh=len(items),
+            )
+        except (httpx.HTTPError, OSError, ValueError, TypeError) as exc:
+            return [], Coverage(
+                source_id=coverage_id,
+                status="unavailable",
+                detail=type(exc).__name__,
+            )
+
+    with ThreadPoolExecutor(max_workers=settings.workers) as pool:
+        results = list(pool.map(collect_channel, channels))
+    return (
+        [item for items, _ in results for item in items],
+        [coverage for _, coverage in results],
+    )
+
+
 # Free Nitter RSS instances, tried in order. Instances are volunteer-run and
 # die often (xcancel 451, nitter.net 410); mie.foundation verified live
 # 2026-11-19. A plain bot User-Agent gets an HTML shell; a browser UA is required.
@@ -511,7 +605,9 @@ def collect(settings: Settings, gateway: Gateway, now: datetime, *, no_x: bool =
             pool.map(lambda source: retrieve_one(source, settings, now), settings.sources)
         )
     items = [item for batch, _ in results for item in batch]
-    coverage = [status for _, status in results]
+    coverage = [
+        row for _, status in results for row in (status if isinstance(status, list) else [status])
+    ]
     x_sources = [s for s in settings.sources if s.kind == "x" and s.enabled]
     if settings.x_enabled and not no_x and x_sources:
         x_items, x_coverage = retrieve_x(x_sources, settings, gateway, now)

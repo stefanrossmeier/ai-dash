@@ -20,13 +20,29 @@ class Source(Model):
     category: str
     url: str
     priority: Literal["P1", "P2"]
-    kind: Literal["feed", "html", "hn", "hf_papers", "hf_models", "github", "x", "manual"]
+    kind: Literal[
+        "feed", "html", "hn", "hf_papers", "hf_models", "github", "x", "youtube", "manual"
+    ]
     endpoint: str
     focus: str
+    channel_config: str | None = None
     enabled: bool = True
     note: str = ""
     expand_roundups: bool = False
     article_paths: list[str] = []
+
+    @model_validator(mode="after")
+    def youtube_channel_config(self) -> Source:
+        if self.kind == "youtube" and not self.channel_config:
+            raise ValueError("YouTube sources require channel_config")
+        return self
+
+    @field_validator("channel_config")
+    @classmethod
+    def relative_channel_config(cls, value: str | None) -> str | None:
+        if value is not None and (Path(value).is_absolute() or ".." in Path(value).parts):
+            raise ValueError("channel_config must be relative to AI_DASH_HOME")
+        return value
 
     @field_validator("url", "endpoint")
     @classmethod
@@ -65,6 +81,7 @@ class Settings(Model):
     report_title: str = "AI News"
     editorial_focus: str = "AI engineering developments"
     send_empty: bool = False
+    no_llm: bool = False
     example: bool = False
     request_timeout: int = Field(default=20, ge=1, le=60)
     workers: int = Field(default=5, ge=1, le=12)
@@ -98,6 +115,29 @@ class Settings(Model):
 
 def load_settings(path: Path) -> Settings:
     return Settings.model_validate(yaml.safe_load(path.read_text()))
+
+
+class YouTubeChannel(Model):
+    id: str = Field(pattern=r"^[a-z0-9_-]+$")
+    display_name: str
+    handle: str = Field(pattern=r"^@[A-Za-z0-9._-]+$")
+    channel_id: str = Field(pattern=r"^UC[A-Za-z0-9_-]{22}$")
+    enabled: bool = True
+
+
+class YouTubeChannelConfig(Model):
+    channels: list[YouTubeChannel] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def unique_channel_ids(self) -> YouTubeChannelConfig:
+        ids = [channel.id for channel in self.channels]
+        if len(set(ids)) != len(ids):
+            raise ValueError("YouTube channel IDs must be unique")
+        return self
+
+
+def load_youtube_channels(path: Path) -> list[YouTubeChannel]:
+    return YouTubeChannelConfig.model_validate(yaml.safe_load(path.read_text())).channels
 
 
 class Item(Model):
@@ -197,6 +237,7 @@ class Artifact(Model):
     report_title: str = "AI News"
     send_empty: bool = False
     example: bool = False
+    no_llm: bool = False
     run_id: str
     created_at: datetime
     window_start: datetime

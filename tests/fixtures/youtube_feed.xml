@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:yt="http://www.youtube.com/xml/schemas/2015">
+  <author>
+    <name>Fixture Channel</name>
+    <uri>https://www.youtube.com/channel/UCLocalFixture0000000000</uri>
+  </author>
+  <entry>
+    <id>yt:video:shortAbc1234</id>
+    <yt:videoId>shortAbc1234</yt:videoId>
+    <title>A new short video</title>
+    <link rel="alternate" href="https://www.youtube.com/shorts/shortAbc1234"/>
+    <published>2026-11-10T18:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>yt:video:videoDef5678</id>
+    <yt:videoId>videoDef5678</yt:videoId>
+    <title>A regular video</title>
+    <link rel="alternate" href="https://www.youtube.com/watch?v=videoDef5678"/>
+    <published>2026-11-09T18:45:00+00:00</published>
+  </entry>
+  <entry>
+    <id>yt:video:staleGhi9012</id>
+    <yt:videoId>staleGhi9012</yt:videoId>
+    <title>Outside the rolling window</title>
+    <link rel="alternate" href="https://www.youtube.com/watch?v=staleGhi9012"/>
+    <published>2026-11-09T18:29:00+00:00</published>
+  </entry>
+</feed>
