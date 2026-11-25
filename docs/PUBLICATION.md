@@ -1,17 +1,19 @@
 # Publication readiness
 
-Reviewed 25 November 2026. The application is suitable for evaluation as a small
-source reference, with explicit alpha/single-operator limits. Do not make the
-existing operational repository public or release its derived container image
-unchanged. A clean source export addresses historical disclosure; runtime image
-security and component licensing remain separate release gates.
+Reviewed 25 November 2026; history assessment corrected after manual context
+review. The application is suitable for evaluation as a small source reference,
+with explicit alpha/single-operator limits. For a developer/architect portfolio,
+preserve meaningful development history and review operational metadata selectively.
+No credential finding requires a wholesale history replacement. The clean export
+is an optional distribution path. Runtime image security and component licensing
+remain separate release gates.
 
 ## Publication scope
 
 | Deliverable | Assessment |
 | --- | --- |
 | Current application source and synthetic demonstration | Can be packaged for review through the checked clean export |
-| Existing repository with all Git/PR/Actions history | Contains historical operator details; needs an explicit privacy decision before a visibility change |
+| Existing repository with Git/PR/Actions history | Valuable development evidence; selectively review low-sensitivity operational metadata and keep dated claims in context |
 | Prebuilt application worker image | Not release-approved: component terms and inherited advisory backlog remain unresolved |
 | Bare PyPI wheel as a complete product | Not supported: deployment also requires configuration, assets and workflows from the checkout |
 | Hosted or multi-user service | Not established by the implementation, testing or licensing review |
@@ -28,24 +30,57 @@ about 2.65 MB, scanned with secret values redacted. No credential was detected i
 these published-content surfaces. There were no repository release assets,
 retained Actions artifacts or wiki to inspect at the time.
 
-Five workflow runs contained operator aliases and two contained private home
-paths. Old Git blobs also retain machine/bot identifiers, home paths and provider
-trace IDs removed from current docs. These are not authentication credentials,
-but would reveal operational context. No destructive history rewrite, run
-deletion or visibility change was performed.
+An initial regex pass flagged five CI runs for an operator-name match and two
+for a home-path match. Manual review corrected those classifications: the former
+were Git branch references such as an agent-named YouTube feature branch; the
+latter were the Windmill API route `/users/setpassword`, incorrectly matched by a
+case-insensitive `/Users/` filesystem pattern. These alerts do not establish
+private filesystem or server-address disclosures and do not justify deleting those
+CI runs. The earlier report overstated this concern.
+
+Older Git documentation does retain actual SSH aliases, a machine/bot identifier,
+a private source-registry home path and provider trace IDs. These are operational
+metadata, not authentication credentials. They can be retained with the owner's
+acceptance or selectively redacted. No destructive history rewrite, run deletion
+or visibility change was performed.
 
 GitHub documents that making a repository public exposes its retained Actions
 [history and logs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility).
-Current-file cleanup alone therefore does not satisfy a policy of withholding
-historical operator information. A new repository initialized from the reviewed
-source export avoids importing those histories and discussions. Publishing the
-existing repository instead requires accepting those disclosures or a deliberate
-cleanup plan covering Git, old PR refs and Actions surfaces together.
+A strict policy of withholding historical operator information would require
+more than current-file cleanup. That is a privacy choice, not a requirement to
+hide ordinary engineering iteration. A new repository from the clean export is
+available for minimal-disclosure distribution; retaining this repository's
+meaningful history is preferable when architectural evolution is part of its
+purpose. Any chosen redaction needs to account for old PR references as well as
+Git branches, and should avoid destroying useful review context unnecessarily.
 
 This inspection did not establish an exposed provider credential or account
 compromise. It is not an audit of every external service, host session or unrelated
 repository. Private audit exports and raw production artifacts remain outside the
 clean source candidate.
+
+## History as engineering evidence
+
+The history records a progression from 9 to 25 November 2026, including evidence
+hydration, runtime separation, paid-search experiments, free RSS retrieval,
+request identity/recovery and community-specific ranking. Those transitions and
+their regression fixes are useful evidence of operating and improving a system.
+A clean snapshot loses much of that evidence.
+
+Reviewers can reasonably question earlier claims that exceeded the implementation:
+the old X budget reserved zero while describing spending headroom, early gateway
+idempotency used a new UUID per call, and successful runs/tests did not establish
+that readers received useful stories. Some editorial changes were explicit
+requirement changes; others fixed defects. Preserve that distinction. Dated
+statements about free X editions also need the current clarification that RSS
+collection is free while inference can cost money.
+
+The appropriate response is a concise, evidenced evolution narrative linking the
+problem, observation, changed decision, validation and remaining limit. Do not
+rewrite old defects out of existence or present old claims as current guarantees.
+Squashing routine fixups may improve readability, but flattening the whole history
+would remove useful evidence. Owner-only instructions, including fixed commit
+identity requirements, also need review before inviting public contributors.
 
 ## Runtime image evidence
 
