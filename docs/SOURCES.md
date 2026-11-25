@@ -1,117 +1,58 @@
-# Source provenance
+# Source registry and provenance
 
 ## Current configuration
 
-The registry contains 119 entries, including archived and manual sources. Current
-report membership is 21 company, seven analysis, 24 research/OSS, fourteen X,
-one Reddit OAuth listing, four tech-press feeds and one YouTube channel registry.
-The latter expands into the five enabled channels in `config/youtube_channels.yaml`.
-Membership counts are not measurements of source availability.
+`config/sources.yaml`, `config/reports.yaml` and `config/youtube_channels.yaml`
+are authoritative. The registry contains 119 entries, including archived and
+manual sources. Report membership is 21 company, seven analysis, 24 research/OSS,
+fourteen X, one Reddit OAuth listing, four tech-press feeds and one YouTube channel
+registry. The latter expands into five enabled channels. These are configuration
+counts, not measurements of current source availability.
 
-`config/sources.yaml`, `config/reports.yaml` and the YouTube registry are the live
-inputs. X uses free Nitter RSS; model-backed ranking remains paid. Reddit's
-r/singularity report uses approved OAuth with project-owned credential files.
-Reports use cadence-derived windows rather than the older multi-day lookbacks.
-Read the remaining dated sections as historical provenance.
+Reports use cadence-derived windows, with original timestamp basis preserved.
+An old paper newly curated today is labeled as curation, a repository push as
+activity, and a Reddit post as submission; none alone establishes a new release.
 
-## News repair — 2026-11-15
+## Adapters and evidence
 
-The live registry now retains the original 95 entries plus six verified additions:
-Anthropic Engineering, Anthropic Research, Claude Code releases, Codex releases,
-THE DECODER and Import AI. The original Latent Space alias is disabled because it
-returns exactly the same all-content stream as the canonical Latent Space / AINews
-row. Active report counts are 20 company, seven analysis, 24 research/OSS and three X.
+| Input | Acquisition and limitations |
+| --- | --- |
+| RSS/Atom | Publisher-declared endpoints, dated entries and full available bodies before teasers |
+| HTML | Publisher cards/metadata and advertised feeds, followed by bounded article evidence |
+| GitHub | Release Atom feeds or recently active LLM repository discovery; stable releases exclude prerelease markers |
+| Hugging Face | Native model/paper APIs, model-card evidence and distinct activity/curation dates |
+| Hacker News | Dated AI-related submissions and bounded linked article hydration |
+| Reddit | r/singularity uses approved OAuth; preserves submission/crosspost text and hydrates external primary links |
+| X | Free Nitter RSS for configured accounts; no paid retrieval fallback or completeness guarantee |
+| YouTube | Public upload Atom feeds by validated channel ID; no video/transcript summarization |
+| Manual benchmarks | Registry provenance only; undated leaderboard changes are not automatically news |
 
-Full feed bodies are read before teasers; bounded hydration supplies article/model
-card evidence where needed. Source URL query parameters are preserved, including
-HF author, ordering and limit filters. Model-hub author endpoints sort by
-`lastModified`; GitHub discovery now means recently active repositories, not
-“Trending” or newly created projects. Repository updates and paper curation retain
-their timestamp basis and never establish a release by themselves.
+Collection records ok, empty, unavailable, undated, manual, disabled and
+search-required outcomes. A successful adapter request does not mean a delivered
+story, exhaustive coverage or independent validation. Quiet editions and failed
+sources remain distinct. Public-source fetching validates/pins global addresses,
+checks redirects and bounds response bytes; see [deployment](DEPLOYMENT.md).
 
-[Repair verification](NEWS_REPAIR_2026-11-15.md) and the linked evidence record
-the free public-source checks. TLDR AI remains a candidate requiring a verified
-archive adapter; it was not enabled from a landing page alone. No paid X watchlist
-or daily retrieval/delivery limit changed.
+Native Reddit discussion text comes from OAuth rather than repeated HTML scraping.
+When a primary link exists, its evidence can be added without replacing the
+Reddit discussion's identity or submission time. Community ranking and summaries
+must distinguish reported claims from established facts.
 
-The remaining sections describe the original registry and historical rollout.
+## Provenance and changes
 
-Imported on 2026-11-09 from the owner's existing Hermes installation, not generated
-from a model's recommendations:
+The original 95-row snapshot was captured on 9 November 2026 from the owner's
+Hermes news-pipeline registry and endpoint notes. Its public-source rows remain in
+[the captured registry](hermes-sources.md). Private host/machine paths are not
+required to use or reproduce the application.
 
-1. The owner's Hermes `ai-news-pipeline` skill and its endpoint notes.
-2. That installation's authoritative source registry, captured with the owner's
-   access. The private host and machine paths are not needed to use this project.
-3. The resulting 95-row snapshot committed as `docs/hermes-sources.md`.
+Later additions and endpoint adjustments are represented in current configuration
+and source notes. The duplicate Latent Space alias is archived rather than counted
+as independent coverage. Current X accounts and source-specific reports supersede
+the retired paid-X/shared-runtime configuration.
 
-`scripts/import-hermes-sources.py` deterministically converts the snapshot into
-`config/sources.yaml`. Blog-to-feed adaptations are the endpoints documented in
-the Hermes skill. Other HTML pages are fetched at their ORIGINAL registry URL;
-feeds are used only when advertised by the publisher. GitHub releases use Atom,
-arXiv uses its official category Atom feeds, Hugging Face uses native JSON APIs, Hacker News uses Algolia,
-and GitHub discovery uses repository search. Original source URLs remain alongside
-adapter endpoints so discovery adaptations are inspectable.
-
-The four benchmark rows remain in the registry as `manual`: undated leaderboard
-changes are not automatically news. Source failure is a measured coverage state.
-`ok` requires at least one dated item; `fresh` reports its contribution to the
-24-hour window. X coverage means a native search completed, not exhaustive retrieval.
-Model IDs and repository creation times are discovery signals, not verified release announcements.
-
-To change sources, edit `config/sources.yaml`. Re-running the importer intentionally
-resets that file to the captured registry. Add future sources only with an explicit
-provenance note and verify dated item output before claiming coverage.
-
-## Verified endpoint repairs (2026-11-09)
-
-The initial live smoke test found HTTP errors from the arXiv API and smol.ai.
-No replacement sources were added. The existing three arXiv rows now use
-`https://rss.arxiv.org/atom/cs.CL`, `cs.LG`, and `cs.AI`, following
-[arXiv's feed documentation](https://info.arxiv.org/help/rss.html). All three
-returned HTTP 200 and dated entries (146, 417 and 397 in the verification run).
-
-The original smol.ai URL resolves to `https://latent.space/news/`. That publisher
-advertises `/feeds/all.xml` in its HTML alternate links; the feed returned 20 dated
-entries. The original registry URL is preserved, and the endpoint note explains
-that this is the publisher's broader feed. Shared stories with the existing
-Latent Space row are deduplicated. Baseten's JS-only page and the blocked Reddit
-endpoint remain explicit gaps; related X sources remain independent collection paths.
-
-## Source-based rollout and X cost limit
-
-The 95-row registry is preserved. Automatic reports use disjoint source groups
-from `config/reports.yaml`. All original X entries are disabled in the base registry;
-only seven official lab accounts are explicitly re-enabled by `x_major`. The other
-38 X accounts stay archived. Native X search has one persistent daily retrieval
-attempt, no paid retries, and cached reuse for previews/manual runs. No report
-other than `x_major` contains X sources.
-
-## Overlap crosscheck — 2026-11-09
-
-OpenAI RSS and Anthropic News are configured and were checked from the VPS worker.
-OpenAI returned 25 dated entries including two fresh ones. Anthropic initially
-returned eight older articles: its latest feature linked outside `/news/`, so the
-collector missed it. Dated `<article>` cards are now parsed before path-restricted
-fallback discovery, with an explicit publisher date and same-host URL validation.
-Regression coverage includes a root-path announcement with a textual `<time>`.
-
-DeepMind, Mistral and xAI also have configured company blogs. Qwen/DeepSeek model
-releases are partially covered by model hubs; these do not cover all commentary.
-Paid X slots now supplement these sources with three existing Hermes entries:
-
-- Andrej Karpathy (`@karpathy`): independent technical commentary; no dedicated
-  automated source for him in the current reports. [Personal site](https://karpathy.ai/).
-- François Chollet (`@fchollet`): abstraction/ARC/generalization commentary; no
-  dedicated automated source in the current reports. [Personal site](https://fchollet.com/).
-- Artificial Analysis (`@ArtificialAnlys`): independent benchmark updates. Its
-  registry leaderboards are manual, so they are not automatically collected.
-  [About](https://artificialanalysis.ai/about).
-
-This avoids dedicated-source duplication, not every incidental mention in an
-aggregator. Existing once-per-day retrieval/delivery guards stay in effect.
-No extra X scan is made when changing the watchlist during an already-used day.
-
-After the repair, the deployed Anthropic collector returned seven dated articles,
-including two inside the current 24-hour window. OpenAI returned 25 dated entries,
-including two fresh ones. The once-daily complementary X configuration was deployed
-without clearing today's budget or making another paid request.
+Edit the current configuration for ordinary changes. The historical importer
+`scripts/import-hermes-sources.py` reconstructs the original snapshot and overwrites
+`config/sources.yaml`; it is not an additive synchronization command. Verify usable
+dates and evidence before representing a new endpoint as covered. Respect each
+publisher/API's access and reuse terms; configured availability is not permission
+to redistribute complete source content.

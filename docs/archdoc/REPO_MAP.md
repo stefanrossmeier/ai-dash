@@ -2,7 +2,8 @@
 
 Reviewed 25 November 2026 against the application integrated in PR 29 and the
 documentation/checker follow-up. This describes repository behavior; live
-deployment checks are scoped separately in the [review](../REVIEW_2026-11-25.md).
+deployment and publication checks are scoped separately in the
+[publication review](../PUBLICATION.md).
 
 AI Dash is a Python 3.12+ application for scheduled Telegram briefings. Start with
 the [README](../../README.md), [architecture](ARCHITECTURE.md), then the
@@ -52,5 +53,7 @@ source. Registration owns runtime enablement and preserves existing settings.
 The Hermes importer reconstructs an old registry snapshot and overwrites the live
 source file; it is not an additive synchronization command.
 
-`AGENTS.md` owns repository instructions. These files describe implementation and
-do not establish historical decision approval or permission for external actions.
+The operational checkout uses `AGENTS.md` for owner-specific instructions; that
+file is omitted from the clean source export. Public contribution guidance is in
+`CONTRIBUTING.md`. These guides describe implementation and do not establish
+historical decision approval or permission for external actions.
