@@ -15,12 +15,13 @@ Start with the [key-free quickstart](../QUICKSTART.md), then the
 | [Sources](SOURCES.md) | Current adapters, registry and provenance |
 | [Impact ranking](IMPACT_RANKING.md) | Scoring policy and dated calibration evidence |
 | [X retrieval](X_REPORT_FIX.md) | Current free-RSS collection boundary |
+| [History sanitization](HISTORY_SANITIZATION.md) | Identifier redaction, preserved Git history and the GitHub publication boundary |
 | [Publication readiness](PUBLICATION.md) | Source export, inspection scope and unresolved release gates |
 | [Security policy](../SECURITY.md) | Private reporting and deployment boundaries |
 | [Third-party notices](../THIRD_PARTY_NOTICES.md) | Application provenance and separate component terms |
 
-Dated operational investigations remain in the private development history. They
-are not current setup instructions and are excluded from the reviewed clean source
-export, together with raw production snapshots. Public-safe contributor and agent
-guidance is included. The Git history is preserved; the export is an optional
-packaging format, not a replacement for that history.
+Dated operational investigations and sanitized diagnostic snapshots remain in the
+Git checkout as development evidence. They are not current setup instructions and
+are excluded from the narrower reviewed source archive. Public-safe contributor
+and agent guidance is included. The Git history is preserved with private rollout
+identifiers replaced; see the [sanitization record](HISTORY_SANITIZATION.md).

@@ -23,6 +23,8 @@ tests
 workflows
 docs/README.md
 docs/EVOLUTION.md
+docs/HISTORY_SANITIZATION.md
+docs/history
 docs/PUBLICATION.md
 docs/SOURCES.md
 docs/DEPLOYMENT.md

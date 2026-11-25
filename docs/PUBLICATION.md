@@ -1,9 +1,9 @@
 # Publication readiness
 
-Reviewed 25 November 2026; history assessment corrected after manual context
-review. The application is suitable for evaluation as a small source reference,
+Reviewed 25 November 2026; identifier-redacted publication candidate. The application is suitable for evaluation as a small source reference,
 with explicit alpha/single-operator limits. For a developer/architect portfolio,
-preserve meaningful development history and review operational metadata selectively.
+preserve the sanitized development history. See the
+[history sanitization record](HISTORY_SANITIZATION.md) for the publication boundary.
 No credential finding requires a wholesale history replacement. The clean export
 is an optional distribution path. Runtime image security and component licensing
 remain separate release gates.
@@ -13,7 +13,8 @@ remain separate release gates.
 | Deliverable | Assessment |
 | --- | --- |
 | Current application source and synthetic demonstration | Can be packaged for review through the checked clean export |
-| Existing repository with Git/PR/Actions history | Valuable development evidence; selectively review low-sensitivity operational metadata and keep dated claims in context |
+| Sanitized Git history | Implementation commits, merges, authors and dates preserved; private operational identifiers replaced |
+| Original GitHub PR/Actions history | Keep private: retained PR refs and run metadata still contain old identifiers |
 | Prebuilt application worker image | Not release-approved: component terms and inherited advisory backlog remain unresolved |
 | Bare PyPI wheel as a complete product | Not supported: deployment also requires configuration, assets and workflows from the checkout |
 | Hosted or multi-user service | Not established by the implementation, testing or licensing review |
@@ -30,34 +31,29 @@ about 2.65 MB, scanned with secret values redacted. No credential was detected i
 these published-content surfaces. There were no repository release assets,
 retained Actions artifacts or wiki to inspect at the time.
 
-An initial regex pass flagged five CI runs for an operator-name match and two
-for a home-path match. Manual review corrected those classifications: the former
-were Git branch references such as an agent-named YouTube feature branch; the
-latter were the Windmill API route `/users/setpassword`, incorrectly matched by a
-case-insensitive `/Users/` filesystem pattern. These alerts do not establish
-private filesystem or server-address disclosures and do not justify deleting those
-CI runs. The earlier report overstated this concern.
+The original content review distinguished credential findings from operational
+identifiers. Subsequent publication preparation replaced host aliases, a private
+source-registry path, a machine directory identifier, the operator's bot username
+and provider generation IDs throughout the candidate's reachable Git history.
+A branch name and its merge message were sanitized too. No application behavior
+was changed by those replacements. Author/committer identities, timestamps and
+merge relationships remain intact; changed commit hashes require updated evidence
+links, and cryptographic signatures cannot survive changed commit contents.
 
-Older Git documentation does retain actual SSH aliases, a machine/bot identifier,
-a private source-registry home path and provider trace IDs. These are operational
-metadata, not authentication credentials. They can be retained with the owner's
-acceptance or selectively redacted. No destructive history rewrite, run deletion
-or visibility change was performed.
-
-GitHub documents that making a repository public exposes its retained Actions
-[history and logs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility).
-A strict policy of withholding historical operator information would require
-more than current-file cleanup. That is a privacy choice, not a requirement to
-hide ordinary engineering iteration. A new repository from the clean export is
-available for minimal-disclosure distribution; retaining this repository's
-meaningful history is preferable when architectural evolution is part of its
-purpose. Any chosen redaction needs to account for old PR references as well as
-Git branches, and should avoid destroying useful review context unnecessarily.
+Current-file edits and a force-push cannot fully remove an original repository's
+GitHub pull-request refs or cached diffs. GitHub marks those refs read-only and
+[documents the limits of removal](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
+For strict identifier exclusion, the publication candidate must use a replacement
+GitHub repository. Retain the original repository privately for PR/CI evidence;
+do not make it public in the belief that source redaction cleaned those surfaces.
+This preserves development history in Git without exposing the original PR/run
+metadata. Existing local clones must not push original history into the replacement.
 
 This inspection did not establish an exposed provider credential or account
 compromise. It is not an audit of every external service, host session or unrelated
-repository. Private audit exports and raw production artifacts remain outside the
-clean source candidate.
+repository. Private audit exports remain outside this candidate. Tracked historical source/
+selection snapshots are sanitized development evidence, not credentials or private
+channel data; they are omitted from the narrower source archive.
 
 ## History as engineering evidence
 
@@ -127,9 +123,9 @@ Component-term questions are detailed in [third-party notices](../THIRD_PARTY_NO
 
 `publication-files.txt` selects current code, config, prompts, synthetic tests,
 workflows, public-facing docs and the compact dated ranking calibration. It includes public-safe `AGENTS.md` guidance and omits
-the private portfolio review, raw production snapshots,
-dated operational dossiers and every Git/PR/Actions history. Historical files
-remain in the operational checkout and its private history.
+the dated portfolio review, production diagnostic snapshots,
+dated operational dossiers and every Git/PR/Actions history. Historical documents remain in the sanitized Git checkout. The original
+GitHub repository and unredacted audit backups must remain private.
 
 After committing the reviewed source, use a reviewed Gitleaks installation:
 

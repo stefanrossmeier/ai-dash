@@ -54,6 +54,8 @@ or agreed service-level objective. Architecture-significant historical rationale
 has not been reconstructed into accepted ADRs.
 
 The contributor instructions now preserve real authorship and route maintainers
-to the architecture documents. Meaningful commits, PR discussions and CI history
-are retained. Old operational metadata needs a deliberate privacy decision;
-ordinary fixes and requirement changes are useful engineering evidence.
+to the architecture documents. Meaningful Git commits and merge relationships are retained with operational
+identifiers replaced. Original PR discussions and CI history belong in the private
+pre-publication repository; a replacement repository avoids exposing their retained
+metadata. See the [sanitization record](HISTORY_SANITIZATION.md). Ordinary fixes and
+requirement changes remain useful engineering evidence.
