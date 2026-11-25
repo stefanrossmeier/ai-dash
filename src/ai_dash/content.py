@@ -92,13 +92,19 @@ def hydrate(items: list[Item], settings: Settings) -> tuple[list[Item], list[dic
     targets = [
         i
         for i in items
-        if (i.discovered_via or len(i.text) < 500 or i.date_basis == "repository_update")
+        if (
+            i.linked_url
+            or i.discovered_via
+            or len(i.text) < 500
+            or i.date_basis == "repository_update"
+        )
         and urlsplit(i.url).hostname not in {"x.com", "twitter.com"}
+        and (i.linked_url or urlsplit(i.url).hostname not in {"reddit.com", "www.reddit.com"})
     ][: settings.hydration_max_requests]
     target_ids = {i.id for i in targets}
 
     def one(item):
-        url = item.url
+        url = item.linked_url or item.url
         if urlsplit(url).hostname == "huggingface.co" and item.category in {
             "Model hub",
             "Discovery",

@@ -223,3 +223,10 @@ __marimo__/
 var/
 secrets/
 *.sqlite*
+.env.*
+!.env.example
+windmill-profile.json
+*.pem
+*.key
+*.p12
+*.pfx

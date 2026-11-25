@@ -11,10 +11,12 @@ configuration, credentials and deployment remain fully owned by AI Dash.
 
 ## Model and cost structure
 
-The model remains `openai/gpt-6-luna`, the same GPT-6 variant used by DailyDash.
-The owned gateway now explicitly requests `reasoning.effort=low`, excludes returned
-reasoning text, and allows 32,768 output tokens per request. There are at most two
-provider attempts, with no automatic model fallback.
+The 15 November calibration used `openai/gpt-6-luna` with low reasoning effort.
+Its then-owned gateway excluded returned reasoning, allowed 32,768 output tokens
+and at most two provider attempts without model fallback. These are historical
+calibration settings. Current model choice, output limits, attempts and spending
+policy belong to the independently deployed LLM Gateway, through `rank-cheap`.
+The application does not provision those provider settings.
 
 All evidenced candidates are evaluated in bounded batches of up to **150**; there
 is no global first-N truncation of the pool at ranking time. Each candidate supplies
@@ -40,11 +42,17 @@ score = 0.65 * H(impact, breadth)
       + 0.10 * quality
 ```
 
-Every condition must hold:
+The default policy uses the following gates. Report overrides in
+[`config/reports.yaml`](../config/reports.yaml) are authoritative: research uses
+a score floor of 60; tech press uses 55. Reddit uses its community prompt and
+a score floor of 40 with tier 2 and distinct evidence/materiality floors. X uses a separate prompt and
+lower floors with routine updates allowed. The YouTube report bypasses ranking.
+
+For the default policy, every condition must hold:
 
 | Gate | Minimum |
 |---|---:|
-| Composite score: company / analysis / X | 65 |
+| Composite score: company / analysis | 65 |
 | Composite score: research & OSS | 60 |
 | Impact | 60 |
 | Breadth | 45 |

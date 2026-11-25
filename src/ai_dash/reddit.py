@@ -117,9 +117,34 @@ def retrieve_reddit(source: Source, settings: Settings, now: datetime):
                     if url in seen:
                         continue
                     seen.add(url)
+                    crossposts = [
+                        parent
+                        for parent in (row.get("crosspost_parent_list") or [])[:3]
+                        if isinstance(parent, dict)
+                    ]
+                    linked_url = ""
+                    for target in [row.get("url"), *(p.get("url") for p in crossposts)]:
+                        if not isinstance(target, str):
+                            continue
+                        target_url = urlsplit(target)
+                        host = (target_url.hostname or "").removeprefix("www.")
+                        if (
+                            target_url.scheme in {"https", "http"}
+                            and host
+                            and host != "reddit.com"
+                            and not host.endswith(".reddit.com")
+                            and host != "redd.it"
+                            and not host.endswith(".redd.it")
+                            and target_url.username is None
+                            and target_url.password is None
+                        ):
+                            linked_url = target
+                            break
+                    context = "\n".join(str(p.get("selftext") or "") for p in crossposts)
                     text = (
                         f"Community submission to r/{subreddit}, not independently verified. "
                         f"{title}\n{row.get('selftext') or ''}\n"
+                        f"Crossposted discussion: {context}\n"
                         f"Linked source: {row.get('url') or url}"
                     )
                     items.append(
@@ -134,6 +159,7 @@ def retrieve_reddit(source: Source, settings: Settings, now: datetime):
                             priority=source.priority,
                             text=excerpt(html.unescape(text)),
                             date_basis="submission",
+                            linked_url=linked_url,
                         )
                     )
                     if len(items) >= settings.max_per_source:

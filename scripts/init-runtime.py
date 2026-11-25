@@ -16,8 +16,6 @@ def initialize(runtime: Path):
             f"POSTGRES_PASSWORD={password}\n"
             f"DATABASE_URL=postgres://postgres:{password}@db:5432/windmill\n"
             "AI_DASH_WINDMILL_PORT=18090\n"
-            "AI_DASH_MODEL_PORT=18082\n"
-            "AI_DASH_X_PORT=18081\n"
         )
         with open(env, "x", opener=lambda p, f: os.open(p, f, 0o600)) as file:
             file.write(content)

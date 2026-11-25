@@ -6,3 +6,10 @@ __pycache__
 var
 .env
 secrets
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+windmill-profile.json
+dist

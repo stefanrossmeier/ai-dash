@@ -10,7 +10,7 @@ AI Dash has its OWN bot and channel. Do not reuse daily-dash's Telegram token or
 4. Store its token on the VPS with the command below. Do not paste it into chat.
 
 ```bash
-ssh deployment-host
+ssh your-vps
 install -d -m 700 /var/code/ai-dash-runtime/secrets
 read -rs -p 'New AI Dash bot token: ' AI_TOKEN; echo
 printf '%s' "$AI_TOKEN" > /var/code/ai-dash-runtime/secrets/telegram_token

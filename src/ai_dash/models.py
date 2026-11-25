@@ -155,6 +155,7 @@ class Item(Model):
     )
     original_published_at: datetime | None = None
     discovered_via: str = ""
+    linked_url: str = ""
 
     @field_validator("url")
     @classmethod
