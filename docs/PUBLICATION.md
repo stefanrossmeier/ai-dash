@@ -8,6 +8,26 @@ No credential finding requires a wholesale history replacement. The clean export
 is an optional distribution path. Runtime image security and component licensing
 remain separate release gates.
 
+## Current publication state
+
+Published 2026-11-25T17:47:13Z at
+[stefanrossmeier/ai-dash](https://github.com/stefanrossmeier/ai-dash). This is the
+single active repository for development, CI and deployment. The original GitHub
+repository is a frozen private archive; future changes use the public repository
+directly, without a separate publication synchronization step.
+
+Independent anonymous access verified the sanitized source and history. The old
+unredacted commit, PR and workflow URLs tested were inaccessible anonymously.
+All downloaded public Git content objects and fresh CI logs were scanned with no
+excluded identifier matches. The 83 original implementation commits and 33 merges
+remain, with targeted redactions and corrected evidence links. Private vulnerability
+reporting, secret scanning and push protection are enabled.
+
+The local and VPS source checkouts use this public repository. Installed application
+code matched source; all twelve schedules, runtime secrets, container identities,
+SQLite integrity and delivery history were preserved. No container image or package
+registry release was published by this cutover.
+
 ## Publication scope
 
 | Deliverable | Assessment |
@@ -19,8 +39,8 @@ remain separate release gates.
 | Bare PyPI wheel as a complete product | Not supported: deployment also requires configuration, assets and workflows from the checkout |
 | Hosted or multi-user service | Not established by the implementation, testing or licensing review |
 
-The export is a local artifact. Producing it does not create a public repository,
-change GitHub visibility, publish an image or approve an upstream license route.
+The optional export is a local artifact. Repository publication does not publish
+a container image or approve an upstream image license route.
 
 ## Source and account disclosures
 
@@ -154,7 +174,7 @@ file hashes and the absence of excluded histories/runtime data. A source candida
 does not contain provider credentials or require any inference/delivery to verify.
 The synthetic example must not be presented as real news or a model-quality test.
 
-Before actual publication, choose the destination and update repository URLs if
-different, add an accurate short description/topics, enable appropriate private
-security reporting and review the final candidate. Preserve contributor authorship.
-No public repository, registry release or managed service was created by this review.
+The canonical repository URL, description/topics and private security-reporting
+route are configured. Preserve contributor authorship in future changes and
+re-run the artifact gate for releases. No registry release or managed service was
+created by this publication.
