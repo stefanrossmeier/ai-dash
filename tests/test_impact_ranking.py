@@ -89,8 +89,12 @@ def test_large_pool_is_compact_source_neutral_and_only_finalists_get_summaries(t
         for c in gateway.calls
         if c["purpose"] == "ai-news-ranking"
     ]
-    assert list(map(len, scoring)) == [150, 150, 72]
+    assert list(map(len, scoring)) == [30] * 12 + [12]
     assert sum(map(len, scoring)) == 372
+    for call in gateway.calls:
+        if call["purpose"] == "ai-news-ranking":
+            # The gateway counts schema bytes as well as candidate evidence.
+            assert len(json.dumps(call).encode()) + 256 < 131072
     for batch in scoring:
         for candidate in batch:
             assert set(candidate) == {"id", "headline", "evidence", "date_basis"}
@@ -152,7 +156,7 @@ def test_model_and_threshold_config_are_independent_and_explicit():
 
     root = Path(__file__).resolve().parents[1]
     source = yaml.safe_load((root / "config/sources.yaml").read_text())
-    assert source["min_score"] == 65 and source["ranking_batch_size"] == 150
+    assert source["min_score"] == 65 and source["ranking_batch_size"] == 30
     from ai_dash.models import load_settings
     from ai_dash.reports import load_reports, select_report
 

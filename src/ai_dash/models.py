@@ -69,7 +69,7 @@ class Settings(Model):
     omit_delivered: bool = True
     x_batch_size: int = Field(default=5, ge=1, le=14)
     reject_routine_updates: bool = True
-    ranking_batch_size: int = Field(default=150, ge=1, le=250)
+    ranking_batch_size: int = Field(default=30, ge=1, le=250)
     ranking_excerpt_chars: int = Field(default=1200, ge=200, le=3000)
     ranking_alias: str = "rank-cheap"
     # Optional per-report ranking prompt filename, resolved next to the default

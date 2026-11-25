@@ -12,7 +12,8 @@ min_impact: 60
 min_breadth: 45
 min_novelty: 40
 min_quality: 60
-ranking_batch_size: 150
+# Keep repeated response schemas within the gateway's conservative input bound.
+ranking_batch_size: 30
 ranking_excerpt_chars: 1200
 x_enabled: false
 sources:
