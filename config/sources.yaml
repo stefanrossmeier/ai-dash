@@ -54,11 +54,11 @@ sources:
   category: Community
   url: https://www.reddit.com/r/singularity/
   priority: P1
-  kind: feed
-  endpoint: https://www.reddit.com/r/singularity/new.rss?limit=25
+  kind: reddit
+  endpoint: https://oauth.reddit.com/r/singularity/new
   focus: AI capability milestones, frontier-model releases, AGI discourse, AI industry news
   enabled: true
-  note: Reddit requires a full browser User-Agent from datacenter IPs.
+  note: Approved Reddit OAuth using ai-dash-owned private credential files.
 - id: news-techcrunch-ai
   name: TechCrunch AI
   category: News

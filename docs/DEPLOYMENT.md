@@ -42,3 +42,14 @@ oversized ranking and summary batches. Explicit gateway input-limit rejections
 also split recursively without dropping candidates. Unknown outcomes and unrelated
 errors are never retried through this path. Keep this setting aligned with the
 project-owned gateway policy; spending caps and provider credentials remain there.
+
+r/singularity uses the approved Reddit OAuth Data API because its public RSS can
+reject this host. Provision `reddit_client_id`, `reddit_client_secret`, and
+`reddit_user_agent` as one-value files in this project's private runtime secret
+directory (directory mode 0700, files mode 0600). Use a descriptive ai-dash
+User-Agent with the Reddit account owner's contact. The worker mounts only these
+files read-only; values are never copied into source, images, artifacts or logs.
+`AI_DASH_REDDIT_CLIENT_ID_FILE`, `AI_DASH_REDDIT_CLIENT_SECRET_FILE`, and
+`AI_DASH_REDDIT_USER_AGENT_FILE` can override the default mounted paths for an
+operator's standalone CLI. OAuth access tokens remain in memory. No other
+project's runtime or Windmill credentials are accessed by the application.

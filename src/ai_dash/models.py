@@ -21,7 +21,7 @@ class Source(Model):
     url: str
     priority: Literal["P1", "P2"]
     kind: Literal[
-        "feed", "html", "hn", "hf_papers", "hf_models", "github", "x", "youtube", "manual"
+        "feed", "html", "hn", "hf_papers", "hf_models", "github", "x", "youtube", "reddit", "manual"
     ]
     endpoint: str
     focus: str
